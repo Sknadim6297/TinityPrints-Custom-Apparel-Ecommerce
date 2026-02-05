@@ -94,10 +94,59 @@
                         </label>
                     </div>
 
-                    <div id="stock_limit_container" style="display: {{ $product->is_limited_edition ? 'block' : 'none' }}">
-                        <label for="stock_limit" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Stock Limit</label>
-                        <input id="stock_limit" type="number" name="stock_limit" value="{{ $product->stock_limit }}" min="1"
-                               class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400">
+                    <div id="drop_control_container" class="sm:col-span-2" style="display: {{ $product->is_limited_edition ? 'block' : 'none' }}">
+                        <div class="mt-2 p-4 rounded-xl border border-yellow-200 dark:border-gray-600 bg-yellow-50/60 dark:bg-gray-700/40">
+                            <h4 class="text-sm font-bold text-gray-800 dark:text-gray-200 mb-4">Limited Edition Drop Control</h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div class="sm:col-span-2">
+                                    <label for="drop_name" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Drop Name</label>
+                                    <input id="drop_name" type="text" name="drop_name" value="{{ $product->drop_name }}"
+                                           class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400">
+                                </div>
+
+                                <div class="sm:col-span-2">
+                                    <label for="drop_story" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Drop Story / Theme</label>
+                                    <textarea id="drop_story" name="drop_story" rows="3"
+                                              class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400">{{ $product->drop_story }}</textarea>
+                                </div>
+
+                                <div>
+                                    <label for="drop_start_at" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Drop Start Date</label>
+                                    <input id="drop_start_at" type="datetime-local" name="drop_start_at"
+                                           value="{{ $product->drop_start_at ? $product->drop_start_at->format('Y-m-d\TH:i') : '' }}"
+                                           class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400">
+                                </div>
+
+                                <div>
+                                    <label for="drop_end_at" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Drop End Date</label>
+                                    <input id="drop_end_at" type="datetime-local" name="drop_end_at"
+                                           value="{{ $product->drop_end_at ? $product->drop_end_at->format('Y-m-d\TH:i') : '' }}"
+                                           class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400">
+                                </div>
+
+                                <div>
+                                    <label for="quantity_limit" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Quantity Limit</label>
+                                    <input id="quantity_limit" type="number" name="quantity_limit" value="{{ $product->quantity_limit }}" min="1"
+                                           class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400">
+                                </div>
+
+                                <div class="flex items-center">
+                                    <input id="countdown_enabled" type="checkbox" name="countdown_enabled" value="1" {{ $product->countdown_enabled ? 'checked' : '' }}
+                                           class="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-red-600 focus:ring-red-500 dark:focus:ring-red-400 dark:bg-gray-700">
+                                    <label for="countdown_enabled" class="ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        Countdown Timer Activation
+                                    </label>
+                                </div>
+
+                                <div class="flex items-center">
+                                    <input id="auto_hide_out_of_stock" type="checkbox" name="auto_hide_out_of_stock" value="1" {{ $product->auto_hide_out_of_stock ? 'checked' : '' }}
+                                           class="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-red-600 focus:ring-red-500 dark:focus:ring-red-400 dark:bg-gray-700">
+                                    <label for="auto_hide_out_of_stock" class="ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        Auto Hide when stock = 0
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -168,11 +217,11 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const limitedEditionCheckbox = document.getElementById('is_limited_edition');
-    const stockLimitContainer = document.getElementById('stock_limit_container');
+    const dropControlContainer = document.getElementById('drop_control_container');
 
     if (limitedEditionCheckbox) {
         limitedEditionCheckbox.addEventListener('change', function() {
-            stockLimitContainer.style.display = this.checked ? 'block' : 'none';
+            dropControlContainer.style.display = this.checked ? 'block' : 'none';
         });
     }
 });

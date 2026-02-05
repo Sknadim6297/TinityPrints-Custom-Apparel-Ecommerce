@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\Auth\AdminAuthenticatedSessionController;
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\DesignApprovalController;
 use App\Http\Controllers\Admin\ProductController;
 use Illuminate\Support\Facades\Route;
 
@@ -51,6 +52,13 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
     
     // Routes for Design Approver
     Route::middleware('admin.role:design_approver,super_admin')->group(function () {
-        // Add design approval routes here
+        Route::get('design-approvals', [DesignApprovalController::class, 'index'])
+            ->name('design-approvals.index');
+        Route::post('design-approvals/{designRequest}/approve', [DesignApprovalController::class, 'approve'])
+            ->name('design-approvals.approve');
+        Route::post('design-approvals/{designRequest}/reject', [DesignApprovalController::class, 'reject'])
+            ->name('design-approvals.reject');
+        Route::post('design-approvals/{designRequest}/request-changes', [DesignApprovalController::class, 'requestChanges'])
+            ->name('design-approvals.request-changes');
     });
 });

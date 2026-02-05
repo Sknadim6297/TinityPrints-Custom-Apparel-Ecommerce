@@ -52,7 +52,7 @@ class ProductSeeder extends Seeder
             'is_active' => true,
         ]);
 
-        // Product 2: Limited Edition Black Hoodie
+        // Product 2: Limited Edition Black Hoodie - Updated with drop controls
         $product2 = Product::create([
             'name' => 'Limited Edition Black Hoodie',
             'description' => 'Exclusive black hoodie with unique design elements. Limited stock available - get yours before it\'s gone!',
@@ -62,6 +62,13 @@ class ProductSeeder extends Seeder
             'base_price' => 79.99,
             'is_limited_edition' => true,
             'drop_month' => 'February 2026',
+            'drop_name' => 'Midnight Eclipse',
+            'drop_story' => 'Inspired by the rare celestial event of a total lunar eclipse, this hoodie captures the mysterious beauty of the night sky. Each piece tells a story of cosmic wonder and earthly connection.',
+            'drop_start_at' => now()->addDays(7), // Starts in 7 days
+            'drop_end_at' => now()->addDays(14), // Ends in 14 days
+            'quantity_limit' => 100,
+            'countdown_enabled' => true,
+            'auto_hide_out_of_stock' => true,
             'stock_limit' => 100,
             'is_active' => true,
             'created_by' => $admin->id ?? 1,
@@ -191,6 +198,141 @@ class ProductSeeder extends Seeder
         foreach ($capColors as $colorData) {
             ProductColor::create([
                 'product_id' => $product5->id,
+                'color_name' => $colorData['name'],
+                'hex_code' => $colorData['hex'],
+                'is_active' => true,
+            ]);
+        }
+
+        // Product 6: Limited Edition "Neon Dreams" T-Shirt - Upcoming Drop
+        $product6 = Product::create([
+            'name' => 'Neon Dreams T-Shirt',
+            'description' => 'Vibrant neon colors that light up your style. A celebration of urban energy and nightlife culture.',
+            'category' => 't-shirt',
+            'fit_type' => 'normal',
+            'sleeve_type' => 'half',
+            'base_price' => 39.99,
+            'is_limited_edition' => true,
+            'drop_month' => 'March 2026',
+            'drop_name' => 'Neon Dreams',
+            'drop_story' => 'Step into the electric glow of city lights with our Neon Dreams collection. Inspired by the pulsating energy of urban nightlife, this drop captures the vibrant spirit of those who live for the night and dream in color.',
+            'drop_start_at' => now()->addDays(14), // Starts in 14 days
+            'drop_end_at' => now()->addDays(21), // Ends in 21 days
+            'quantity_limit' => 200,
+            'countdown_enabled' => true,
+            'auto_hide_out_of_stock' => false,
+            'stock_limit' => 200,
+            'is_active' => true,
+            'created_by' => $admin->id ?? 1,
+        ]);
+
+        // Add sizes for product 6
+        $sizes6 = ['s', 'm', 'l', 'xl', 'xxl'];
+        foreach ($sizes6 as $size) {
+            ProductSize::create([
+                'product_id' => $product6->id,
+                'size' => $size,
+                'stock_quantity' => rand(8, 20),
+                'is_available' => true,
+            ]);
+        }
+
+        // Add colors for product 6
+        $neonColors = [
+            ['name' => 'Electric Blue', 'hex' => '#00FFFF'],
+            ['name' => 'Hot Pink', 'hex' => '#FF1493'],
+            ['name' => 'Lime Green', 'hex' => '#32CD32'],
+        ];
+
+        foreach ($neonColors as $colorData) {
+            ProductColor::create([
+                'product_id' => $product6->id,
+                'color_name' => $colorData['name'],
+                'hex_code' => $colorData['hex'],
+                'is_active' => true,
+            ]);
+        }
+
+        // Product 7: Limited Edition "Arctic Fox" Hoodie - Past Drop (Ended)
+        $product7 = Product::create([
+            'name' => 'Arctic Fox Hoodie',
+            'description' => 'Inspired by the elusive arctic fox, this hoodie represents resilience and adaptability in harsh conditions.',
+            'category' => 't-shirt',
+            'fit_type' => 'slight_oversize',
+            'sleeve_type' => 'full',
+            'base_price' => 89.99,
+            'is_limited_edition' => true,
+            'drop_month' => 'January 2026',
+            'drop_name' => 'Arctic Expedition',
+            'drop_story' => 'Journey to the frozen north with our Arctic Expedition collection. Drawing inspiration from the majestic arctic fox, this drop celebrates survival, beauty, and the quiet strength found in extreme environments.',
+            'drop_start_at' => now()->subDays(10), // Started 10 days ago
+            'drop_end_at' => now()->subDays(3), // Ended 3 days ago
+            'quantity_limit' => 150,
+            'countdown_enabled' => false,
+            'auto_hide_out_of_stock' => true,
+            'stock_limit' => 150,
+            'is_active' => false, // Auto-hidden due to stock = 0
+            'created_by' => $admin->id ?? 1,
+        ]);
+
+        // Add sizes for product 7 (out of stock)
+        $sizes7 = ['s', 'm', 'l', 'xl'];
+        foreach ($sizes7 as $size) {
+            ProductSize::create([
+                'product_id' => $product7->id,
+                'size' => $size,
+                'stock_quantity' => 0, // Out of stock
+                'is_available' => true,
+            ]);
+        }
+
+        // Add color for product 7
+        ProductColor::create([
+            'product_id' => $product7->id,
+            'color_name' => 'Arctic White',
+            'hex_code' => '#F8F8FF',
+            'is_active' => true,
+        ]);
+
+        // Product 8: Limited Edition "Solar Flare" Cap - Active Drop
+        $product8 = Product::create([
+            'name' => 'Solar Flare Baseball Cap',
+            'description' => 'Bold and energetic cap inspired by solar flares. Perfect for those who shine bright and stand out.',
+            'category' => 'accessories',
+            'fit_type' => 'normal',
+            'sleeve_type' => 'half',
+            'base_price' => 29.99,
+            'is_limited_edition' => true,
+            'drop_month' => 'February 2026',
+            'drop_name' => 'Solar Flare',
+            'drop_story' => 'Harness the power of the sun with our Solar Flare collection. Inspired by the explosive beauty of solar phenomena, this drop radiates energy and warmth for those who light up every room they enter.',
+            'drop_start_at' => now()->subDays(2), // Started 2 days ago
+            'drop_end_at' => now()->addDays(5), // Ends in 5 days
+            'quantity_limit' => 75,
+            'countdown_enabled' => true,
+            'auto_hide_out_of_stock' => true,
+            'stock_limit' => 75,
+            'is_active' => true,
+            'created_by' => $admin->id ?? 1,
+        ]);
+
+        // Add sizes for product 8
+        ProductSize::create([
+            'product_id' => $product8->id,
+            'size' => 'm',
+            'stock_quantity' => 23, // Some stock remaining
+            'is_available' => true,
+        ]);
+
+        // Add colors for product 8
+        $flareColors = [
+            ['name' => 'Sunset Orange', 'hex' => '#FF4500'],
+            ['name' => 'Golden Yellow', 'hex' => '#FFD700'],
+        ];
+
+        foreach ($flareColors as $colorData) {
+            ProductColor::create([
+                'product_id' => $product8->id,
                 'color_name' => $colorData['name'],
                 'hex_code' => $colorData['hex'],
                 'is_active' => true,

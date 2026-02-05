@@ -37,7 +37,13 @@ class ProductController extends Controller
             'base_price' => 'required|numeric|min:0.01',
             'is_limited_edition' => 'boolean',
             'drop_month' => 'nullable|string',
-            'stock_limit' => 'nullable|integer|min:1',
+            'drop_name' => 'nullable|string|max:255',
+            'drop_story' => 'nullable|string',
+            'drop_start_at' => 'nullable|date',
+            'drop_end_at' => 'nullable|date|after_or_equal:drop_start_at',
+            'quantity_limit' => 'nullable|integer|min:1',
+            'countdown_enabled' => 'boolean',
+            'auto_hide_out_of_stock' => 'boolean',
             'sizes' => 'required|array|min:1',
             'sizes.*' => 'in:xs,s,m,l,xl,xxl',
             'colors' => 'required|array|min:1',
@@ -57,7 +63,14 @@ class ProductController extends Controller
             'base_price' => $validated['base_price'],
             'is_limited_edition' => $validated['is_limited_edition'] ?? false,
             'drop_month' => $validated['drop_month'],
-            'stock_limit' => $validated['is_limited_edition'] ? $validated['stock_limit'] : null,
+            'drop_name' => $validated['drop_name'] ?? null,
+            'drop_story' => $validated['drop_story'] ?? null,
+            'drop_start_at' => $validated['drop_start_at'] ?? null,
+            'drop_end_at' => $validated['drop_end_at'] ?? null,
+            'quantity_limit' => $validated['quantity_limit'] ?? null,
+            'countdown_enabled' => $validated['countdown_enabled'] ?? false,
+            'auto_hide_out_of_stock' => $validated['auto_hide_out_of_stock'] ?? false,
+            'stock_limit' => ($validated['is_limited_edition'] ?? false) ? ($validated['quantity_limit'] ?? null) : null,
             'created_by' => auth()->guard('admin')->id(),
         ]);
 
@@ -107,6 +120,10 @@ class ProductController extends Controller
             }
         }
 
+        if ($product->auto_hide_out_of_stock && $product->totalStock() === 0) {
+            $product->update(['is_active' => false]);
+        }
+
         return redirect()->route('admin.products.show', $product)
             ->with('success', 'Product created successfully!');
     }
@@ -134,15 +151,49 @@ class ProductController extends Controller
             'base_price' => 'required|numeric|min:0.01',
             'is_limited_edition' => 'boolean',
             'drop_month' => 'nullable|string',
-            'stock_limit' => 'nullable|integer|min:1',
+            'drop_name' => 'nullable|string|max:255',
+            'drop_story' => 'nullable|string',
+            'drop_start_at' => 'nullable|date',
+            'drop_end_at' => 'nullable|date|after_or_equal:drop_start_at',
+            'quantity_limit' => 'nullable|integer|min:1',
+            'countdown_enabled' => 'boolean',
+            'auto_hide_out_of_stock' => 'boolean',
         ]);
 
-        $product->update($validated);
+        $product->update([
+            'name' => $validated['name'],
+            'description' => $validated['description'],
+            'category' => $validated['category'],
+            'fit_type' => $validated['fit_type'],
+            'sleeve_type' => $validated['sleeve_type'],
+            'base_price' => $validated['base_price'],
+            'is_limited_edition' => $validated['is_limited_edition'] ?? false,
+            'drop_month' => $validated['drop_month'],
+            'drop_name' => $validated['drop_name'] ?? null,
+            'drop_story' => $validated['drop_story'] ?? null,
+            'drop_start_at' => $validated['drop_start_at'] ?? null,
+            'drop_end_at' => $validated['drop_end_at'] ?? null,
+            'quantity_limit' => $validated['quantity_limit'] ?? null,
+            'countdown_enabled' => $validated['countdown_enabled'] ?? false,
+            'auto_hide_out_of_stock' => $validated['auto_hide_out_of_stock'] ?? false,
+            'stock_limit' => ($validated['is_limited_edition'] ?? false) ? ($validated['quantity_limit'] ?? null) : null,
+        ]);
 
-        if ($request->has('is_limited_edition')) {
-            $product->update(['stock_limit' => $validated['stock_limit']]);
-        } else {
-            $product->update(['stock_limit' => null]);
+        if (!$product->is_limited_edition) {
+            $product->update([
+                'drop_name' => null,
+                'drop_story' => null,
+                'drop_start_at' => null,
+                'drop_end_at' => null,
+                'quantity_limit' => null,
+                'countdown_enabled' => false,
+                'auto_hide_out_of_stock' => false,
+                'stock_limit' => null,
+            ]);
+        }
+
+        if ($product->auto_hide_out_of_stock && $product->totalStock() === 0) {
+            $product->update(['is_active' => false]);
         }
 
         return redirect()->route('admin.products.show', $product)

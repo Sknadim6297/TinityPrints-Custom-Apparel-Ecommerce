@@ -72,12 +72,43 @@
                                 <p class="font-semibold text-gray-900 dark:text-gray-100 mt-1">{{ $product->drop_month }}</p>
                             </div>
                         @endif
+                        @if($product->drop_name)
+                            <div>
+                                <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Drop Name</p>
+                                <p class="font-semibold text-gray-900 dark:text-gray-100 mt-1">{{ $product->drop_name }}</p>
+                            </div>
+                        @endif
+                        @if($product->drop_start_at)
+                            <div>
+                                <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Drop Start Date</p>
+                                <p class="font-semibold text-gray-900 dark:text-gray-100 mt-1">{{ $product->drop_start_at->format('M d, Y H:i') }}</p>
+                            </div>
+                        @endif
+                        @if($product->drop_end_at)
+                            <div>
+                                <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Drop End Date</p>
+                                <p class="font-semibold text-gray-900 dark:text-gray-100 mt-1">{{ $product->drop_end_at->format('M d, Y H:i') }}</p>
+                            </div>
+                        @endif
+                        @if($product->quantity_limit)
+                            <div>
+                                <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Quantity Limit</p>
+                                <p class="font-semibold text-gray-900 dark:text-gray-100 mt-1">{{ $product->quantity_limit }}</p>
+                            </div>
+                        @endif
                     </div>
 
                     @if($product->description)
                         <div class="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-200 dark:border-gray-700">
                             <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Product Story</p>
                             <p class="text-gray-900 dark:text-gray-100 mt-2 leading-relaxed">{{ $product->description }}</p>
+                        </div>
+                    @endif
+
+                    @if($product->is_limited_edition && $product->drop_story)
+                        <div class="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-200 dark:border-gray-700">
+                            <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Drop Story / Theme</p>
+                            <p class="text-gray-900 dark:text-gray-100 mt-2 leading-relaxed">{{ $product->drop_story }}</p>
                         </div>
                     @endif
                 </div>
@@ -184,6 +215,26 @@
                             <div class="flex justify-between items-center pt-3 border-t border-yellow-200 dark:border-gray-600">
                                 <p class="text-sm text-gray-600 dark:text-gray-400">Stock Limit</p>
                                 <p class="text-2xl font-bold text-red-600 dark:text-red-400">{{ $product->stock_limit }}</p>
+                            </div>
+                        @endif
+                        @if($product->is_limited_edition && $product->quantity_limit)
+                            <div class="flex justify-between items-center pt-3 border-t border-yellow-200 dark:border-gray-600">
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Quantity Limit</p>
+                                <p class="text-2xl font-bold text-red-600 dark:text-red-400">{{ $product->quantity_limit }}</p>
+                            </div>
+                        @endif
+                        @if($product->is_limited_edition)
+                            <div class="flex justify-between items-center pt-3 border-t border-yellow-200 dark:border-gray-600">
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Countdown Timer</p>
+                                <p class="text-sm font-semibold {{ $product->countdown_enabled ? 'text-green-600 dark:text-green-400' : 'text-gray-600 dark:text-gray-400' }}">
+                                    {{ $product->countdown_enabled ? 'Enabled' : 'Disabled' }}
+                                </p>
+                            </div>
+                            <div class="flex justify-between items-center pt-3 border-t border-yellow-200 dark:border-gray-600">
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Auto Hide (Stock = 0)</p>
+                                <p class="text-sm font-semibold {{ $product->auto_hide_out_of_stock ? 'text-green-600 dark:text-green-400' : 'text-gray-600 dark:text-gray-400' }}">
+                                    {{ $product->auto_hide_out_of_stock ? 'Enabled' : 'Disabled' }}
+                                </p>
                             </div>
                         @endif
                     </div>

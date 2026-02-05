@@ -15,7 +15,14 @@ class Product extends Model
         'base_price',
         'is_limited_edition',
         'drop_month',
+        'drop_name',
+        'drop_story',
+        'drop_start_at',
+        'drop_end_at',
         'stock_limit',
+        'quantity_limit',
+        'countdown_enabled',
+        'auto_hide_out_of_stock',
         'is_active',
         'created_by',
     ];
@@ -24,6 +31,10 @@ class Product extends Model
         'is_limited_edition' => 'boolean',
         'is_active' => 'boolean',
         'base_price' => 'decimal:2',
+        'drop_start_at' => 'datetime',
+        'drop_end_at' => 'datetime',
+        'countdown_enabled' => 'boolean',
+        'auto_hide_out_of_stock' => 'boolean',
     ];
 
     public function colors()
@@ -44,5 +55,10 @@ class Product extends Model
     public function admin()
     {
         return $this->belongsTo(Admin::class, 'created_by');
+    }
+
+    public function totalStock(): int
+    {
+        return (int) $this->sizes()->sum('stock_quantity');
     }
 }
