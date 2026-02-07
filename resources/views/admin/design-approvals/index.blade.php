@@ -30,10 +30,23 @@
                                 $previewUrl = (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, '/'))
                                     ? $path
                                     : Storage::url($path);
+                                $fileExt = $request->file_format ?: strtolower(pathinfo($path, PATHINFO_EXTENSION));
+                                $isImage = in_array($fileExt, ['png', 'jpg', 'jpeg', 'webp']);
                             @endphp
                             <div class="sm:w-56 lg:w-40">
-                                <img src="{{ $previewUrl }}" alt="Design preview" class="w-full h-32 sm:h-36 lg:h-28 object-contain bg-gray-50 dark:bg-gray-700/40 rounded-lg border border-gray-200 dark:border-gray-600">
+                                @if($isImage)
+                                    <img src="{{ $previewUrl }}" alt="Design preview" class="w-full h-32 sm:h-36 lg:h-28 object-contain bg-gray-50 dark:bg-gray-700/40 rounded-lg border border-gray-200 dark:border-gray-600">
+                                @else
+                                    <div class="w-full h-32 sm:h-36 lg:h-28 flex items-center justify-center bg-gray-50 dark:bg-gray-700/40 rounded-lg border border-gray-200 dark:border-gray-600">
+                                        <span class="text-xs font-semibold text-gray-600 dark:text-gray-300">
+                                            {{ strtoupper($fileExt ?: 'FILE') }}
+                                        </span>
+                                    </div>
+                                @endif
                                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Design File Preview</p>
+                                <a href="{{ $previewUrl }}" class="mt-2 inline-flex items-center text-xs font-semibold text-yellow-600 dark:text-yellow-400 hover:text-yellow-700" download>
+                                    Download print-ready design
+                                </a>
                             </div>
 
                             <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -78,6 +91,78 @@
                                         {{ $request->payment_unlocked ? 'Unlocked' : 'Locked' }}
                                     </p>
                                 </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-3">
+                            <div class="lg:col-span-2 rounded-lg border border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-700/30">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h4 class="text-sm font-bold text-gray-800 dark:text-gray-200">Print File Checks</h4>
+                                    <span class="text-xs font-semibold {{ $request->file_locked ? 'text-green-600 dark:text-green-400' : 'text-gray-600 dark:text-gray-400' }}">
+                                        {{ $request->file_locked ? 'File Locked' : 'File Unlocked' }}
+                                    </span>
+                                </div>
+                                <form method="POST" action="{{ route('admin.design-approvals.update-checks', $request) }}" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    @csrf
+                                    @method('PATCH')
+                                    <div>
+                                        <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Format (PNG / PSD / AI)</label>
+                                        <select name="file_format" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                                            <option value="">Select</option>
+                                            @foreach(['png', 'psd', 'ai'] as $format)
+                                                <option value="{{ $format }}" {{ ($request->file_format === $format || $fileExt === $format) ? 'selected' : '' }}>
+                                                    {{ strtoupper($format) }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">DPI</label>
+                                        <input type="number" name="dpi" value="{{ $request->dpi }}" min="72" max="1200"
+                                               class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Print Width</label>
+                                        <input type="number" name="print_width" value="{{ $request->print_width }}" step="0.01" min="0.1"
+                                               class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Print Height</label>
+                                        <input type="number" name="print_height" value="{{ $request->print_height }}" step="0.01" min="0.1"
+                                               class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Unit</label>
+                                        <select name="print_unit" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                                            @foreach(['in' => 'Inches', 'cm' => 'Centimeters', 'mm' => 'Millimeters'] as $unit => $label)
+                                                <option value="{{ $unit }}" {{ $request->print_unit === $unit ? 'selected' : '' }}>{{ $label }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="sm:col-span-2 flex justify-end">
+                                        <button type="submit" class="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg font-semibold text-sm">
+                                            Save File Checks
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <div class="rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+                                <h4 class="text-sm font-bold text-gray-800 dark:text-gray-200 mb-3">File Management</h4>
+                                <form method="POST" action="{{ route('admin.design-approvals.update-file', $request) }}" enctype="multipart/form-data" class="space-y-3">
+                                    @csrf
+                                    <input type="file" name="design_file" accept=".png,.psd,.ai" class="w-full text-xs text-gray-700 dark:text-gray-200">
+                                    <button type="submit" class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm">
+                                        Replace File (Re-approval Required)
+                                    </button>
+                                </form>
+                                <form method="POST" action="{{ route('admin.design-approvals.toggle-lock', $request) }}" class="mt-3">
+                                    @csrf
+                                    <input type="hidden" name="locked" value="{{ $request->file_locked ? 0 : 1 }}">
+                                    <button type="submit" class="w-full px-4 py-2 {{ $request->file_locked ? 'bg-gray-600 hover:bg-gray-700' : 'bg-green-600 hover:bg-green-700' }} text-white rounded-lg font-semibold text-sm">
+                                        {{ $request->file_locked ? 'Unlock File' : 'Lock File' }}
+                                    </button>
+                                </form>
                             </div>
                         </div>
 

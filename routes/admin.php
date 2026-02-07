@@ -2,8 +2,12 @@
 
 use App\Http\Controllers\Admin\Auth\AdminAuthenticatedSessionController;
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminNotificationController;
+use App\Http\Controllers\Admin\CouponController;
 use App\Http\Controllers\Admin\DesignApprovalController;
+use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\RefundController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -32,6 +36,14 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
     // Logout
     Route::post('logout', [AdminAuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
+
+    // Notifications
+    Route::get('notifications', [AdminNotificationController::class, 'index'])
+        ->name('notifications.index');
+    Route::patch('notifications/read-all', [AdminNotificationController::class, 'markAllRead'])
+        ->name('notifications.read-all');
+    Route::patch('notifications/{notification}/read', [AdminNotificationController::class, 'markRead'])
+        ->name('notifications.read');
     
     // Product Management
     Route::resource('products', ProductController::class);
@@ -42,12 +54,36 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
     
     // Routes for Super Admin only
     Route::middleware('admin.role:super_admin')->group(function () {
-        // Add super admin specific routes here
+        Route::get('coupons', [CouponController::class, 'index'])
+            ->name('coupons.index');
+        Route::post('coupons', [CouponController::class, 'store'])
+            ->name('coupons.store');
+        Route::get('coupons/{coupon}/edit', [CouponController::class, 'edit'])
+            ->name('coupons.edit');
+        Route::patch('coupons/{coupon}', [CouponController::class, 'update'])
+            ->name('coupons.update');
+        Route::delete('coupons/{coupon}', [CouponController::class, 'destroy'])
+            ->name('coupons.destroy');
+        Route::patch('coupons/{coupon}/toggle', [CouponController::class, 'toggle'])
+            ->name('coupons.toggle');
     });
     
     // Routes for Order Manager
     Route::middleware('admin.role:order_manager,super_admin')->group(function () {
-        // Add order management routes here
+        Route::get('orders', [OrderController::class, 'index'])
+            ->name('orders.index');
+        Route::patch('orders/{order}', [OrderController::class, 'update'])
+            ->name('orders.update');
+        Route::get('refunds', [RefundController::class, 'index'])
+            ->name('refunds.index');
+        Route::patch('refunds/{refund}/approve', [RefundController::class, 'approve'])
+            ->name('refunds.approve');
+        Route::patch('refunds/{refund}/reject', [RefundController::class, 'reject'])
+            ->name('refunds.reject');
+        Route::patch('refunds/{refund}/status', [RefundController::class, 'updateStatus'])
+            ->name('refunds.status');
+        Route::patch('refunds/{refund}/paid', [RefundController::class, 'markPaid'])
+            ->name('refunds.paid');
     });
     
     // Routes for Design Approver
@@ -60,5 +96,11 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
             ->name('design-approvals.reject');
         Route::post('design-approvals/{designRequest}/request-changes', [DesignApprovalController::class, 'requestChanges'])
             ->name('design-approvals.request-changes');
+        Route::patch('design-approvals/{designRequest}/checks', [DesignApprovalController::class, 'updateChecks'])
+            ->name('design-approvals.update-checks');
+        Route::post('design-approvals/{designRequest}/file', [DesignApprovalController::class, 'updateFile'])
+            ->name('design-approvals.update-file');
+        Route::post('design-approvals/{designRequest}/lock', [DesignApprovalController::class, 'toggleLock'])
+            ->name('design-approvals.toggle-lock');
     });
 });

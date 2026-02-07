@@ -12,6 +12,14 @@ class DesignRequest extends Model
         'email',
         'selected_size',
         'design_file_path',
+        'file_format',
+        'dpi',
+        'print_width',
+        'print_height',
+        'print_unit',
+        'file_locked',
+        'file_checksum',
+        'file_updated_at',
         'front_label',
         'back_label',
         'status',
@@ -23,7 +31,9 @@ class DesignRequest extends Model
 
     protected $casts = [
         'payment_unlocked' => 'boolean',
+        'file_locked' => 'boolean',
         'reviewed_at' => 'datetime',
+        'file_updated_at' => 'datetime',
     ];
 
     public function admin()

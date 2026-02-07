@@ -15,13 +15,19 @@
                     <a href="{{ route('admin.dashboard') }}" class="text-gray-900 dark:text-gray-100 px-3 py-2 rounded-md text-sm font-medium hover:text-red-600 dark:hover:text-red-400 transition-colors">
                         Dashboard
                     </a>
+
+                    @php
+                        $adminUnreadCount = \Illuminate\Support\Facades\Schema::hasTable('notifications')
+                            ? auth()->guard('admin')->user()->unreadNotifications()->count()
+                            : 0;
+                    @endphp
                     
-                    <a href="{{ route('admin.products.index') }}" class="text-gray-900 dark:text-gray-100 px-3 py-2 rounded-md text-sm font-medium hover:text-red-600 dark:hover:text-red-400 transition-colors">
+                    {{-- <a href="{{ route('admin.products.index') }}" class="text-gray-900 dark:text-gray-100 px-3 py-2 rounded-md text-sm font-medium hover:text-red-600 dark:hover:text-red-400 transition-colors">
                         Products
-                    </a>
+                    </a> --}}
                     
                     @if(auth()->guard('admin')->user()->isOrderManager())
-                        <a href="#" class="text-gray-900 dark:text-gray-100 px-3 py-2 rounded-md text-sm font-medium hover:text-red-600 dark:hover:text-red-400 transition-colors">
+                        <a href="{{ route('admin.orders.index') }}" class="text-gray-900 dark:text-gray-100 px-3 py-2 rounded-md text-sm font-medium hover:text-red-600 dark:hover:text-red-400 transition-colors">
                             Orders
                         </a>
                     @endif
@@ -33,6 +39,9 @@
                     @endif
                     
                     @if(auth()->guard('admin')->user()->isSuperAdmin())
+                        <a href="{{ route('admin.coupons.index') }}" class="text-gray-900 dark:text-gray-100 px-3 py-2 rounded-md text-sm font-medium hover:text-red-600 dark:hover:text-red-400 transition-colors">
+                            Coupons
+                        </a>
                         <a href="#" class="text-gray-900 dark:text-gray-100 px-3 py-2 rounded-md text-sm font-medium hover:text-red-600 dark:hover:text-red-400 transition-colors">
                             Settings
                         </a>
@@ -42,6 +51,20 @@
 
             <!-- Settings Dropdown & Dark Mode Toggle -->
             <div class="flex items-center space-x-2 sm:space-x-4">
+                <!-- Notifications -->
+                <a href="{{ route('admin.notifications.index') }}"
+                   class="relative p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                   aria-label="Notifications">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0a3 3 0 11-6 0h6z" />
+                    </svg>
+                    @if($adminUnreadCount > 0)
+                        <span class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-semibold rounded-full px-1.5 py-0.5">
+                            {{ $adminUnreadCount }}
+                        </span>
+                    @endif
+                </a>
+
                 <!-- Dark Mode Toggle -->
                 <button onclick="toggleDarkMode()" 
                         type="button"
@@ -104,9 +127,13 @@
             <a href="{{ route('admin.dashboard') }}" class="text-gray-900 dark:text-gray-100 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                 Dashboard
             </a>
+
+            <a href="{{ route('admin.notifications.index') }}" class="text-gray-900 dark:text-gray-100 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                Notifications
+            </a>
             
             @if(auth()->guard('admin')->user()->isOrderManager())
-                <a href="#" class="text-gray-900 dark:text-gray-100 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                <a href="{{ route('admin.orders.index') }}" class="text-gray-900 dark:text-gray-100 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                     Orders
                 </a>
             @endif
@@ -118,6 +145,9 @@
             @endif
             
             @if(auth()->guard('admin')->user()->isSuperAdmin())
+                <a href="{{ route('admin.coupons.index') }}" class="text-gray-900 dark:text-gray-100 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                    Coupons
+                </a>
                 <a href="#" class="text-gray-900 dark:text-gray-100 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                     Settings
                 </a>

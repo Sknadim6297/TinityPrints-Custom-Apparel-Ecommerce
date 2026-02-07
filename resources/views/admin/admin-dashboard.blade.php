@@ -1,8 +1,7 @@
 @extends('admin.layouts.admin-app')
 
 @section('content')
-Dashboard content goes here.
-{{-- <div class="py-6 md:py-12">
+<div class="py-6 md:py-12">
     <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <!-- Page Header -->
         <div class="mb-6 md:mb-8">
@@ -163,7 +162,7 @@ Dashboard content goes here.
                         </a>
                     @endif
                     
-                    <a href="#" class="block w-full bg-gradient-to-r from-orange-400 to-orange-600 text-white rounded-lg px-3 sm:px-4 py-2 sm:py-3 font-semibold text-sm sm:text-base hover:from-orange-500 hover:to-orange-700 transition-all duration-300 text-center shadow-md hover:shadow-lg">
+                    <a href="{{ route('admin.refunds.index') }}" class="block w-full bg-gradient-to-r from-orange-400 to-orange-600 text-white rounded-lg px-3 sm:px-4 py-2 sm:py-3 font-semibold text-sm sm:text-base hover:from-orange-500 hover:to-orange-700 transition-all duration-300 text-center shadow-md hover:shadow-lg">
                         Process Refunds
                     </a>
                     
@@ -263,5 +262,5 @@ Dashboard content goes here.
         }
     });
 </script>
-@endpush --}}
+@endpush
 @endsection
