@@ -69,6 +69,10 @@
                                     <p class="text-xs text-gray-500 dark:text-gray-400">Requested</p>
                                     <p class="font-semibold text-gray-900 dark:text-gray-100">{{ $refund->created_at->format('M d, Y') }}</p>
                                 </div>
+                                <div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Notified</p>
+                                    <p class="font-semibold text-gray-900 dark:text-gray-100">{{ $refund->notified_at ? $refund->notified_at->format('M d, Y H:i') : 'No' }}</p>
+                                </div>
                             </div>
                         </div>
 
@@ -117,6 +121,13 @@
                                 @method('PATCH')
                                 <button type="submit" class="w-full sm:w-auto px-4 py-2 rounded-lg font-semibold text-sm border border-blue-600 bg-blue-600 hover:bg-blue-700 text-white">
                                     Process Refund Payment
+                                </button>
+                            </form>
+                            <form method="POST" action="{{ route('admin.refunds.notify', $refund) }}" class="w-full sm:w-auto">
+                                @csrf
+                                @method('PATCH')
+                                <button type="submit" class="w-full sm:w-auto px-4 py-2 rounded-lg font-semibold text-sm border border-slate-600 bg-slate-600 hover:bg-slate-700 text-white">
+                                    Send Refund Notification
                                 </button>
                             </form>
                         </div>

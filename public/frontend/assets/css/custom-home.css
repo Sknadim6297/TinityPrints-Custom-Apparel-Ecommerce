@@ -1,0 +1,41 @@
+/* Logo sizing across all pages */
+
+/* Main header logo */
+.header3-logo img {
+  max-width: 120px;
+  height: auto;
+}
+
+/* Logo in navigation */
+.header-logo img {
+  max-width: 120px;
+  height: auto;
+}
+
+/* Footer logo */
+.footer-widget-logo img {
+  max-width: 140px;
+  height: auto;
+}
+
+/* Sidebar/offcanvas logo */
+.offset-logo img {
+  max-width: 100px;
+  height: auto;
+}
+
+/* Admin logo */
+.admin-logo img {
+  max-width: 80px;
+  height: auto;
+}
+
+/* Fallback for all logo images */
+.logo-bl img,
+a img[alt="logo-img"],
+a img[alt="Logo"],
+a img[alt="img"] {
+  max-width: 120px;
+  height: auto;
+  display: block;
+}

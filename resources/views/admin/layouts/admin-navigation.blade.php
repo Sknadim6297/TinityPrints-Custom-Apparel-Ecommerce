@@ -6,7 +6,7 @@
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('admin.dashboard') }}" class="flex items-center">
-                        <img src="/assets/logo.png" alt="Tinnity" class="h-8 w-auto">
+                        <img src="{{ asset('frontend/assets/img/logo/logo.png') }}" alt="Tinnity" class="h-8 w-auto">
                     </a>
                 </div>
 
@@ -22,30 +22,33 @@
                             : 0;
                     @endphp
                     
-                    {{-- <a href="{{ route('admin.products.index') }}" class="text-gray-900 dark:text-gray-100 px-3 py-2 rounded-md text-sm font-medium hover:text-red-600 dark:hover:text-red-400 transition-colors">
+                    <a href="{{ route('admin.products.index') }}" class="text-gray-900 dark:text-gray-100 px-3 py-2 rounded-md text-sm font-medium hover:text-red-600 dark:hover:text-red-400 transition-colors">
                         Products
-                    </a> --}}
+                    </a>
                     
-                    @if(auth()->guard('admin')->user()->isOrderManager())
+                    {{-- @if(auth()->guard('admin')->user()->isOrderManager())
                         <a href="{{ route('admin.orders.index') }}" class="text-gray-900 dark:text-gray-100 px-3 py-2 rounded-md text-sm font-medium hover:text-red-600 dark:hover:text-red-400 transition-colors">
                             Orders
                         </a>
-                    @endif
+                        <a href="{{ route('admin.refunds.index') }}" class="text-gray-900 dark:text-gray-100 px-3 py-2 rounded-md text-sm font-medium hover:text-red-600 dark:hover:text-red-400 transition-colors">
+                            Refunds
+                        </a>
+                    @endif --}}
                     
-                    @if(auth()->guard('admin')->user()->isDesignApprover())
+                    {{-- @if(auth()->guard('admin')->user()->isDesignApprover())
                         <a href="{{ route('admin.design-approvals.index') }}" class="text-gray-900 dark:text-gray-100 px-3 py-2 rounded-md text-sm font-medium hover:text-red-600 dark:hover:text-red-400 transition-colors">
                             Designs
                         </a>
-                    @endif
+                    @endif --}}
                     
-                    @if(auth()->guard('admin')->user()->isSuperAdmin())
+                    {{-- @if(auth()->guard('admin')->user()->isSuperAdmin())
                         <a href="{{ route('admin.coupons.index') }}" class="text-gray-900 dark:text-gray-100 px-3 py-2 rounded-md text-sm font-medium hover:text-red-600 dark:hover:text-red-400 transition-colors">
                             Coupons
                         </a>
                         <a href="#" class="text-gray-900 dark:text-gray-100 px-3 py-2 rounded-md text-sm font-medium hover:text-red-600 dark:hover:text-red-400 transition-colors">
                             Settings
                         </a>
-                    @endif
+                    @endif --}}
                 </div>
             </div>
 
@@ -135,6 +138,9 @@
             @if(auth()->guard('admin')->user()->isOrderManager())
                 <a href="{{ route('admin.orders.index') }}" class="text-gray-900 dark:text-gray-100 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                     Orders
+                </a>
+                <a href="{{ route('admin.refunds.index') }}" class="text-gray-900 dark:text-gray-100 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                    Refunds
                 </a>
             @endif
             

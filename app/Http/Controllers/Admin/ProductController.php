@@ -12,13 +12,56 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::with('colors', 'sizes')
-            ->orderBy('created_at', 'desc')
-            ->paginate(15);
+        $query = Product::with(['colors.images', 'sizes', 'admin']);
 
-        return view('admin.products.index', compact('products'));
+        // Apply filters
+        if ($request->filled('category')) {
+            $query->where('category', $request->category);
+        }
+
+        if ($request->filled('sleeve_type')) {
+            $query->where('sleeve_type', $request->sleeve_type);
+        }
+
+        if ($request->filled('size')) {
+            $query->whereHas('sizes', function($q) use ($request) {
+                $q->where('size', $request->size);
+            });
+        }
+
+        if ($request->filled('color')) {
+            $query->whereHas('colors', function($q) use ($request) {
+                $q->whereRaw('LOWER(color_name) LIKE ?', ['%' . strtolower($request->color) . '%']);
+            });
+        }
+
+        if ($request->filled('limited_edition')) {
+            $query->where('is_limited_edition', $request->boolean('limited_edition'));
+        }
+
+        if ($request->filled('story')) {
+            $query->whereNotNull('drop_story')->where('drop_story', '!=', '');
+        }
+
+        // Get segment counts
+        $tshirtCount = Product::where('category', 't-shirt')->count();
+        $accessoriesCount = Product::where('category', 'accessories')->count();
+
+        // Get filter options
+        $availableSizes = ProductSize::distinct()->pluck('size')->sort();
+        $availableColors = ProductColor::distinct()->pluck('color_name')->sort();
+
+        $products = $query->orderBy('created_at', 'desc')->paginate(12);
+
+        return view('admin.products.index', compact(
+            'products', 
+            'tshirtCount', 
+            'accessoriesCount', 
+            'availableSizes', 
+            'availableColors'
+        ));
     }
 
     public function create()

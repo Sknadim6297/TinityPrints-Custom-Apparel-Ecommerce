@@ -119,6 +119,26 @@ class RefundController extends Controller
             ->with('success', 'Refund payment processed successfully.');
     }
 
+    public function notify(RefundRequest $refund)
+    {
+        $refund->update([
+            'notified_at' => now(),
+        ]);
+
+        $orderNumber = $refund->order?->order_number ?? 'N/A';
+        AdminNotifier::notifyAll(
+            'Refund notification sent',
+            'Refund notification sent for order ' . $orderNumber . '.',
+            'info',
+            route('admin.refunds.index'),
+            'View refunds',
+            ['refund_id' => $refund->id, 'order_number' => $orderNumber]
+        );
+
+        return redirect()->route('admin.refunds.index')
+            ->with('success', 'Refund notification sent.');
+    }
+
     private function markOrderRefunded(RefundRequest $refund): void
     {
         if (!$refund->order) {

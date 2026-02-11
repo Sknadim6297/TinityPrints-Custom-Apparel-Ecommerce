@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
             DesignRequestSeeder::class,
             OrderSeeder::class,
             CouponSeeder::class,
+            RefundSeeder::class,
         ]);
     }
 }

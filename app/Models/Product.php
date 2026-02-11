@@ -10,6 +10,8 @@ class Product extends Model
         'name',
         'description',
         'category',
+        'brand',
+        'rating',
         'fit_type',
         'sleeve_type',
         'base_price',
@@ -31,6 +33,7 @@ class Product extends Model
         'is_limited_edition' => 'boolean',
         'is_active' => 'boolean',
         'base_price' => 'decimal:2',
+        'rating' => 'decimal:1',
         'drop_start_at' => 'datetime',
         'drop_end_at' => 'datetime',
         'countdown_enabled' => 'boolean',
@@ -60,5 +63,24 @@ class Product extends Model
     public function totalStock(): int
     {
         return (int) $this->sizes()->sum('stock_quantity');
+    }
+
+    // Getter for price (using base_price)
+    public function getPriceAttribute()
+    {
+        return $this->base_price;
+    }
+
+    // Getter for stock_quantity (total stock)
+    public function getStockQuantityAttribute()
+    {
+        return $this->totalStock();
+    }
+
+    // Method to get sale price if applicable
+    public function getSalePriceAttribute()
+    {
+        // You can add sale price logic here
+        return null;
     }
 }

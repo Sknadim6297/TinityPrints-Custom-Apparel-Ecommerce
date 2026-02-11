@@ -84,6 +84,8 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
             ->name('refunds.status');
         Route::patch('refunds/{refund}/paid', [RefundController::class, 'markPaid'])
             ->name('refunds.paid');
+        Route::patch('refunds/{refund}/notify', [RefundController::class, 'notify'])
+            ->name('refunds.notify');
     });
     
     // Routes for Design Approver

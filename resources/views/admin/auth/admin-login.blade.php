@@ -73,7 +73,7 @@
                 <div class="bg-white dark:bg-gray-800 shadow-2xl rounded-2xl sm:rounded-3xl overflow-hidden border border-gray-100 dark:border-gray-700">
                     <!-- Logo Section -->
                     <div class="px-6 sm:px-8 pt-8 sm:pt-10 pb-6 sm:pb-8 text-center bg-gradient-to-br from-yellow-400 via-red-500 to-yellow-600">
-                        <img src="/assets/logo.png" alt="Tinnity" class="mx-auto h-16 sm:h-20 mb-4">
+                        <img src="{{ asset('frontend/assets/img/logo/logo.png') }}" alt="Tinnity" class="mx-auto h-16 sm:h-20 mb-4">
                         <p class="text-yellow-100 text-xs sm:text-sm font-medium">Admin Portal</p>
                     </div>
 
