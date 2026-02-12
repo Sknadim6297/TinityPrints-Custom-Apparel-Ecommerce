@@ -26,6 +26,10 @@
                         Products
                     </a>
                     
+                    <a href="{{ route('admin.design-approvals.index') }}" class="text-gray-900 dark:text-gray-100 px-3 py-2 rounded-md text-sm font-medium hover:text-red-600 dark:hover:text-red-400 transition-colors">
+                        Designs
+                    </a>
+                    
                     {{-- @if(auth()->guard('admin')->user()->isOrderManager())
                         <a href="{{ route('admin.orders.index') }}" class="text-gray-900 dark:text-gray-100 px-3 py-2 rounded-md text-sm font-medium hover:text-red-600 dark:hover:text-red-400 transition-colors">
                             Orders
@@ -135,7 +139,15 @@
                 Notifications
             </a>
             
-            @if(auth()->guard('admin')->user()->isOrderManager())
+            <a href="{{ route('admin.products.index') }}" class="text-gray-900 dark:text-gray-100 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                Products
+            </a>
+            
+            <a href="{{ route('admin.design-approvals.index') }}" class="text-gray-900 dark:text-gray-100 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                Designs
+            </a>
+            
+            {{-- @if(auth()->guard('admin')->user()->isOrderManager())
                 <a href="{{ route('admin.orders.index') }}" class="text-gray-900 dark:text-gray-100 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                     Orders
                 </a>
@@ -157,7 +169,7 @@
                 <a href="#" class="text-gray-900 dark:text-gray-100 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                     Settings
                 </a>
-            @endif
+            @endif --}}
         </div>
     </div>
 </nav>

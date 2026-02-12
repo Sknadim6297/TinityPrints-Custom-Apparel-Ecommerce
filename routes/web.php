@@ -11,7 +11,7 @@ Route::get('/shop/{category}', [HomeController::class, 'shop'])->name('shop.cate
 Route::get('/product/{id}', [HomeController::class, 'productDetails'])->name('product.details');
 Route::get('/custom-design', [HomeController::class, 'customDesign'])->name('custom-design');
 Route::get('/limited-edition', [HomeController::class, 'limitedEdition'])->name('limited-edition');
-Route::get('/about', [HomeController::class, 'about'])->name('about');
+    Route::get('/about', [HomeController::class, 'about'])->name('about');
 Route::get('/refund-policy', [HomeController::class, 'refundPolicy'])->name('refund-policy');
 Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
 Route::post('/contact', [HomeController::class, 'contactSubmit'])->name('contact.submit');
@@ -22,4 +22,22 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 require __DIR__.'/auth.php';
+
+// Admin Seeder Route (for production use - remove after seeding)
+Route::get('/seed-admin', function () {
+    \Artisan::call('db:seed', ['--class' => 'AdminSeeder']);
+    return 'Admin data seeded successfully';
+});
+
+// Migration Route (for production use - remove after running)
+Route::get('/migrate', function () {
+    \Artisan::call('migrate');
+    return 'Migrations run successfully';
+});
+
+// Storage Link Route (for production use - remove after running)
+Route::get('/storage-link', function () {
+    \Artisan::call('storage:link');
+    return 'Storage link created successfully';
+});
 

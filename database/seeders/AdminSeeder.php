@@ -14,33 +14,39 @@ class AdminSeeder extends Seeder
     public function run(): void
     {
         // Create Super Admin
-        Admin::create([
-            'name' => 'Super Admin',
-            'email' => 'admin@tinnity.com',
-            'password' => Hash::make('password'),
-            'role' => 'super_admin',
-            'is_active' => true,
-            'email_verified_at' => now(),
-        ]);
+        Admin::updateOrCreate(
+            ['email' => 'admin@tinnity.com'],
+            [
+                'name' => 'Super Admin',
+                'password' => Hash::make('password'),
+                'role' => 'super_admin',
+                'is_active' => true,
+                'email_verified_at' => now(),
+            ]
+        );
 
         // Create Order Manager
-        Admin::create([
-            'name' => 'Order Manager',
-            'email' => 'orders@tinnity.com',
-            'password' => Hash::make('password'),
-            'role' => 'order_manager',
-            'is_active' => true,
-            'email_verified_at' => now(),
-        ]);
+        Admin::updateOrCreate(
+            ['email' => 'orders@tinnity.com'],
+            [
+                'name' => 'Order Manager',
+                'password' => Hash::make('password'),
+                'role' => 'order_manager',
+                'is_active' => true,
+                'email_verified_at' => now(),
+            ]
+        );
 
         // Create Design Approver
-        Admin::create([
-            'name' => 'Design Approver',
-            'email' => 'design@tinnity.com',
-            'password' => Hash::make('password'),
-            'role' => 'design_approver',
-            'is_active' => true,
-            'email_verified_at' => now(),
-        ]);
+        Admin::updateOrCreate(
+            ['email' => 'design@tinnity.com'],
+            [
+                'name' => 'Design Approver',
+                'password' => Hash::make('password'),
+                'role' => 'design_approver',
+                'is_active' => true,
+                'email_verified_at' => now(),
+            ]
+        );
     }
 }
