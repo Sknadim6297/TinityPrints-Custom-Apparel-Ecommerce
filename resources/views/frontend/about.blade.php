@@ -13,8 +13,8 @@
                <div class="offset-widget offset-logo mb-40">
                   <div class="row align-items-center">
                      <div class="col-9">
-                        <a href="index-2.html">
-                           <img src="assets/img/logo/logo-bl.png" alt="Logo">
+                        <a href="{{ route('home') }}">
+                           <img src="{{ asset('frontend/assets/img/logo/logo.png') }}" width="100px" alt="Logo">
                         </a>
                      </div>
                      <div class="col-3 text-end"><button class="side-info-close"><i class="fal fa-times"></i></button>
@@ -159,7 +159,7 @@
                      <div class="breadcrumb-menu">
                         <nav aria-label="Breadcrumbs" class="breadcrumb-trail breadcrumbs">
                            <ul class="trail-items">
-                              <li class="trail-item trail-begin"><a href="index-2.html"><span>Home</span></a></li>
+                              <li class="trail-item trail-begin"><a href="{{ route('home') }}"><span>Home</span></a></li>
                               <li class="trail-item trail-end"><span>About</span></li>
                            </ul>
                         </nav>

@@ -282,19 +282,33 @@
                     Available Sizes
                 </h3>
 
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     @foreach(['XS' => 'xs', 'S' => 's', 'M' => 'm', 'L' => 'l', 'XL' => 'xl', 'XXL' => 'xxl'] as $label => $value)
-                        <label class="flex items-center p-3 border-2 border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer hover:border-yellow-400 dark:hover:border-yellow-500 transition-colors duration-200 {{ in_array($value, old('sizes', [])) ? 'border-yellow-400 dark:border-yellow-500 bg-yellow-50 dark:bg-yellow-900/10' : '' }}">
-                            <input type="checkbox" 
-                                   name="sizes[]" 
-                                   value="{{ $value }}"
-                                   {{ in_array($value, old('sizes', [])) ? 'checked' : '' }}
-                                   class="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-yellow-600 focus:ring-yellow-500 dark:focus:ring-yellow-400 dark:bg-gray-700">
-                            <span class="ml-2 font-semibold text-gray-700 dark:text-gray-300">{{ $label }}</span>
-                        </label>
+                        <div class="flex items-center gap-3 p-3 border-2 border-gray-200 dark:border-gray-600 rounded-lg hover:border-yellow-400 dark:hover:border-yellow-500 transition-colors duration-200 {{ in_array($value, old('sizes', [])) ? 'border-yellow-400 dark:border-yellow-500 bg-yellow-50 dark:bg-yellow-900/10' : '' }}">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox"
+                                       name="sizes[]"
+                                       value="{{ $value }}"
+                                       {{ in_array($value, old('sizes', [])) ? 'checked' : '' }}
+                                       class="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-yellow-600 focus:ring-yellow-500 dark:focus:ring-yellow-400 dark:bg-gray-700">
+                                <span class="font-semibold text-gray-700 dark:text-gray-300">{{ $label }}</span>
+                            </label>
+                            <div class="ml-auto flex items-center gap-2">
+                                <label for="size_stock_{{ $value }}" class="text-xs text-gray-600 dark:text-gray-400">Stock</label>
+                                <input id="size_stock_{{ $value }}"
+                                       type="number"
+                                       name="size_stocks[{{ $value }}]"
+                                       value="{{ old('size_stocks.' . $value, 0) }}"
+                                       min="0"
+                                       class="w-20 px-2 py-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400">
+                            </div>
+                        </div>
                     @endforeach
                 </div>
                 @error('sizes')
+                    <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                @enderror
+                @error('size_stocks')
                     <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                 @enderror
             </div>

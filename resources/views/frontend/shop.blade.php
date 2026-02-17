@@ -99,43 +99,44 @@
                      <div class="products-wrapper">
                         @forelse($products as $product)
                         @php($productImage = optional($product->images->first())->image_path)
+                        @php($productColors = $product->colors ?? collect())
                         <div class="single-product">
                            <div class="product-image pos-rel">
                               <a href="{{ route('product.details', $product->id) }}" class="">
                                  <img src="{{ $productImage ? Storage::url($productImage) : asset('frontend/assets/img/product/product-img1.jpg') }}" alt="{{ $product->name }}">
                               </a>
                               <div class="product-action">
-                                 <a href="#" class="quick-view-btn"><i class="fas fa-eye"></i></a>
-                                 <a href="#" class="wishlist-btn"><i class="fas fa-heart"></i></a>
-                                 <a href="#" class="compare-btn"><i class="fas fa-exchange"></i></a>
+                                 <a href="{{ route('product.details', $product->id) }}" class="quick-view-btn"><i class="fal fa-eye"></i></a>
+                                 <button type="button" class="wishlist-btn add-to-wishlist-btn" data-product-id="{{ $product->id }}"><i class="fal fa-heart"></i></button>
                               </div>
                               <div class="product-action-bottom">
-                                 <a href="#" class="add-cart-btn"><i class="fas fa-shopping-bag"></i>Add to Cart</a>
+                                 <button type="button" class="add-cart-btn add-to-cart-btn" data-product-id="{{ $product->id }}"><i class="fal fa-shopping-bag"></i>Add to Cart</button>
                               </div>
+                              @if($product->is_limited_edition)
                               <div class="product-sticker-wrapper">
-                                 @if($product->is_limited_edition)
-                                 <span class="product-sticker limited" 
-                                       style="background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%); color: #000; font-weight: 700; padding: 6px 12px; border-radius: 20px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">
-                                    <i class="fas fa-fire mr-1"></i>Limited
-                                 </span>
-                                 @elseif($product->created_at >= now()->subDays(30))
+                                 <span class="product-sticker new">Limited</span>
+                              </div>
+                              @elseif($product->created_at >= now()->subDays(30))
+                              <div class="product-sticker-wrapper">
                                  <span class="product-sticker new">New</span>
-                                 @endif
-                              </div>
-                           </div>
-                           <div class="product-desc">
-                              <div class="product-category" style="color: var(--clr-common-text); font-size: 12px; text-transform: uppercase; margin-bottom: 5px;">
-                                 {{ $product->category == 't-shirt' ? 'T-Shirt' : 'Accessories' }}
-                              </div>
-                              <div class="product-name"><a href="{{ route('product.details', $product->id) }}">{{ $product->name }}</a></div>
-                              @if($product->is_limited_edition && $product->drop_name)
-                              <div class="drop-name" style="color: #ffc107; font-size: 11px; font-weight: 600; margin-top: 4px;">
-                                 {{ $product->drop_name }}
                               </div>
                               @endif
+                           </div>
+                           <div class="product-desc">
+                              <div class="product-name"><a href="{{ route('product.details', $product->id) }}">{{ $product->name }}</a></div>
                               <div class="product-price">
-                                 <span class="price-now">£{{ number_format($product->price, 2) }}</span>
+                                 <span class="price-now">INR {{ number_format($product->price, 2) }}</span>
                               </div>
+                              @if($productColors->count() > 0)
+                              <ul class="product-color-nav">
+                                 @foreach($productColors as $color)
+                                 @php($colorImage = optional($color->images->first())->image_path)
+                                 <li class="cl-{{ \Illuminate\Support\Str::slug($color->name ?? 'color') }} {{ $loop->first ? 'active' : '' }}">
+                                    <img src="{{ $colorImage ? Storage::url($colorImage) : asset('frontend/assets/img/product/product-img1.jpg') }}" alt="img">
+                                 </li>
+                                 @endforeach
+                              </ul>
+                              @endif
                            </div>
                         </div>
                         @empty

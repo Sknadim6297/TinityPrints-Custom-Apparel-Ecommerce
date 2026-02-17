@@ -22,21 +22,34 @@
                   <div class="action-list d-none d-md-flex action-list-header3">
                      <div class="user-btn action-item">
                         @auth
-                           <a href="{{ route('dashboard') }}">
-                              <div class="user-icon">
-                                 <svg xmlns="http://www.w3.org/2000/svg" width="16.077" height="19"
-                                    viewBox="0 0 16.077 19">
-                                    <g id="avatar" transform="translate(-39.385)">
-                                       <g id="Group_6" data-name="Group 6" transform="translate(39.385)">
-                                          <path id="Path_32" data-name="Path 32"
-                                             d="M50.288,8.81a4.872,4.872,0,1,0-5.729,0,8.052,8.052,0,0,0-5.174,7.511A2.683,2.683,0,0,0,42.064,19H52.782a2.683,2.683,0,0,0,2.679-2.679A8.052,8.052,0,0,0,50.288,8.81ZM44.013,4.872a3.41,3.41,0,1,1,3.41,3.41A3.414,3.414,0,0,1,44.013,4.872Zm8.769,12.667H42.064a1.219,1.219,0,0,1-1.218-1.218A6.577,6.577,0,1,1,54,16.32,1.219,1.219,0,0,1,52.782,17.538Z"
-                                             transform="translate(-39.385)" fill="#171717"></path>
+                           <div class="dropdown">
+                              <a href="#" class="user-profile-trigger" data-bs-toggle="dropdown" aria-expanded="false">
+                                 <div class="user-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16.077" height="19"
+                                       viewBox="0 0 16.077 19">
+                                       <g id="avatar" transform="translate(-39.385)">
+                                          <g id="Group_6" data-name="Group 6" transform="translate(39.385)">
+                                             <path id="Path_32" data-name="Path 32"
+                                                d="M50.288,8.81a4.872,4.872,0,1,0-5.729,0,8.052,8.052,0,0,0-5.174,7.511A2.683,2.683,0,0,0,42.064,19H52.782a2.683,2.683,0,0,0,2.679-2.679A8.052,8.052,0,0,0,50.288,8.81ZM44.013,4.872a3.41,3.41,0,1,1,3.41,3.41A3.414,3.414,0,0,1,44.013,4.872Zm8.769,12.667H42.064a1.219,1.219,0,0,1-1.218-1.218A6.577,6.577,0,1,1,54,16.32,1.219,1.219,0,0,1,52.782,17.538Z"
+                                                transform="translate(-39.385)" fill="#171717"></path>
+                                          </g>
                                        </g>
-                                    </g>
-                                 </svg>
-                              </div>
-                           </a>
-                           <a href="{{ route('dashboard') }}" class="action-btn-text">Dashboard</a>
+                                    </svg>
+                                 </div>
+                                 <span class="user-name-text">{{ Auth::user()->name }}</span>
+                              </a>
+                              <ul class="dropdown-menu">
+                                 <li><a class="dropdown-item" href="{{ route('orders') }}">My Orders</a></li>
+                                 <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Profile</a></li>
+                                 <li><a class="dropdown-item" href="{{ route('contact') }}">Support</a></li>
+                                 <li>
+                                    <form method="POST" action="{{ route('logout') }}">
+                                       @csrf
+                                       <button type="submit" class="dropdown-item">Logout</button>
+                                    </form>
+                                 </li>
+                              </ul>
+                           </div>
                         @else
                            <a href="{{ route('login') }}">
                               <div class="user-icon">
@@ -56,7 +69,7 @@
                         @endauth
                      </div>
                      <div class="action-item action-item-cart">
-                        <a href="javascript:void(0)" class="view-cart-button">
+                        <a href="{{ route('cart.index') }}" class="view-cart-button">
                            <svg xmlns="http://www.w3.org/2000/svg" width="16.665" height="20" viewBox="0 0 16.665 20">
                               <g id="Layer_2" data-name="Layer 2" transform="translate(-4.096 -1)">
                                  <path id="Path_35" data-name="Path 35"
@@ -70,12 +83,19 @@
                                     transform="translate(-1.771 0)"></path>
                               </g>
                            </svg>
-                           <span class="action-item-number">3</span>
+                           @auth
+                              @php
+                                 $cartCount = \App\Models\Cart::where('user_id', auth()->id())->sum('quantity');
+                              @endphp
+                              <span class="action-item-number cart-count">{{ $cartCount }}</span>
+                           @else
+                              <span class="action-item-number cart-count">0</span>
+                           @endauth
                         </a>
                         <a href="#" class="action-btn-text">Cartlisht</a>
                      </div>
                      <div class="action-item action-item-wishlist">
-                        <a href="javascript:void(0)" class="view-wishlist-button">
+                        <a href="{{ route('wishlist.index') }}" class="view-wishlist-button">
                            <svg id="heart_2_" data-name="heart (2)" xmlns="http://www.w3.org/2000/svg" width="19.452"
                               height="18" viewBox="0 0 19.452 18">
                               <g id="Group_2" data-name="Group 2" transform="translate(0 0)">
@@ -84,7 +104,14 @@
                                     transform="translate(0 -39.221)" fill="#171717"></path>
                               </g>
                            </svg>
-                           <span class="action-item-number">2</span>
+                           @auth
+                              @php
+                                 $wishlistCount = \App\Models\Wishlist::where('user_id', auth()->id())->count();
+                              @endphp
+                              <span class="action-item-number wishlist-count">{{ $wishlistCount }}</span>
+                           @else
+                              <span class="action-item-number wishlist-count">0</span>
+                           @endauth
                         </a>
                         <a href="#" class="action-btn-text">Wishlisht</a>
                      </div>
@@ -145,7 +172,7 @@
                   <div class="row align-items-center">
                      <div class="col-9">
                         <a href="{{ route('home') }}">
-                           <img src="{{ asset('frontend/assets/img/logo/logo.png') }}" alt="Logo">
+                           <img src="{{ asset('frontend/assets/img/logo/logo.png') }}" width="100px"  alt="Logo">
                         </a>
                      </div>
                      <div class="col-3 text-end"><button class="side-info-close"><i class="fal fa-times"></i></button>
@@ -155,16 +182,72 @@
                <div class="mobile-menu d-lg-none fix"></div>
                <div class="offset-profile-action d-lg-none">
                   <div class="offset-widget mb-40">
+                     @auth
+                        <div class="mobile-user-info mb-20 text-center">
+                           <div class="user-icon" style="display: inline-block; margin-bottom: 10px;">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="38"
+                                 viewBox="0 0 16.077 19">
+                                 <g id="avatar" transform="translate(-39.385)">
+                                    <g id="Group_6" data-name="Group 6" transform="translate(39.385)">
+                                       <path id="Path_32" data-name="Path 32"
+                                          d="M50.288,8.81a4.872,4.872,0,1,0-5.729,0,8.052,8.052,0,0,0-5.174,7.511A2.683,2.683,0,0,0,42.064,19H52.782a2.683,2.683,0,0,0,2.679-2.679A8.052,8.052,0,0,0,50.288,8.81ZM44.013,4.872a3.41,3.41,0,1,1,3.41,3.41A3.414,3.414,0,0,1,44.013,4.872Zm8.769,12.667H42.064a1.219,1.219,0,0,1-1.218-1.218A6.577,6.577,0,1,1,54,16.32,1.219,1.219,0,0,1,52.782,17.538Z"
+                                          transform="translate(-39.385)" fill="#171717"></path>
+                                    </g>
+                                 </g>
+                              </svg>
+                           </div>
+                           <div class="user-name" style="font-weight: 600; font-size: 16px;">{{ Auth::user()->name }}</div>
+                        </div>
+                     @endauth
+                     <div class="action-list action-list-header1 mb-20">
+                        @auth
+                           <div class="action-item">
+                              <a href="{{ route('orders') }}" class="action-btn-text">My Orders</a>
+                           </div>
+                           <div class="action-item">
+                              <a href="{{ route('profile.edit') }}" class="action-btn-text">Profile</a>
+                           </div>
+                           <div class="action-item">
+                              <a href="{{ route('contact') }}" class="action-btn-text">Support</a>
+                           </div>
+                           <div class="action-item">
+                              <form method="POST" action="{{ route('logout') }}">
+                                 @csrf
+                                 <button type="submit" class="action-btn-text">Logout</button>
+                              </form>
+                           </div>
+                        @else
+                           <div class="action-item">
+                              <a href="{{ route('login') }}" class="action-btn-text">Sign in</a>
+                           </div>
+                        @endauth
+                     </div>
                      <div class="action-list action-list-header1">
                         <div class="action-item action-item-cart">
-                           <a href="javascript:void(0)" class="view-cart-button">
+                           <a href="{{ route('cart.index') }}" class="view-cart-button">
                               <i class="fal fa-shopping-bag"></i>
-                              <span class="action-item-number">3</span></a>
+                              @auth
+                                 @php
+                                    $cartCount = \App\Models\Cart::where('user_id', auth()->id())->sum('quantity');
+                                 @endphp
+                                 <span class="action-item-number cart-count">{{ $cartCount }}</span>
+                              @else
+                                 <span class="action-item-number cart-count">0</span>
+                              @endauth
+                           </a>
                         </div>
                         <div class="action-item action-item-wishlist">
-                           <a href="javascript:void(0)" class="view-wishlist-button">
+                           <a href="{{ route('wishlist.index') }}" class="view-wishlist-button">
                               <i class="fal fa-heart"></i>
-                              <span class="action-item-number">2</span></a>
+                              @auth
+                                 @php
+                                    $wishlistCount = \App\Models\Wishlist::where('user_id', auth()->id())->count();
+                                 @endphp
+                                 <span class="action-item-number wishlist-count">{{ $wishlistCount }}</span>
+                              @else
+                                 <span class="action-item-number wishlist-count">0</span>
+                              @endauth
+                           </a>
                         </div>
                      </div>
                   </div>
@@ -186,55 +269,67 @@
             <button class="close-sidebar">Close<i class="fal fa-times"></i></button>
             <h4 class="sidebar-action-title">Shopping Cart</h4>
             <div class="sidebar-action-list">
-               <div class="sidebar-list-item">
-                  <div class="product-image pos-rel">
-                     <a href="{{ route('product.details', 1) }}" class=""><img src="{{ asset('frontend/assets/img/shirt/3/1.jpg') }}" alt="img"></a>
-                  </div>
-                  <div class="product-desc">
-                     <div class="product-name"><a href="shop-details.html">Felted Shirt for Man</a></div>
-                     <div class="product-pricing">
-                        <span class="item-number">1 &times;</span>
-                        <span class="price-now">$24.00</span>
+               @auth
+                  @php
+                     $sidebarCartItems = \App\Models\Cart::where('user_id', auth()->id())
+                        ->with(['product.images', 'color'])
+                        ->latest()
+                        ->take(3)
+                        ->get();
+                     $sidebarCartTotal = $sidebarCartItems->sum(function($item) {
+                        return $item->product->price * $item->quantity;
+                     });
+                  @endphp
+                  
+                  @forelse($sidebarCartItems as $cartItem)
+                     <div class="sidebar-list-item">
+                        <div class="product-image pos-rel">
+                           <a href="{{ route('product.details', $cartItem->product->id) }}" class="">
+                              @if($cartItem->product->images->first())
+                                 <img src="{{ Storage::url($cartItem->product->images->first()->image_path) }}" alt="{{ $cartItem->product->name }}">
+                              @else
+                                 <img src="{{ asset('frontend/assets/img/product/product-img1.jpg') }}" alt="{{ $cartItem->product->name }}">
+                              @endif
+                           </a>
+                        </div>
+                        <div class="product-desc">
+                           <div class="product-name"><a href="{{ route('product.details', $cartItem->product->id) }}">{{ $cartItem->product->name }}</a></div>
+                           <div class="product-pricing">
+                              <span class="item-number">{{ $cartItem->quantity }} &times;</span>
+                              <span class="price-now">INR {{ number_format($cartItem->product->price, 2) }}</span>
+                           </div>
+                           <form action="{{ route('cart.destroy', $cartItem->id) }}" method="POST" class="d-inline">
+                              @csrf
+                              @method('DELETE')
+                              <button type="submit" class="remove-item" onclick="return confirm('Remove this item?')"><i class="fal fa-times"></i></button>
+                           </form>
+                        </div>
                      </div>
-                     <button class="remove-item"><i class="fal fa-times"></i></button>
-                  </div>
-               </div>
-               <div class="sidebar-list-item">
-                  <div class="product-image pos-rel">
-                     <a href="{{ route('product.details', 2) }}" class=""><img src="{{ asset('frontend/assets/img/pant/1/4.jpg') }}" alt="img"></a>
-                  </div>
-                  <div class="product-desc">
-                     <div class="product-name"><a href="shop-details.html">Denim Jeans Pant</a></div>
-                     <div class="product-pricing">
-                        <span class="item-number">1 &times;</span>
-                        <span class="price-now">$12.00</span>
+                  @empty
+                     <div class="text-center py-4">
+                        <i class="fal fa-shopping-cart" style="font-size: 48px; color: #ddd;"></i>
+                        <p class="text-muted mt-2">Your cart is empty</p>
                      </div>
-                     <button class="remove-item"><i class="fal fa-times"></i></button>
+                  @endforelse
+               @else
+                  <div class="text-center py-4">
+                     <i class="fal fa-shopping-cart" style="font-size: 48px; color: #ddd;"></i>
+                     <p class="text-muted mt-2">Please login to view cart</p>
                   </div>
-               </div>
-               <div class="sidebar-list-item">
-                  <div class="product-image pos-rel">
-                     <a href="{{ route('product.details', 3) }}" class=""><img src="{{ asset('frontend/assets/img/jacket/2/2.jpg') }}" alt="img"></a>
+               @endauth
+            </div>
+            @auth
+               @if($sidebarCartItems->count() > 0)
+                  <div class="product-price-total">
+                     <span>Subtotal :</span>
+                     <span class="subtotal-price">INR {{ number_format($sidebarCartTotal, 2) }}</span>
                   </div>
-                  <div class="product-desc">
-                     <div class="product-name"><a href="shop-details.html">Denim Official Jacket</a></div>
-                     <div class="product-pricing">
-                        <span class="item-number">1 &times;</span>
-                        <span class="price-now">$42.00</span>
-                     </div>
-                     <button class="remove-item"><i class="fal fa-times"></i></button>
+                  <div class="sidebar-action-btn">
+                     <a href="{{ route('cart.index') }}" class="fill-btn">View cart</a>
+                     <a href="#" class="border-btn">Checkout</a>
                   </div>
-               </div>
-
-            </div>
-            <div class="product-price-total">
-               <span>Subtotal :</span>
-               <span class="subtotal-price">$78.00</span>
-            </div>
-            <div class="sidebar-action-btn">
-               <a href="cart.html" class="fill-btn">View cart</a>
-               <a href="checkout.html" class="border-btn">Checkout</a>
-            </div>
+               @endif
+            @endauth
          </div>
       </div>
       <div class="fix">
@@ -242,39 +337,54 @@
             <button class="close-sidebar">Close<i class="fal fa-times"></i></button>
             <h4 class="sidebar-action-title">Wishlist</h4>
             <div class="sidebar-action-list">
-               <div class="sidebar-list-item">
-                  <div class="product-image pos-rel">
-                     <a href="{{ route('product.details', 4) }}" class=""><img src="{{ asset('frontend/assets/img/shirt/1/1.jpg') }}" alt="img"></a>
-                  </div>
-                  <div class="product-desc">
-                     <div class="product-name"><a href="shop-details.html">Women's Faux-Trim Shirt</a></div>
-                     <div class="product-pricing">
-                        <span class="price-now">$20.00</span>
+               @auth
+                  @php
+                     $sidebarWishlistItems = \App\Models\Wishlist::where('user_id', auth()->id())
+                        ->with(['product.images'])
+                        ->latest()
+                        ->take(3)
+                        ->get();
+                  @endphp
+                  
+                  @forelse($sidebarWishlistItems as $wishlistItem)
+                     <div class="sidebar-list-item">
+                        <div class="product-image pos-rel">
+                           <a href="{{ route('product.details', $wishlistItem->product->id) }}" class="">
+                              @if($wishlistItem->product->images->first())
+                                 <img src="{{ Storage::url($wishlistItem->product->images->first()->image_path) }}" alt="{{ $wishlistItem->product->name }}">
+                              @else
+                                 <img src="{{ asset('frontend/assets/img/product/product-img1.jpg') }}" alt="{{ $wishlistItem->product->name }}">
+                              @endif
+                           </a>
+                        </div>
+                        <div class="product-desc">
+                           <div class="product-name"><a href="{{ route('product.details', $wishlistItem->product->id) }}">{{ $wishlistItem->product->name }}</a></div>
+                           <div class="product-pricing">
+                              <span class="price-now">INR {{ number_format($wishlistItem->product->price, 2) }}</span>
+                           </div>
+                           <form action="{{ route('wishlist.destroy', $wishlistItem->id) }}" method="POST" class="d-inline">
+                              @csrf
+                              @method('DELETE')
+                              <button type="submit" class="remove-item" onclick="return confirm('Remove from wishlist?')"><i class="fal fa-times"></i></button>
+                           </form>
+                        </div>
                      </div>
-                     <button class="remove-item"><i class="fal fa-times"></i></button>
-                  </div>
-               </div>
-               <div class="sidebar-list-item">
-                  <div class="product-image pos-rel">
-                     <a href="{{ route('product.details', 5) }}" class=""><img src="{{ asset('frontend/assets/img/pant/1/1.jpg') }}" alt="img"></a>
-                  </div>
-                  <div class="product-desc">
-                     <div class="product-name"><a href="shop-details.html">Skinny Jeans Pant</a></div>
-                     <div class="product-pricing">
-                        <span class="price-now">$24.00</span>
+                  @empty
+                     <div class="text-center py-4">
+                        <i class="fal fa-heart" style="font-size: 48px; color: #ddd;"></i>
+                        <p class="text-muted mt-2">Your wishlist is empty</p>
                      </div>
-                     <button class="remove-item"><i class="fal fa-times"></i></button>
+                  @endforelse
+               @else
+                  <div class="text-center py-4">
+                     <i class="fal fa-heart" style="font-size: 48px; color: #ddd;"></i>
+                     <p class="text-muted mt-2">Please login to view wishlist</p>
                   </div>
-               </div>
-
-            </div>
-            <div class="product-price-total">
-               <span>Subtotal :</span>
-               <span class="subtotal-price">$44.00</span>
+               @endauth
             </div>
             <div class="sidebar-action-btn">
-               <a href="cart.html" class="fill-btn">View cart</a>
-               <a href="cart.html" class="border-btn">Checkout</a>
+               <a href="{{ route('wishlist.index') }}" class="fill-btn">View Wishlist</a>
+               <a href="{{ route('shop') }}" class="border-btn">Continue Shopping</a>
             </div>
          </div>
       </div>

@@ -27,40 +27,42 @@
 <!-- custom design area start -->
 <section class="custom-design-area pt-120 pb-120">
    <div class="container">
-      <div class="row">
+      <div class="row align-items-center">
          <div class="col-lg-6 mb-60">
             <div class="custom-design-content">
-               <h2 class="section-title mb-30">Create Your Unique Design</h2>
+               <div class="section-title mb-30">
+                  <h2 class="section-main-title">Create Your Unique Design</h2>
+               </div>
                <p class="mb-30">Bring your imagination to life with our custom design service. Whether you have a specific vision or need creative guidance, our design team is here to help you create something truly unique.</p>
                
-               <div class="feature-list">
-                  <div class="feature-item mb-20">
-                     <i class="fas fa-palette text-primary mr-3"></i>
-                     <div>
-                        <h5>Professional Design Team</h5>
-                        <p>Our experienced designers will work with you to create the perfect design for your needs.</p>
+               <ul class="custom-process-list">
+                  <li class="process-step">
+                     <span class="step-number">1</span>
+                     <div class="step-content">
+                        <strong class="step-title">Professional Design Team</strong>
+                        <p class="step-desc">Our experienced designers will work with you to create the perfect design for your needs.</p>
                      </div>
-                  </div>
-                  <div class="feature-item mb-20">
-                     <i class="fas fa-cogs text-primary mr-3"></i>
-                     <div>
-                        <h5>High-Quality Materials</h5>
-                        <p>We use only premium fabrics and printing techniques to ensure your design looks amazing and lasts long.</p>
+                  </li>
+                  <li class="process-step">
+                     <span class="step-number">2</span>
+                     <div class="step-content">
+                        <strong class="step-title">High-Quality Materials</strong>
+                        <p class="step-desc">We use only premium fabrics and printing techniques to ensure your design looks amazing and lasts long.</p>
                      </div>
-                  </div>
-                  <div class="feature-item mb-20">
-                     <i class="fas fa-shipping-fast text-primary mr-3"></i>
-                     <div>
-                        <h5>Fast Delivery</h5>
-                        <p>Get your custom designs delivered within 7-14 business days anywhere in the country.</p>
+                  </li>
+                  <li class="process-step">
+                     <span class="step-number">3</span>
+                     <div class="step-content">
+                        <strong class="step-title">Fast Delivery</strong>
+                        <p class="step-desc">Get your custom designs delivered within 7-14 business days anywhere in the country.</p>
                      </div>
-                  </div>
-               </div>
+                  </li>
+               </ul>
             </div>
          </div>
          
          <div class="col-lg-6">
-            <div class="custom-design-form bg-light p-40 rounded">
+            <div class="custom-design-form bg-gray p-40 rounded">
                <h3 class="form-title mb-30">Start Your Custom Design</h3>
                <form action="#" method="POST" enctype="multipart/form-data">
                   @csrf
@@ -75,12 +77,13 @@
                         <input type="tel" name="phone" class="form-control" placeholder="Phone Number*" required>
                      </div>
                      <div class="col-md-6 mb-20">
-                        <select name="product_type" class="form-control" required>
+                        <select name="product_type" class="form-control no-nice-select" required>
                            <option value="">Select Product Type*</option>
-                           <option value="t-shirt">T-Shirt</option>
-                           <option value="hoodie">Hoodie</option>
-                           <option value="bag">Bag</option>
-                           <option value="other">Other</option>
+                           @foreach($productTypes as $typeValue => $typeLabel)
+                              <option value="{{ $typeValue }}" {{ old('product_type') === $typeValue ? 'selected' : '' }}>
+                                 {{ $typeLabel }}
+                              </option>
+                           @endforeach
                         </select>
                      </div>
                      <div class="col-md-12 mb-20">
@@ -92,70 +95,29 @@
                         <small class="text-muted">You can upload multiple images for reference</small>
                      </div>
                      <div class="col-md-6 mb-20">
-                        <select name="quantity" class="form-control" required>
+                        <select name="quantity" class="form-control no-nice-select" required>
                            <option value="">Select Quantity*</option>
-                           <option value="1-5">1-5 pieces</option>
-                           <option value="6-10">6-10 pieces</option>
-                           <option value="11-25">11-25 pieces</option>
-                           <option value="26-50">26-50 pieces</option>
-                           <option value="50+">50+ pieces</option>
+                           <option value="1-5" {{ old('quantity') === '1-5' ? 'selected' : '' }}>1-5 pieces</option>
+                           <option value="6-10" {{ old('quantity') === '6-10' ? 'selected' : '' }}>6-10 pieces</option>
+                           <option value="11-25" {{ old('quantity') === '11-25' ? 'selected' : '' }}>11-25 pieces</option>
+                           <option value="26-50" {{ old('quantity') === '26-50' ? 'selected' : '' }}>26-50 pieces</option>
+                           <option value="50+" {{ old('quantity') === '50+' ? 'selected' : '' }}>50+ pieces</option>
                         </select>
                      </div>
                      <div class="col-md-6 mb-20">
-                        <select name="budget" class="form-control">
+                        <select name="budget" class="form-control no-nice-select">
                            <option value="">Budget Range</option>
-                           <option value="under-500">Under $500</option>
-                           <option value="500-1000">$500 - $1000</option>
-                           <option value="1000-2000">$1000 - $2000</option>
-                           <option value="2000+">$2000+</option>
+                           <option value="under-5000" {{ old('budget') === 'under-5000' ? 'selected' : '' }}>Under INR 5000</option>
+                           <option value="5000-10000" {{ old('budget') === '5000-10000' ? 'selected' : '' }}>INR 5000 - 10000</option>
+                           <option value="10000-20000" {{ old('budget') === '10000-20000' ? 'selected' : '' }}>INR 10000 - 20000</option>
+                           <option value="20000+" {{ old('budget') === '20000+' ? 'selected' : '' }}>INR 20000+</option>
                         </select>
                      </div>
                      <div class="col-md-12">
-                        <button type="submit" class="fill-btn">Submit Design Request</button>
+                        <button type="submit" class="border-btn">Submit Design Request</button>
                      </div>
                   </div>
                </form>
-            </div>
-         </div>
-      </div>
-      
-      <!-- Design Process Section -->
-      <div class="row mt-80">
-         <div class="col-lg-12">
-            <div class="section-title text-center mb-60">
-               <h2 class="section-main-title">Our Design Process</h2>
-               <p>From concept to completion, we make sure your custom design exceeds expectations</p>
-            </div>
-         </div>
-      </div>
-      
-      <div class="row">
-         <div class="col-lg-3 col-md-6 mb-40 text-center">
-            <div class="process-step">
-               <div class="step-number">1</div>
-               <h4>Submit Request</h4>
-               <p>Fill out our form with your design ideas and requirements</p>
-            </div>
-         </div>
-         <div class="col-lg-3 col-md-6 mb-40 text-center">
-            <div class="process-step">
-               <div class="step-number">2</div>
-               <h4>Design Consultation</h4>
-               <p>Our team contacts you to discuss details and provide a quote</p>
-            </div>
-         </div>
-         <div class="col-lg-3 col-md-6 mb-40 text-center">
-            <div class="process-step">
-               <div class="step-number">3</div>
-               <h4>Design & Approval</h4>
-               <p>We create your design and send it for your approval</p>
-            </div>
-         </div>
-         <div class="col-lg-3 col-md-6 mb-40 text-center">
-            <div class="process-step">
-               <div class="step-number">4</div>
-               <h4>Production & Delivery</h4>
-               <p>Once approved, we produce and ship your custom items</p>
             </div>
          </div>
       </div>
@@ -163,72 +125,150 @@
 </section>
 <!-- custom design area end -->
 
-<style>
-.feature-item {
-   display: flex;
-   align-items: flex-start;
-}
+<!-- design preview area start -->
+<section class="design-preview-area pt-120 pb-120 bg-gray">
+   <div class="container">
+      <div class="row justify-content-center mb-60">
+         <div class="col-xl-8">
+            <div class="section-title text-center">
+               <h2 class="section-main-title">Design Preview</h2>
+               <p>Latest design request details submitted by customers</p>
+            </div>
+         </div>
+      </div>
 
-.feature-item i {
-   font-size: 1.5rem;
-   margin-top: 5px;
-}
+      @if($latestDesignRequest)
+          @php
+            $path = $latestDesignRequest->design_file_path ?? '';
+            $hasPath = $path !== '';
+            $previewUrl = $hasPath && (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, '/'))
+               ? $path
+               : ($hasPath ? Storage::url($path) : null);
+            $fileExt = $latestDesignRequest->file_format ?: ($hasPath ? strtolower(pathinfo($path, PATHINFO_EXTENSION)) : null);
+            $isImage = $previewUrl && in_array($fileExt, ['png', 'jpg', 'jpeg', 'webp']);
+          @endphp
+         <div class="row">
+            <div class="col-lg-4 mb-30">
+               <div class="bg-white rounded-lg p-20 text-center">
+                  @if($isImage)
+                     <img src="{{ $previewUrl }}" alt="Design preview" class="img-fluid mb-20">
+                  @else
+                     <div class="bg-gray p-40 mb-20">{{ strtoupper($fileExt ?: 'FILE') }}</div>
+                  @endif
+                  <p class="mb-10">Design File Preview</p>
+                  @if($previewUrl)
+                     <a href="{{ $previewUrl }}" class="border-btn" download>Download print-ready design</a>
+                  @endif
+               </div>
+            </div>
+            <div class="col-lg-8">
+               <div class="bg-white rounded-lg p-20">
+                  <div class="row">
+                     <div class="col-md-6 mb-20">
+                        <p class="text-muted mb-5">Customer Name</p>
+                        <p class="mb-0">{{ $latestDesignRequest->customer_name }}</p>
+                     </div>
+                     <div class="col-md-6 mb-20">
+                        <p class="text-muted mb-5">Phone</p>
+                        <p class="mb-0">{{ $latestDesignRequest->phone }}</p>
+                     </div>
+                     <div class="col-md-6 mb-20">
+                        <p class="text-muted mb-5">Email</p>
+                        <p class="mb-0">{{ $latestDesignRequest->email }}</p>
+                     </div>
+                     <div class="col-md-6 mb-20">
+                        <p class="text-muted mb-5">Selected Size</p>
+                        <p class="mb-0">{{ strtoupper($latestDesignRequest->selected_size) }}</p>
+                     </div>
+                     <div class="col-md-6 mb-20">
+                        <p class="text-muted mb-5">Front Label</p>
+                        <p class="mb-0">{{ $latestDesignRequest->front_label ?? '—' }}</p>
+                     </div>
+                     <div class="col-md-6 mb-20">
+                        <p class="text-muted mb-5">Back Label</p>
+                        <p class="mb-0">{{ $latestDesignRequest->back_label ?? '—' }}</p>
+                     </div>
+                     <div class="col-md-6 mb-20">
+                        <p class="text-muted mb-5">Status</p>
+                        <p class="mb-0">{{ ucwords(str_replace('_', ' ', $latestDesignRequest->status)) }}</p>
+                     </div>
+                     <div class="col-md-6 mb-20">
+                        <p class="text-muted mb-5">Payment</p>
+                        <p class="mb-0">{{ $latestDesignRequest->payment_unlocked ? 'Unlocked' : 'Locked' }}</p>
+                     </div>
+                  </div>
 
-.process-step .step-number {
-   width: 60px;
-   height: 60px;
-   background: #007bff;
-   color: white;
-   border-radius: 50%;
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   font-size: 1.5rem;
-   font-weight: bold;
-   margin: 0 auto 20px;
-}
+                  <div class="mt-10">
+                     <h4 class="mb-15">Print File Checks</h4>
+                     <div class="row">
+                        <div class="col-md-6 mb-20">
+                           <p class="text-muted mb-5">File Unlocked</p>
+                           <p class="mb-0">{{ $latestDesignRequest->file_locked ? 'No' : 'Yes' }}</p>
+                        </div>
+                        <div class="col-md-6 mb-20">
+                           <p class="text-muted mb-5">Format (PNG / PSD / AI)</p>
+                           <p class="mb-0">{{ strtoupper($latestDesignRequest->file_format ?? $fileExt ?? '—') }}</p>
+                        </div>
+                        <div class="col-md-6 mb-20">
+                           <p class="text-muted mb-5">DPI</p>
+                           <p class="mb-0">{{ $latestDesignRequest->dpi ?? '—' }}</p>
+                        </div>
+                        <div class="col-md-6 mb-20">
+                           <p class="text-muted mb-5">Print Width</p>
+                           <p class="mb-0">{{ $latestDesignRequest->print_width ?? '—' }}</p>
+                        </div>
+                        <div class="col-md-6 mb-20">
+                           <p class="text-muted mb-5">Print Height</p>
+                           <p class="mb-0">{{ $latestDesignRequest->print_height ?? '—' }}</p>
+                        </div>
+                        <div class="col-md-6 mb-20">
+                           <p class="text-muted mb-5">Unit</p>
+                           <p class="mb-0">{{ strtoupper($latestDesignRequest->print_unit ?? '—') }}</p>
+                        </div>
+                     </div>
+                  </div>
 
-.form-control {
-   padding: 12px 15px;
-   border: 1px solid #ddd;
-   border-radius: 5px;
-   font-size: 14px;
-}
+                  <div class="mt-10">
+                     <h4 class="mb-15">File Management</h4>
+                     <p class="mb-0">{{ $latestDesignRequest->remarks ?? 'No remarks yet.' }}</p>
+                  </div>
+               </div>
+            </div>
+         </div>
+      @else
+         <div class="text-center">
+            <h3>No Design Requests Yet</h3>
+            <p>Please check back after a customer submits a design request.</p>
+         </div>
+      @endif
+   </div>
+</section>
+<!-- design preview area end -->
 
-.bg-light {
-   background-color: #f8f9fa !important;
-}
-
-.p-40 {
-   padding: 40px;
-}
-
-.text-primary {
-   color: #007bff !important;
-}
-
-.mr-3 {
-   margin-right: 1rem;
-}
-
-.mb-20 {
-   margin-bottom: 20px;
-}
-
-.mb-30 {
-   margin-bottom: 30px;
-}
-
-.mb-40 {
-   margin-bottom: 40px;
-}
-
-.mb-60 {
-   margin-bottom: 60px;
-}
-
-.mt-80 {
-   margin-top: 80px;
-}
-</style>
+<!-- newsletter section start -->
+<section class="newsletter-area pt-120 pb-120">
+   <div class="container">
+      <div class="row justify-content-center">
+         <div class="col-xl-8">
+            <div class="newsletter-content text-center">
+               <div class="newsletter-icon">
+                  <i class="fas fa-bullhorn"></i>
+               </div>
+               <h2 class="section-main-title newsletter-title mb-35">Get Notified for Custom Drops</h2>
+               <p class="newsletter-desc mb-40">Subscribe to our newsletter and never miss custom design updates</p>
+               <form action="#" class="newsletter-form-custom">
+                  <div class="newsletter-input-wrapper">
+                     <input type="email" placeholder="Enter your email address" class="newsletter-email-input" required>
+                     <button type="submit" class="border-btn newsletter-submit-btn">Subscribe Now</button>
+                  </div>
+               </form>
+               <div class="newsletter-note">
+                  <i class="fas fa-check-circle"></i> Join 10,000+ subscribers • No spam • Unsubscribe anytime
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</section>
+<!-- newsletter section end -->
 @endsection

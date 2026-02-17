@@ -1854,11 +1854,32 @@ div.mean-container a.meanmenu-reveal {
   justify-content: center;
   transition: 0.3s;
   white-space: nowrap;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  text-decoration: none;
 }
 .add-cart-btn:hover {
   background-color: var(--clr-common-white);
   border-color: var(--clr-common-heading);
   color: var(--clr-common-heading);
+}
+
+button.add-cart-btn,
+button.wishlist-btn {
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+button.wishlist-btn {
+  background: transparent;
+  padding: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .product-action-bottom {

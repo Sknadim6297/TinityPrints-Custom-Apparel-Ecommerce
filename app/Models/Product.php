@@ -60,6 +60,21 @@ class Product extends Model
         return $this->belongsTo(Admin::class, 'created_by');
     }
 
+    public function reviews()
+    {
+        return $this->hasMany(ProductReview::class);
+    }
+
+    public function approvedReviews()
+    {
+        return $this->hasMany(ProductReview::class)->where('is_approved', true);
+    }
+
+    public function averageRating()
+    {
+        return $this->approvedReviews()->avg('rating') ?? 0;
+    }
+
     public function totalStock(): int
     {
         return (int) $this->sizes()->sum('stock_quantity');

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\DesignRequest;
 use App\Models\Product;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -225,7 +227,30 @@ class HomeController extends Controller
      */
     public function customDesign()
     {
-        return view('frontend.custom-design');
+        $latestDesignRequest = DesignRequest::latest()->first();
+        $productTypes = Product::whereNotNull('category')
+            ->where('category', '!=', '')
+            ->distinct()
+            ->orderBy('category')
+            ->pluck('category')
+            ->mapWithKeys(function ($category) {
+                $value = trim($category);
+                $label = Str::title(str_replace(['-', '_'], ' ', $value));
+
+                return [$value => $label];
+            })
+            ->toArray();
+
+        if (empty($productTypes)) {
+            $productTypes = [
+                't-shirt' => 'T Shirt',
+                'hoodie' => 'Hoodie',
+                'bag' => 'Bag',
+                'other' => 'Other',
+            ];
+        }
+
+        return view('frontend.custom-design', compact('latestDesignRequest', 'productTypes'));
     }
 
     /**

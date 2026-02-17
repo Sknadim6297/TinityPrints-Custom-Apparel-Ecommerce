@@ -8,6 +8,7 @@
    <title>@yield('title', config('app.name', 'Tinnity Ecom'))</title>
    <meta name="description" content="">
    <meta name="viewport" content="width=device-width, initial-scale=1">
+   <meta name="csrf-token" content="{{ csrf_token() }}">
    
    <!-- Place favicon.ico in the root directory -->
    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('frontend/assets/img/favicon.png') }}">
@@ -28,6 +29,42 @@
    <link rel="stylesheet" href="{{ asset('frontend/assets/css/flaticon.css') }}">
    <link rel="stylesheet" href="{{ asset('frontend/assets/css/default.css') }}">
    <link rel="stylesheet" href="{{ asset('frontend/assets/css/style.css') }}">
+   <style>
+      /* Custom User Profile Dropdown Styling */
+      .user-profile-trigger {
+         display: flex;
+         flex-direction: column;
+         align-items: center;
+         text-decoration: none;
+         color: #171717;
+         gap: 5px;
+      }
+      .user-profile-trigger:hover {
+         color: #171717;
+         text-decoration: none;
+      }
+      .user-profile-trigger .user-icon {
+         margin-bottom: 0;
+      }
+      .user-profile-trigger .user-name-text {
+         font-size: 12px;
+         font-weight: 500;
+         white-space: nowrap;
+         overflow: hidden;
+         text-overflow: ellipsis;
+         max-width: 80px;
+      }
+      /* Remove Bootstrap default dropdown arrow */
+      .user-profile-trigger::after {
+         display: none !important;
+      }
+      /* Mobile user info styling */
+      .mobile-user-info {
+         padding: 15px;
+         background: #f8f9fa;
+         border-radius: 8px;
+      }
+   </style>
    @yield('styles')
 </head>
 <body>
@@ -66,5 +103,6 @@
    <script src="{{ asset('frontend/assets/js/isotope.pkgd.min.js') }}"></script>
    <script src="{{ asset('frontend/assets/js/imagesloaded.pkgd.min.js') }}"></script>
    <script src="{{ asset('frontend/assets/js/main.js') }}"></script>
+   <script src="{{ asset('frontend/assets/js/cart-wishlist.js') }}"></script>
 </body>
 </html>

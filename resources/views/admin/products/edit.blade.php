@@ -52,6 +52,7 @@
                             <option value="t-shirt" {{ $product->category == 't-shirt' ? 'selected' : '' }}>T-Shirt</option>
                             <option value="accessories" {{ $product->category == 'accessories' ? 'selected' : '' }}>Accessories</option>
                         </select>
+                        <input type="hidden" name="category" value="{{ $product->category }}">
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Cannot be changed</p>
                     </div>
 
@@ -68,6 +69,7 @@
                             <option value="full" {{ $product->sleeve_type == 'full' ? 'selected' : '' }}>Full Sleeve</option>
                             <option value="half" {{ $product->sleeve_type == 'half' ? 'selected' : '' }}>Half Sleeve</option>
                         </select>
+                        <input type="hidden" name="sleeve_type" value="{{ $product->sleeve_type }}">
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Cannot be changed</p>
                     </div>
 
@@ -149,6 +151,40 @@
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- Sizes Management -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 border border-gray-100 dark:border-gray-700">
+                <h3 class="text-lg sm:text-xl font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
+                    <svg class="w-6 h-6 mr-3 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.5a2 2 0 00-1 .267V5a2 2 0 10-4 0v.733A2 2 0 00 7 5" />
+                    </svg>
+                    Size Stock
+                </h3>
+
+                @if($product->sizes->count() > 0)
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                        @foreach($product->sizes as $size)
+                            <div class="flex items-center gap-3 p-3 border-2 border-gray-200 dark:border-gray-600 rounded-lg">
+                                <span class="font-semibold text-gray-700 dark:text-gray-300">{{ strtoupper($size->size) }}</span>
+                                <div class="ml-auto flex items-center gap-2">
+                                    <label for="size_stock_{{ $size->size }}" class="text-xs text-gray-600 dark:text-gray-400">Stock</label>
+                                    <input id="size_stock_{{ $size->size }}"
+                                           type="number"
+                                           name="size_stocks[{{ $size->size }}]"
+                                           value="{{ old('size_stocks.' . $size->size, $size->stock_quantity) }}"
+                                           min="0"
+                                           class="w-20 px-2 py-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400">
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <p class="text-gray-600 dark:text-gray-400">No sizes added yet.</p>
+                @endif
+                @error('size_stocks')
+                    <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                @enderror
             </div>
 
             <!-- Colors Management -->

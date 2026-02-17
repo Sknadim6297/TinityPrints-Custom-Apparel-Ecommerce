@@ -103,52 +103,8 @@
       </div>
       <!-- banner area end  -->
 
-      <!-- brand story area start -->
-      <section class="brand-story-area pt-120 pb-120">
-         <div class="container">
-            <div class="row justify-content-center">
-               <div class="col-xl-8">
-                  <div class="section-title text-center">
-                     <h2 class="section-main-title mb-35">Every T-shirt Has a Story</h2>
-                     <p>We craft tees that feel personal, bold, and built to last.</p>
-                  </div>
-               </div>
-            </div>
-            <div class="row mt-60">
-               <div class="col-md-4 mb-4">
-                  <div class="brand-story-card text-center">
-                     <div class="story-icon">
-                        <i class="fas fa-eye"></i>
-                     </div>
-                     <h4 class="story-title">Our Vision</h4>
-                     <p class="story-desc">To be the leading online fashion retailer, inspiring confidence and style in every customer.</p>
-                  </div>
-               </div>
-               <div class="col-md-4 mb-4">
-                  <div class="brand-story-card text-center">
-                     <div class="story-icon">
-                        <i class="fas fa-bullseye"></i>
-                     </div>
-                     <h4 class="story-title">Our Mission</h4>
-                     <p class="story-desc">To provide exceptional fashion products and customer experience through innovation and dedication.</p>
-                  </div>
-               </div>
-               <div class="col-md-4 mb-4">
-                  <div class="brand-story-card text-center">
-                     <div class="story-icon">
-                        <i class="fas fa-heart"></i>
-                     </div>
-                     <h4 class="story-title">Our Values</h4>
-                     <p class="story-desc">Quality, integrity, customer satisfaction, and sustainable fashion practices.</p>
-                  </div>
-               </div>
-            </div>
-         </div>
-      </section>
-      <!-- brand story area end -->
-
       <!-- product area start  -->
-      <section class="product-area pt-120 pb-120">
+      <section class="product-area pt-90 pb-120">
          <div class="container">
             <div class="row justify-content-center">
                <div class="col-xl-8">
@@ -161,18 +117,18 @@
             <div class="products-wrapper">
                @forelse($bestSellerProducts as $product)
                @php($productImage = optional($product->images->first())->image_path)
+               @php($productColors = $product->colors ?? collect())
                <div class="single-product">
                   <div class="product-image pos-rel">
                      <a href="{{ route('product.details', $product->id) }}" class="">
                         <img src="{{ $productImage ? Storage::url($productImage) : asset('frontend/assets/img/product/product-img1.jpg') }}" alt="{{ $product->name }}">
                      </a>
                      <div class="product-action">
-                        <a href="#" class="quick-view-btn"><i class="fas fa-eye"></i></a>
-                        <a href="#" class="wishlist-btn"><i class="fas fa-heart"></i></a>
-                        <a href="#" class="compare-btn"><i class="fas fa-exchange"></i></a>
+                        <a href="{{ route('product.details', $product->id) }}" class="quick-view-btn"><i class="fal fa-eye"></i></a>
+                        <button type="button" class="wishlist-btn add-to-wishlist-btn" data-product-id="{{ $product->id }}"><i class="fal fa-heart"></i></button>
                      </div>
                      <div class="product-action-bottom">
-                        <a href="#" class="add-cart-btn"><i class="fas fa-shopping-bag"></i>Add to Cart</a>
+                        <button type="button" class="add-cart-btn add-to-cart-btn" data-product-id="{{ $product->id }}"><i class="fal fa-shopping-bag"></i>Add to Cart</button>
                      </div>
                      @if($product->created_at >= now()->subDays(30))
                      <div class="product-sticker-wrapper">
@@ -183,8 +139,18 @@
                   <div class="product-desc">
                      <div class="product-name"><a href="{{ route('product.details', $product->id) }}">{{ $product->name }}</a></div>
                      <div class="product-price">
-                        <span class="price-now">£{{ number_format($product->price, 2) }}</span>
+                        <span class="price-now">INR {{ number_format($product->price, 2) }}</span>
                      </div>
+                     @if($productColors->count() > 0)
+                     <ul class="product-color-nav">
+                        @foreach($productColors as $color)
+                        @php($colorImage = optional($color->images->first())->image_path)
+                        <li class="cl-{{ \Illuminate\Support\Str::slug($color->name ?? 'color') }} {{ $loop->first ? 'active' : '' }}">
+                           <img src="{{ $colorImage ? Storage::url($colorImage) : asset('frontend/assets/img/product/product-img1.jpg') }}" alt="img">
+                        </li>
+                        @endforeach
+                     </ul>
+                     @endif
                   </div>
                </div>
                @empty

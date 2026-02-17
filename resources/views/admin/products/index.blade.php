@@ -165,7 +165,7 @@
                             @if($product->colors->first() && $product->colors->first()->images->first())
                                 <img src="{{ Storage::url($product->colors->first()->images->first()->image_path) }}" 
                                      alt="{{ $product->name }}" 
-                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" width="400px">
                             @else
                                 <div class="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500">
                                     <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\Auth\AdminAuthenticatedSessionController;
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\AdminNotificationController;
 use App\Http\Controllers\Admin\CouponController;
 use App\Http\Controllers\Admin\DesignApprovalController;
@@ -32,6 +33,14 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
     // Dashboard
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])
         ->name('dashboard');
+
+    // Customers
+    Route::middleware('admin.access')->group(function () {
+        Route::get('customers', [CustomerController::class, 'index'])
+            ->name('customers.index');
+        Route::get('customer/{id}/history', [CustomerController::class, 'history'])
+            ->name('customers.history');
+    });
     
     // Logout
     Route::post('logout', [AdminAuthenticatedSessionController::class, 'destroy'])

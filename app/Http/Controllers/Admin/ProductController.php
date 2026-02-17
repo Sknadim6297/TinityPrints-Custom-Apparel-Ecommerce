@@ -74,9 +74,9 @@ class ProductController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'category' => 'required|in:t-shirt,accessories',
+            'category' => 'nullable|in:t-shirt,accessories',
             'fit_type' => 'required|in:normal,slight_oversize',
-            'sleeve_type' => 'required|in:full,half',
+            'sleeve_type' => 'nullable|in:full,half',
             'base_price' => 'required|numeric|min:0.01',
             'is_limited_edition' => 'boolean',
             'drop_month' => 'nullable|string',
@@ -89,6 +89,8 @@ class ProductController extends Controller
             'auto_hide_out_of_stock' => 'boolean',
             'sizes' => 'required|array|min:1',
             'sizes.*' => 'in:xs,s,m,l,xl,xxl',
+            'size_stocks' => 'nullable|array',
+            'size_stocks.*' => 'nullable|integer|min:0',
             'colors' => 'required|array|min:1',
             'colors.*.name' => 'required|string|max:100',
             'colors.*.hex_code' => 'nullable|regex:/^#[0-9A-Fa-f]{6}$/',
@@ -119,11 +121,13 @@ class ProductController extends Controller
 
         // Create sizes
         foreach ($validated['sizes'] as $size) {
+            $stockQuantity = (int) ($validated['size_stocks'][$size] ?? 0);
+
             ProductSize::create([
                 'product_id' => $product->id,
                 'size' => $size,
-                'stock_quantity' => 0,
-                'is_available' => true,
+                'stock_quantity' => $stockQuantity,
+                'is_available' => $stockQuantity > 0,
             ]);
         }
 
@@ -201,14 +205,16 @@ class ProductController extends Controller
             'quantity_limit' => 'nullable|integer|min:1',
             'countdown_enabled' => 'boolean',
             'auto_hide_out_of_stock' => 'boolean',
+            'size_stocks' => 'nullable|array',
+            'size_stocks.*' => 'nullable|integer|min:0',
         ]);
 
         $product->update([
             'name' => $validated['name'],
             'description' => $validated['description'],
-            'category' => $validated['category'],
+            'category' => $validated['category'] ?? $product->category,
             'fit_type' => $validated['fit_type'],
-            'sleeve_type' => $validated['sleeve_type'],
+            'sleeve_type' => $validated['sleeve_type'] ?? $product->sleeve_type,
             'base_price' => $validated['base_price'],
             'is_limited_edition' => $validated['is_limited_edition'] ?? false,
             'drop_month' => $validated['drop_month'],
@@ -233,6 +239,18 @@ class ProductController extends Controller
                 'auto_hide_out_of_stock' => false,
                 'stock_limit' => null,
             ]);
+        }
+
+        if (!empty($validated['size_stocks'])) {
+            foreach ($product->sizes as $size) {
+                if (array_key_exists($size->size, $validated['size_stocks'])) {
+                    $stockQuantity = (int) $validated['size_stocks'][$size->size];
+                    $size->update([
+                        'stock_quantity' => $stockQuantity,
+                        'is_available' => $stockQuantity > 0,
+                    ]);
+                }
+            }
         }
 
         if ($product->auto_hide_out_of_stock && $product->totalStock() === 0) {

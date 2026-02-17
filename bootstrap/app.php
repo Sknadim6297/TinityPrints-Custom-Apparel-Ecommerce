@@ -20,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => \App\Http\Middleware\RedirectIfNotAdmin::class,
             'admin.guest' => \App\Http\Middleware\RedirectIfAdmin::class,
             'admin.role' => \App\Http\Middleware\AdminRole::class,
+            'admin.access' => \App\Http\Middleware\EnsureAdminAccess::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
