@@ -5,66 +5,150 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\LoginHistory;
 use App\Models\User;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class CustomerController extends Controller
 {
-    public function index(): JsonResponse
+    /**
+     * Display a listing of customers.
+     */
+    public function index()
     {
-        $customers = User::query()
-            ->where('role', 'customer')
-            ->withCount('loginHistories')
-            ->withMax('loginHistories', 'login_time')
-            ->orderByDesc('created_at')
-            ->get()
-            ->map(function (User $user) {
-                return [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'phone' => $user->phone,
-                    'registered_at' => $user->created_at,
-                    'total_logins' => $user->login_histories_count,
-                    'last_login' => $user->login_histories_max_login_time,
-                    'history_url' => route('admin.customers.history', $user->id),
-                ];
-            });
+        $search = request('search');
+        $customers = User::where('role', 'customer');
 
-        return response()->json(['data' => $customers]);
+        if ($search) {
+            $customers->where(function ($query) use ($search) {
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%");
+            });
+        }
+
+        $customers = $customers
+            ->latest('created_at')
+            ->paginate(15);
+
+        return view('admin.customers.index', compact('customers', 'search'));
     }
 
-    public function history(int $id): JsonResponse
+    /**
+     * Show the form for creating a new customer.
+     */
+    public function create()
     {
-        $user = User::query()->findOrFail($id);
+        return view('admin.customers.create');
+    }
 
-        $histories = LoginHistory::query()
-            ->where('user_id', $user->id)
-            ->latest('login_time')
-            ->get()
-            ->map(function (LoginHistory $history) {
-                $durationSeconds = null;
-
-                if ($history->login_time && $history->logout_time) {
-                    $durationSeconds = $history->logout_time->diffInSeconds($history->login_time);
-                }
-
-                return [
-                    'login_time' => $history->login_time,
-                    'logout_time' => $history->logout_time,
-                    'ip_address' => $history->ip_address,
-                    'device' => $history->device,
-                    'session_duration_seconds' => $durationSeconds,
-                ];
-            });
-
-        return response()->json([
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'phone' => $user->phone,
-            ],
-            'data' => $histories,
+    /**
+     * Store a newly created customer in storage.
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'unique:users,email'],
+            'phone' => ['nullable', 'string', 'max:20'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
+
+        $validated['role'] = 'customer';
+        $validated['password'] = bcrypt($validated['password']);
+
+        User::create($validated);
+
+        return redirect()->route('admin.customers.index')
+            ->with('success', 'Customer created successfully.');
+    }
+
+    /**
+     * Display the specified customer.
+     */
+    public function show(User $customer)
+    {
+        if ($customer->role !== 'customer') {
+            abort(404);
+        }
+
+        $reviews = $customer->reviews()->latest()->take(5)->get();
+        $loginHistory = LoginHistory::where('user_id', $customer->id)
+            ->latest('login_time')
+            ->take(5)
+            ->get();
+
+        return view('admin.customers.show', compact('customer', 'reviews', 'loginHistory'));
+    }
+
+    /**
+     * Show the form for editing the customer.
+     */
+    public function edit(User $customer)
+    {
+        if ($customer->role !== 'customer') {
+            abort(404);
+        }
+
+        return view('admin.customers.edit', compact('customer'));
+    }
+
+    /**
+     * Update the specified customer in storage.
+     */
+    public function update(Request $request, User $customer)
+    {
+        if ($customer->role !== 'customer') {
+            abort(404);
+        }
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'unique:users,email,' . $customer->id],
+            'phone' => ['nullable', 'string', 'max:20'],
+        ]);
+
+        $customer->update($validated);
+
+        return redirect()->route('admin.customers.show', $customer)
+            ->with('success', 'Customer updated successfully.');
+    }
+
+    /**
+     * Remove the specified customer from storage.
+     */
+    public function destroy(User $customer)
+    {
+        if ($customer->role !== 'customer') {
+            abort(404);
+        }
+
+        $name = $customer->name;
+
+        // Delete related data before deleting customer
+        $customer->orders()->delete();
+        $customer->wishlists()->delete();
+        $customer->carts()->delete();
+        $customer->reviews()->delete();
+        LoginHistory::where('user_id', $customer->id)->delete();
+
+        $customer->delete();
+
+        return redirect()->route('admin.customers.index')
+            ->with('success', "Customer '{$name}' deleted successfully.");
+    }
+
+    /**
+     * Display customer login history.
+     */
+    public function history(User $customer)
+    {
+        if ($customer->role !== 'customer') {
+            abort(404);
+        }
+
+        $loginHistory = LoginHistory::where('user_id', $customer->id)
+            ->latest('login_time')
+            ->paginate(20);
+
+        return view('admin.customers.history', compact('customer', 'loginHistory'));
     }
 }

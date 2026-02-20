@@ -36,9 +36,8 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
 
     // Customers
     Route::middleware('admin.access')->group(function () {
-        Route::get('customers', [CustomerController::class, 'index'])
-            ->name('customers.index');
-        Route::get('customer/{id}/history', [CustomerController::class, 'history'])
+        Route::resource('customers', CustomerController::class);
+        Route::get('customers/{customer}/history', [CustomerController::class, 'history'])
             ->name('customers.history');
     });
     
@@ -53,6 +52,10 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
         ->name('notifications.read-all');
     Route::patch('notifications/{notification}/read', [AdminNotificationController::class, 'markRead'])
         ->name('notifications.read');
+
+    // Admin Login History
+    Route::get('login-history', [\App\Http\Controllers\Admin\AdminLoginHistoryController::class, 'index'])
+        ->name('login-history.index');
     
     // Product Management
     Route::resource('products', ProductController::class);
