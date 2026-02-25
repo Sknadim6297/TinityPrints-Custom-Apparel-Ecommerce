@@ -112,14 +112,11 @@
                </p>
                @endif
                @if($productColors->count() > 0)
-               <ul class="product-color-nav">
+               <div class="product-color-nav" style="display: flex; gap: 8px; margin-top: 10px;">
                   @foreach($productColors as $color)
-                  @php($colorImage = optional($color->images->first())->image_path)
-                  <li class="cl-{{ \Illuminate\Support\Str::slug($color->color_name ?? 'color') }} {{ $loop->first ? 'active' : '' }}">
-                     <img src="{{ $colorImage ? Storage::url($colorImage) : asset('frontend/assets/img/product/product-img1.jpg') }}" alt="img">
-                  </li>
+                  <div class="color-circle" style="width: 24px; height: 24px; border-radius: 50%; background-color: {{ $color->hex_code }}; border: 2px solid #ddd; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" title="{{ $color->color_name }}"></div>
                   @endforeach
-               </ul>
+               </div>
                @endif
             </div>
          </div>

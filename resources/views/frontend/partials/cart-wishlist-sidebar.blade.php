@@ -61,7 +61,7 @@
             </div>
             <div class="sidebar-action-btn">
                <a href="{{ route('cart.index') }}" class="fill-btn">View cart</a>
-               <a href="#" class="border-btn">Checkout</a>
+               <a href="{{ route('checkout') }}" class="border-btn">Checkout</a>
             </div>
          @endif
       @endauth

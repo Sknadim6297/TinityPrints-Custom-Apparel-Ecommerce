@@ -98,8 +98,10 @@
                      
                      <div class="products-wrapper">
                         @forelse($products as $product)
-                        @php($productImage = optional($product->images->first())->image_path)
-                        @php($productColors = $product->colors ?? collect())
+                        @php
+                           $productImage = optional($product->images->first())->image_path;
+                           $productColors = $product->colors ?? collect();
+                        @endphp
                         <div class="single-product">
                            <div class="product-image pos-rel">
                               <a href="{{ route('product.details', $product->id) }}" class="">
@@ -128,14 +130,11 @@
                                  <span class="price-now">INR {{ number_format($product->price, 2) }}</span>
                               </div>
                               @if($productColors->count() > 0)
-                              <ul class="product-color-nav">
+                              <div class="product-color-nav" style="display: flex; gap: 8px; margin-top: 10px;">
                                  @foreach($productColors as $color)
-                                 @php($colorImage = optional($color->images->first())->image_path)
-                                 <li class="cl-{{ \Illuminate\Support\Str::slug($color->name ?? 'color') }} {{ $loop->first ? 'active' : '' }}">
-                                    <img src="{{ $colorImage ? Storage::url($colorImage) : asset('frontend/assets/img/product/product-img1.jpg') }}" alt="img">
-                                 </li>
+                                 <div class="color-circle" style="width: 24px; height: 24px; border-radius: 50%; background-color: {{ $color->hex_code }}; border: 2px solid #ddd; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" title="{{ $color->color_name }}"></div>
                                  @endforeach
-                              </ul>
+                              </div>
                               @endif
                            </div>
                         </div>
@@ -241,22 +240,33 @@
                               <h4 class="filter-widget-title drop-btn">Colour</h4>
                               <div class="filter-widget-content">
                                  <div class="category-colours">
-                                    @if(isset($availableColors) && count($availableColors) > 0)
-                                    <div class="color-grid d-flex flex-wrap">
-                                       @foreach($availableColors as $color)
-                                       <label class="color-option {{ in_array($color, (array)request('color', [])) ? 'active-color' : '' }}" 
-                                              style="background-color: {{ strtolower($color) }}; display: inline-block; width: 35px; height: 35px; margin: 5px; cursor: pointer; border-radius: 50%; border: 3px solid {{ in_array($color, (array)request('color', [])) ? 'var(--clr-common-heading)' : '#ddd' }}; position: relative;"
-                                              title="{{ ucfirst($color) }}">
-                                          <input type="checkbox" name="color[]" value="{{ $color }}" 
-                                                 {{ in_array($color, (array)request('color', [])) ? 'checked' : '' }}
+                                    @php
+                                       $colorsForFilter = isset($availableColors) ? $availableColors : [];
+                                    @endphp
+                                    <div class="color-grid d-flex flex-wrap" style="gap: 10px;">
+                                       @foreach($colorsForFilter as $color)
+                                       @php
+                                           $colorName = is_array($color) ? ($color['name'] ?? $color) : $color;
+                                           $colorHex = is_array($color) ? ($color['hex'] ?? '#cccccc') : '#cccccc';
+                                           $isChecked = in_array($colorName, (array)request('color', []));
+                                           $lightColors = ['#ffffff', '#ffff00', '#f0e68c', '#add8e6', '#90ee90', '#ffd700', '#fffacd'];
+                                           $textColor = in_array(strtolower($colorHex), $lightColors) ? '#000' : '#fff';
+                                           $borderColor = $isChecked ? 'var(--clr-common-heading)' : '#ddd';
+                                           $labelClass = 'color-option' . ($isChecked ? ' active-color' : '');
+                                       @endphp
+                                       <label class="{{ $labelClass }}" 
+                                              style="background-color: {{ $colorHex }}; display: inline-block; width: 40px; height: 40px; margin: 0; cursor: pointer; border-radius: 50%; border: 3px solid {{ $borderColor }}; position: relative; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
+                                              title="{{ ucfirst($colorName) }}">
+                                          <input type="checkbox" name="color[]" value="{{ $colorName }}" 
+                                                 {{ $isChecked ? 'checked' : '' }}
                                                  onchange="document.getElementById('filter-form').submit()" style="display: none;">
-                                          @if(in_array($color, (array)request('color', [])))
-                                          <i class="fas fa-check" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: {{ in_array(strtolower($color), ['white', 'yellow', 'lightgray', 'lightblue']) ? '#000' : '#fff' }};"></i>
+                                          @if($isChecked)
+                                          <i class="fas fa-check" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: {{ $textColor }}; font-weight: bold;"></i>
                                           @endif
                                        </label>
                                        @endforeach
                                     </div>
-                                    @else
+                                    @if(count($colorsForFilter) === 0)
                                     <p class="text-muted small">No colors available</p>
                                     @endif
                                  </div>

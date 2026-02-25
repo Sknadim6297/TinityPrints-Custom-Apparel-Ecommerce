@@ -362,15 +362,11 @@
                               <span class="price-now">INR {{ number_format($relatedProduct->price, 2) }}</span>
                            </div>
                            @if($relatedProduct->colors->where('is_active', true)->count() > 0)
-                              <ul class="product-color-nav">
+                              <div class="product-color-nav" style="display: flex; gap: 8px; margin-top: 10px;">
                                  @foreach($relatedProduct->colors->where('is_active', true)->take(4) as $color)
-                                    <li class="cl-{{ strtolower($color->color_name) }}" style="background-color: {{ $color->hex_code }};">
-                                       @if($color->images->first())
-                                          <img src="{{ Storage::url($color->images->first()->image_path) }}" alt="{{ $color->color_name }}">
-                                       @endif
-                                    </li>
+                                    <div class="color-circle" style="width: 24px; height: 24px; border-radius: 50%; background-color: {{ $color->hex_code }}; border: 2px solid #ddd; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" title="{{ $color->color_name }}"></div>
                                  @endforeach
-                              </ul>
+                              </div>
                            @endif
                         </div>
                      </div>

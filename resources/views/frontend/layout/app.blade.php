@@ -104,5 +104,6 @@
    <script src="{{ asset('frontend/assets/js/imagesloaded.pkgd.min.js') }}"></script>
    <script src="{{ asset('frontend/assets/js/main.js') }}"></script>
    <script src="{{ asset('frontend/assets/js/cart-wishlist.js') }}"></script>
+   @stack('scripts')
 </body>
 </html>

@@ -137,7 +137,15 @@ class HomeController extends Controller
         $availableColors = Product::join('product_colors', 'products.id', '=', 'product_colors.product_id')
             ->where('products.is_active', true)
             ->distinct()
-            ->pluck('product_colors.color_name')
+            ->select('product_colors.color_name', 'product_colors.hex_code')
+            ->orderBy('product_colors.color_name')
+            ->get()
+            ->map(function($item) {
+                return [
+                    'name' => $item->color_name,
+                    'hex' => $item->hex_code,
+                ];
+            })
             ->toArray();
         $availableSleeveTypes = Product::where('is_active', true)
             ->where('category', 't-shirt')

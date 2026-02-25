@@ -2,6 +2,7 @@
 
 @section('title', 'Refund Policy')
 @section('content')
+
 <!-- page title area start  -->
 <section class="page-title-area" data-background="assets/img/bg/page-title-bg.html">
    <div class="container">
@@ -26,95 +27,161 @@
 
 <!-- refund policy content -->
 <section class="refund-policy-area pt-120 pb-120">
-   <div class="container">
+   <div class="container container-small">
       <div class="row">
-         <div class="col-lg-8 mx-auto">
+         <div class="col-lg-12">
             <div class="refund-policy-content">
-               
                <!-- Policy Overview -->
-               <div class="policy-section mb-50">
-                  <h2 class="section-title mb-30">Our Commitment to You</h2>
-                  <div class="policy-highlight p-30 mb-30">
-                     <i class="fas fa-shield-check text-success mr-3"></i>
-                     <div>
-                        <h4 class="mb-10">30-Day Money-Back Guarantee</h4>
-                        <p class="mb-0">We stand behind the quality of our products. If you're not completely satisfied with your purchase, we offer a full refund within 30 days of delivery.</p>
-                     </div>
+               <div class="policy-section mb-40">
+                  <div class="section-title">
+                     <h2 class="section-main-title mb-30">Our Commitment to You</h2>
                   </div>
+                  <p class="mb-30">We stand behind the quality of our products. If you're not completely satisfied with your purchase, we offer a full refund within 30 days of delivery.</p>
                   <p>At Tinnity Ecom, customer satisfaction is our top priority. We understand that sometimes a product may not meet your expectations, and we want to make the return process as simple and hassle-free as possible.</p>
                </div>
 
+               <!-- 30-Day Guarantee -->
+               <div class="why-why-box mb-40">
+                  <div class="row">
+                     <div class="col-lg-12">
+                        <div class="single-why-choose">
+                           <div class="why-choose-icon">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                 <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                              </svg>
+                           </div>
+                           <div class="why-choose-text">
+                              <h4 class="mb-10">30-Day Money-Back Guarantee</h4>
+                              <p class="mb-0">Full refund within 30 days of delivery with no questions asked.</p>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+
                <!-- Refund Eligibility -->
-               <div class="policy-section mb-50">
-                  <h3 class="section-subtitle mb-25">Refund Eligibility</h3>
-                  <div class="eligibility-grid">
-                     <div class="eligibility-item eligible mb-20">
-                        <i class="fas fa-check-circle text-success"></i>
-                        <div>
-                           <h5>Items in Original Condition</h5>
-                           <p>Products must be unworn, unwashed, and with all original tags attached</p>
+               <div class="policy-section mb-40">
+                  <div class="section-title">
+                     <h3 class="section-main-title mb-30">Refund Eligibility</h3>
+                  </div>
+                  <div class="row">
+                     <div class="col-lg-6 col-md-6 mb-30">
+                        <div class="why-why-box">
+                           <div class="single-why-choose">
+                              <div class="why-choose-icon">
+                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                 </svg>
+                              </div>
+                              <div class="why-choose-text">
+                                 <h5 class="mb-10">Items in Original Condition</h5>
+                                 <p class="mb-0 text-small">Products must be unworn, unwashed, and with all original tags attached</p>
+                              </div>
+                           </div>
                         </div>
                      </div>
-                     <div class="eligibility-item eligible mb-20">
-                        <i class="fas fa-check-circle text-success"></i>
-                        <div>
-                           <h5>Within 30 Days</h5>
-                           <p>Refund requests must be initiated within 30 days of delivery</p>
+                     <div class="col-lg-6 col-md-6 mb-30">
+                        <div class="why-why-box">
+                           <div class="single-why-choose">
+                              <div class="why-choose-icon">
+                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                 </svg>
+                              </div>
+                              <div class="why-choose-text">
+                                 <h5 class="mb-10">Within 30 Days</h5>
+                                 <p class="mb-0 text-small">Refund requests must be initiated within 30 days of delivery</p>
+                              </div>
+                           </div>
                         </div>
                      </div>
-                     <div class="eligibility-item eligible mb-20">
-                        <i class="fas fa-check-circle text-success"></i>
-                        <div>
-                           <h5>Original Packaging</h5>
-                           <p>Items should be returned in their original packaging when possible</p>
+                     <div class="col-lg-6 col-md-6 mb-30">
+                        <div class="why-why-box">
+                           <div class="single-why-choose">
+                              <div class="why-choose-icon">
+                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                 </svg>
+                              </div>
+                              <div class="why-choose-text">
+                                 <h5 class="mb-10">Original Packaging</h5>
+                                 <p class="mb-0 text-small">Items should be returned in their original packaging when possible</p>
+                              </div>
+                           </div>
                         </div>
                      </div>
-                     <div class="eligibility-item not-eligible mb-20">
-                        <i class="fas fa-times-circle text-danger"></i>
-                        <div>
-                           <h5>Custom/Personalized Items</h5>
-                           <p>Custom designed or personalized products cannot be returned unless defective</p>
+                     <div class="col-lg-6 col-md-6 mb-30">
+                        <div class="why-why-box">
+                           <div class="single-why-choose">
+                              <div class="why-choose-icon" style="color: #dc3545;">
+                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                                 </svg>
+                              </div>
+                              <div class="why-choose-text">
+                                 <h5 class="mb-10">Custom/Personalized Items</h5>
+                                 <p class="mb-0 text-small">Cannot be returned unless defective</p>
+                              </div>
+                           </div>
                         </div>
                      </div>
-                     <div class="eligibility-item not-eligible mb-20">
-                        <i class="fas fa-times-circle text-danger"></i>
-                        <div>
-                           <h5>Final Sale Items</h5>
-                           <p>Items marked as "Final Sale" or purchased with special discounts are non-refundable</p>
+                     <div class="col-lg-6 col-md-6">
+                        <div class="why-why-box">
+                           <div class="single-why-choose">
+                              <div class="why-choose-icon" style="color: #dc3545;">
+                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                                 </svg>
+                              </div>
+                              <div class="why-choose-text">
+                                 <h5 class="mb-10">Final Sale Items</h5>
+                                 <p class="mb-0 text-small">Marked as "Final Sale" or purchased with special discounts</p>
+                              </div>
+                           </div>
                         </div>
                      </div>
                   </div>
                </div>
 
                <!-- Refund Process -->
-               <div class="policy-section mb-50">
-                  <h3 class="section-subtitle mb-25">How to Request a Refund</h3>
-                  <div class="process-steps">
-                     <div class="step-item mb-30">
-                        <div class="step-number">1</div>
-                        <div class="step-content">
-                           <h5>Contact Us</h5>
-                           <p>Email us at <a href="mailto:refunds@tinnityecom.com">refunds@tinnityecom.com</a> or call our customer service at <a href="tel:+1234567890">+1 (234) 567-890</a> with your order number and reason for return.</p>
+               <div class="policy-section mb-40">
+                  <div class="section-title">
+                     <h3 class="section-main-title mb-30">How to Request a Refund</h3>
+                  </div>
+                  <div class="row">
+                     <div class="col-lg-6 col-md-6 mb-30">
+                        <div class="process-box">
+                           <div class="process-step-number">1</div>
+                           <h5 class="mb-15">Contact Us</h5>
+                           <p>Email us at <a href="mailto:refunds@tinnityecom.com">refunds@tinnityecom.com</a> or call <a href="tel:+1234567890">+1 (234) 567-890</a> with your order number and reason for return.</p>
                         </div>
                      </div>
-                     <div class="step-item mb-30">
-                        <div class="step-number">2</div>
-                        <div class="step-content">
-                           <h5>Get Return Authorization</h5>
+                     <div class="col-lg-6 col-md-6 mb-30">
+                        <div class="process-box">
+                           <div class="process-step-number">2</div>
+                           <h5 class="mb-15">Get Return Authorization</h5>
                            <p>Our team will provide you with a Return Authorization (RA) number and detailed return instructions within 24 hours.</p>
                         </div>
                      </div>
-                     <div class="step-item mb-30">
-                        <div class="step-number">3</div>
-                        <div class="step-content">
-                           <h5>Ship the Item</h5>
+                     <div class="col-lg-6 col-md-6 mb-30">
+                        <div class="process-box">
+                           <div class="process-step-number">3</div>
+                           <h5 class="mb-15">Ship the Item</h5>
                            <p>Package the item securely with the RA number clearly marked and ship it to our return center using the provided shipping label.</p>
                         </div>
                      </div>
-                     <div class="step-item mb-30">
-                        <div class="step-number">4</div>
-                        <div class="step-content">
-                           <h5>Processing & Refund</h5>
+                     <div class="col-lg-6 col-md-6 mb-30">
+                        <div class="process-box">
+                           <div class="process-step-number">4</div>
+                           <h5 class="mb-15">Processing & Refund</h5>
                            <p>Once we receive and inspect your return, we'll process your refund within 5-7 business days to your original payment method.</p>
                         </div>
                      </div>
@@ -122,110 +189,164 @@
                </div>
 
                <!-- Refund Timeframes -->
-               <div class="policy-section mb-50">
-                  <h3 class="section-subtitle mb-25">Refund Timeframes</h3>
-                  <div class="timeframe-table">
-                     <table class="table table-bordered">
-                        <thead class="bg-light">
-                           <tr>
-                              <th>Payment Method</th>
-                              <th>Processing Time</th>
-                              <th>Total Time to Account</th>
-                           </tr>
-                        </thead>
-                        <tbody>
-                           <tr>
-                              <td>Credit/Debit Card</td>
-                              <td>5-7 business days</td>
-                              <td>7-10 business days</td>
-                           </tr>
-                           <tr>
-                              <td>PayPal</td>
-                              <td>3-5 business days</td>
-                              <td>3-7 business days</td>
-                           </tr>
-                           <tr>
-                              <td>Bank Transfer</td>
-                              <td>5-7 business days</td>
-                              <td>7-14 business days</td>
-                           </tr>
-                           <tr>
-                              <td>Store Credit</td>
-                              <td>1-2 business days</td>
-                              <td>Immediate upon processing</td>
-                           </tr>
-                        </tbody>
-                     </table>
+               <div class="policy-section mb-40">
+                  <div class="section-title">
+                     <h3 class="section-main-title mb-30">Refund Timeframes</h3>
+                  </div>
+                  <div class="row">
+                     <div class="col-lg-12">
+                        <div class="table-responsive">
+                           <table class="table table-bordered">
+                              <thead>
+                                 <tr>
+                                    <th>Payment Method</th>
+                                    <th>Processing Time</th>
+                                    <th>Total Time to Account</th>
+                                 </tr>
+                              </thead>
+                              <tbody>
+                                 <tr>
+                                    <td>Credit/Debit Card</td>
+                                    <td>5-7 business days</td>
+                                    <td>7-10 business days</td>
+                                 </tr>
+                                 <tr>
+                                    <td>PayPal</td>
+                                    <td>3-5 business days</td>
+                                    <td>3-7 business days</td>
+                                 </tr>
+                                 <tr>
+                                    <td>Bank Transfer</td>
+                                    <td>5-7 business days</td>
+                                    <td>7-14 business days</td>
+                                 </tr>
+                                 <tr>
+                                    <td>Store Credit</td>
+                                    <td>1-2 business days</td>
+                                    <td>Immediate upon processing</td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </div>
+                     </div>
                   </div>
                </div>
 
                <!-- Shipping Costs -->
-               <div class="policy-section mb-50">
-                  <h3 class="section-subtitle mb-25">Shipping Costs</h3>
-                  <div class="shipping-info">
-                     <div class="info-card mb-20">
-                        <i class="fas fa-truck text-primary mr-3"></i>
-                        <div>
-                           <h5>Free Return Shipping</h5>
-                           <p>We provide prepaid return shipping labels for all eligible returns within the United States.</p>
+               <div class="policy-section mb-40">
+                  <div class="section-title">
+                     <h3 class="section-main-title mb-30">Shipping Costs</h3>
+                  </div>
+                  <div class="row">
+                     <div class="col-lg-4 col-md-6 mb-30">
+                        <div class="info-card-box">
+                           <div class="info-card-icon">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                 <line x1="1" y1="1" x2="23" y2="1"></line>
+                                 <path d="M1 6h22v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V6z"></path>
+                              </svg>
+                           </div>
+                           <h5 class="mb-10">Free Return Shipping</h5>
+                           <p class="text-small">We provide prepaid return shipping labels for all eligible returns within the United States.</p>
                         </div>
                      </div>
-                     <div class="info-card mb-20">
-                        <i class="fas fa-globe text-primary mr-3"></i>
-                        <div>
-                           <h5>International Returns</h5>
-                           <p>International customers are responsible for return shipping costs. We recommend using a trackable shipping method.</p>
+                     <div class="col-lg-4 col-md-6 mb-30">
+                        <div class="info-card-box">
+                           <div class="info-card-icon">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                 <circle cx="12" cy="12" r="10"></circle>
+                                 <path d="M12 6v6l4 2"></path>
+                              </svg>
+                           </div>
+                           <h5 class="mb-10">International Returns</h5>
+                           <p class="text-small">International customers are responsible for return shipping costs. Use a trackable method.</p>
                         </div>
                      </div>
-                     <div class="info-card mb-20">
-                        <i class="fas fa-exclamation-triangle text-warning mr-3"></i>
-                        <div>
-                           <h5>Lost or Damaged Returns</h5>
-                           <p>We're not responsible for items lost or damaged during return shipping. Please use appropriate packaging and insurance.</p>
+                     <div class="col-lg-4 col-md-6 mb-30">
+                        <div class="info-card-box">
+                           <div class="info-card-icon">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                 <circle cx="12" cy="12" r="10"></circle>
+                                 <line x1="12" y1="8" x2="12" y2="16"></line>
+                                 <line x1="8" y1="12" x2="16" y2="12"></line>
+                              </svg>
+                           </div>
+                           <h5 class="mb-10">Lost or Damaged Returns</h5>
+                           <p class="text-small">We're not responsible for items lost or damaged during shipping. Use appropriate packaging.</p>
                         </div>
                      </div>
                   </div>
                </div>
 
                <!-- Exchanges -->
-               <div class="policy-section mb-50">
-                  <h3 class="section-subtitle mb-25">Exchanges</h3>
-                  <p class="mb-20">While we don't offer direct exchanges, you can return your item for a full refund and place a new order for the desired size, color, or style. This ensures you get exactly what you want and helps us process your request faster.</p>
-                  <div class="exchange-tip p-20 bg-light rounded">
-                     <i class="fas fa-lightbulb text-warning mr-2"></i>
-                     <strong>Pro Tip:</strong> To ensure availability of your desired item, we recommend placing your new order first, then returning the unwanted item.
+               <div class="policy-section mb-40">
+                  <div class="section-title">
+                     <h3 class="section-main-title mb-30">Exchanges</h3>
+                  </div>
+                  <p class="mb-30">While we don't offer direct exchanges, you can return your item for a full refund and place a new order for the desired size, color, or style. This ensures you get exactly what you want and helps us process your request faster.</p>
+                  <div class="info-banner">
+                     <h5 class="mb-10">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; margin-right: 10px;">
+                           <circle cx="12" cy="12" r="10"></circle>
+                           <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        Pro Tip
+                     </h5>
+                     <p class="mb-0">To ensure availability of your desired item, we recommend placing your new order first, then returning the unwanted item.</p>
                   </div>
                </div>
 
                <!-- Contact Information -->
                <div class="policy-section">
-                  <h3 class="section-subtitle mb-25">Questions About Returns?</h3>
-                  <div class="contact-cards">
-                     <div class="contact-card">
-                        <i class="fas fa-envelope"></i>
-                        <h5>Email Support</h5>
-                        <p><a href="mailto:refunds@tinnityecom.com">refunds@tinnityecom.com</a></p>
-                        <small>Response within 24 hours</small>
+                  <div class="section-title">
+                     <h3 class="section-main-title mb-30">Questions About Returns?</h3>
+                  </div>
+                  <div class="row">
+                     <div class="col-lg-4 col-md-6 mb-30">
+                        <div class="contact-info-box">
+                           <div class="contact-info-icon">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                 <circle cx="12" cy="12" r="1"></circle>
+                                 <path d="M12 1v6m0 6v6"></path>
+                                 <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+                              </svg>
+                           </div>
+                           <h5 class="mb-10">Email Support</h5>
+                           <p class="mb-10"><a href="mailto:refunds@tinnityecom.com">refunds@tinnityecom.com</a></p>
+                           <p class="text-small text-muted">Response within 24 hours</p>
+                        </div>
                      </div>
-                     <div class="contact-card">
-                        <i class="fas fa-phone"></i>
-                        <h5>Phone Support</h5>
-                        <p><a href="tel:+1234567890">+1 (234) 567-890</a></p>
-                        <small>Mon-Fri 9AM-6PM EST</small>
+                     <div class="col-lg-4 col-md-6 mb-30">
+                        <div class="contact-info-box">
+                           <div class="contact-info-icon">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                 <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                              </svg>
+                           </div>
+                           <h5 class="mb-10">Phone Support</h5>
+                           <p class="mb-10"><a href="tel:+1234567890">+1 (234) 567-890</a></p>
+                           <p class="text-small text-muted">Mon-Fri 9AM-6PM EST</p>
+                        </div>
                      </div>
-                     <div class="contact-card">
-                        <i class="fas fa-comments"></i>
-                        <h5>Live Chat</h5>
-                        <p>Available on website</p>
-                        <small>Mon-Fri 9AM-8PM EST</small>
+                     <div class="col-lg-4 col-md-6 mb-30">
+                        <div class="contact-info-box">
+                           <div class="contact-info-icon">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                              </svg>
+                           </div>
+                           <h5 class="mb-10">Live Chat</h5>
+                           <p class="mb-10">Available on website</p>
+                           <p class="text-small text-muted">Mon-Fri 9AM-8PM EST</p>
+                        </div>
                      </div>
                   </div>
                </div>
 
                <!-- Last Updated -->
-               <div class="policy-footer mt-60 pt-30 border-top">
-                  <p class="text-muted small">
-                     <strong>Last Updated:</strong> February 10, 2026<br>
+               <div class="policy-footer mt-60 pt-30 border-top text-center">
+                  <p class="text-small text-muted">
+                     <strong>Last Updated:</strong> February 20, 2026<br>
                      This refund policy is subject to change without notice. Please check this page periodically for updates.
                   </p>
                </div>
@@ -237,205 +358,283 @@
 </section>
 
 <style>
-.policy-highlight {
-   background: #f8f9fa;
+.process-box {
+   padding: 30px 25px;
    border: 1px solid #e9ecef;
-   border-radius: 10px;
-   display: flex;
-   align-items: flex-start;
-}
-
-.policy-highlight i {
-   font-size: 1.5rem;
-   margin-top: 5px;
-}
-
-.section-subtitle {
-   color: #222;
-   font-size: 1.5rem;
-   font-weight: 600;
-   border-bottom: 2px solid #007bff;
-   padding-bottom: 10px;
-}
-
-.eligibility-item {
-   display: flex;
-   align-items: flex-start;
-   padding: 15px;
    border-radius: 8px;
-   transition: background-color 0.2s;
+   background: #fff;
+   transition: all 0.3s ease;
+   position: relative;
 }
 
-.eligibility-item.eligible {
-   background: #f8fffe;
-   border-left: 4px solid #28a745;
+.process-box:hover {
+   box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+   border-color: #007bff;
 }
 
-.eligibility-item.not-eligible {
-   background: #fff5f5;
-   border-left: 4px solid #dc3545;
-}
-
-.eligibility-item i {
-   font-size: 1.2rem;
-   margin-right: 15px;
-   margin-top: 2px;
-}
-
-.step-item {
-   display: flex;
-   align-items: flex-start;
-}
-
-.step-number {
-   background: #007bff;
-   color: white;
-   width: 40px;
-   height: 40px;
-   border-radius: 50%;
-   display: flex;
+.process-step-number {
+   display: inline-flex;
    align-items: center;
    justify-content: center;
+   width: 45px;
+   height: 45px;
+   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+   color: white;
+   border-radius: 50%;
+   font-size: 20px;
    font-weight: bold;
-   margin-right: 20px;
-   flex-shrink: 0;
-}
-
-.step-content h5 {
-   margin-bottom: 8px;
-   color: #222;
-}
-
-.table {
-   border-radius: 8px;
-   overflow: hidden;
-   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-
-.table th {
-   background: #f8f9fa;
-   font-weight: 600;
-   border: none;
-   padding: 15px;
-}
-
-.table td {
-   padding: 15px;
-   border-color: #e9ecef;
-}
-
-.info-card, .contact-card {
-   display: flex;
-   align-items: flex-start;
-   padding: 20px;
-   background: white;
-   border-radius: 10px;
-   box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-   transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.contact-card {
-   text-align: center;
-   flex-direction: column;
-   align-items: center;
    margin-bottom: 20px;
 }
 
-.contact-card:hover {
+.process-box h5 {
+   color: #222;
+   font-weight: 600;
+}
+
+.process-box p {
+   color: #666;
+   margin-bottom: 0;
+   font-size: 14px;
+   line-height: 1.6;
+}
+
+.info-card-box {
+   padding: 25px 20px;
+   background: #f8f9fa;
+   border-radius: 8px;
+   text-align: center;
+   transition: all 0.3s ease;
+}
+
+.info-card-box:hover {
+   background: #fff;
+   box-shadow: 0 5px 20px rgba(0,0,0,0.08);
    transform: translateY(-2px);
-   box-shadow: 0 5px 20px rgba(0,0,0,0.1);
 }
 
-.info-card i, .contact-card i {
-   font-size: 1.5rem;
-   margin-right: 15px;
-   margin-top: 2px;
-}
-
-.contact-card i {
-   margin-right: 0;
+.info-card-icon {
+   color: #667eea;
    margin-bottom: 15px;
+   display: flex;
+   justify-content: center;
+}
+
+.info-card-box h5 {
+   color: #222;
+   font-weight: 600;
+   font-size: 16px;
+}
+
+.info-card-box p {
+   color: #666;
+   font-size: 14px;
+   line-height: 1.5;
+}
+
+.contact-info-box {
+   padding: 25px 20px;
+   background: #fff;
+   border: 1px solid #e9ecef;
+   border-radius: 8px;
+   text-align: center;
+   transition: all 0.3s ease;
+}
+
+.contact-info-box:hover {
+   box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+   border-color: #667eea;
+}
+
+.contact-info-icon {
+   color: #667eea;
+   margin-bottom: 15px;
+   display: flex;
+   justify-content: center;
+}
+
+.contact-info-box h5 {
+   color: #222;
+   font-weight: 600;
+   font-size: 16px;
+}
+
+.contact-info-box a {
    color: #007bff;
+   text-decoration: none;
 }
 
-.contact-cards {
-   display: grid;
-   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-   gap: 20px;
+.contact-info-box a:hover {
+   text-decoration: underline;
 }
 
-.exchange-tip {
+.contact-info-box p {
+   color: #666;
+   font-size: 14px;
+   margin-bottom: 10px;
+}
+
+.info-banner {
+   padding: 20px 25px;
+   background: #fffaf0;
    border-left: 4px solid #ffc107;
+   border-radius: 4px;
+}
+
+.info-banner h5 {
+   color: #222;
+   font-weight: 600;
+   margin-bottom: 10px;
+}
+
+.info-banner p {
+   color: #666;
+   font-size: 14px;
+   line-height: 1.6;
+}
+
+.policy-section {
+   margin-bottom: 50px;
+}
+
+.section-title {
+   margin-bottom: 30px;
+}
+
+.section-main-title {
+   color: #222;
+   font-size: 28px;
+   font-weight: 700;
+   border-bottom: 2px solid #667eea;
+   padding-bottom: 15px;
+}
+
+.table {
+   width: 100%;
+   border-collapse: collapse;
+   border-radius: 8px;
+   overflow: hidden;
+   box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.table thead th {
+   background: #f8f9fa;
+   padding: 15px;
+   font-weight: 600;
+   border: 1px solid #e9ecef;
+   color: #222;
+   text-align: left;
+}
+
+.table tbody td {
+   padding: 15px;
+   border: 1px solid #e9ecef;
+   color: #666;
+   font-size: 14px;
+}
+
+.table tbody tr:hover {
+   background: #f8f9fa;
+}
+
+.table-responsive {
+   overflow-x: auto;
 }
 
 .policy-footer {
    text-align: center;
+   border-top: 1px solid #e9ecef;
 }
 
-.text-success { color: #28a745 !important; }
-.text-danger { color: #dc3545 !important; }
-.text-primary { color: #007bff !important; }
-.text-warning { color: #ffc107 !important; }
-.text-muted { color: #6c757d !important; }
+.policy-footer p {
+   margin-bottom: 0;
+}
 
-.mr-2 { margin-right: 0.5rem; }
-.mr-3 { margin-right: 1rem; }
-.mb-0 { margin-bottom: 0; }
-.mb-10 { margin-bottom: 10px; }
-.mb-20 { margin-bottom: 20px; }
-.mb-25 { margin-bottom: 25px; }
-.mb-30 { margin-bottom: 30px; }
-.mb-50 { margin-bottom: 50px; }
-.mt-60 { margin-top: 60px; }
-.p-20 { padding: 20px; }
-.p-30 { padding: 30px; }
-.pt-30 { padding-top: 30px; }
-.bg-light { background-color: #f8f9fa !important; }
+.text-small {
+   font-size: 13px;
+}
+
+.text-muted {
+   color: #999 !important;
+}
+
+.border-top {
+   border-top: 1px solid #e9ecef;
+}
+
+.mt-60 {
+   margin-top: 60px;
+}
+
+.pt-30 {
+   padding-top: 30px;
+}
+
+.mb-10 {
+   margin-bottom: 10px;
+}
+
+.mb-15 {
+   margin-bottom: 15px;
+}
+
+.mb-30 {
+   margin-bottom: 30px;
+}
+
+.mb-40 {
+   margin-bottom: 40px;
+}
+
+.why-why-box {
+   height: 100%;
+}
+
+.why-choose-icon {
+   color: #667eea;
+   margin-right: 15px;
+   flex-shrink: 0;
+}
+
+.why-choose-text {
+   flex-grow: 1;
+}
+
+.why-choose-text h5 {
+   color: #222;
+   font-weight: 600;
+   font-size: 16px;
+}
+
+.why-choose-text p {
+   color: #666;
+   font-size: 14px;
+   line-height: 1.6;
+   margin-bottom: 0;
+}
 
 @media (max-width: 768px) {
-   .eligibility-item, .info-card {
-      flex-direction: column;
-      text-align: center;
+   .section-main-title {
+      font-size: 24px;
    }
    
-   .eligibility-item i, .info-card i {
-      margin-right: 0;
-      margin-bottom: 10px;
+   .process-box {
+      margin-bottom: 20px;
    }
    
-   .step-item {
-      flex-direction: column;
-      text-align: center;
+   .contact-info-box {
+      margin-bottom: 20px;
    }
    
-   .step-number {
-      margin-right: 0;
-      margin-bottom: 15px;
+   .table {
+      font-size: 13px;
    }
    
-   .contact-cards {
-      grid-template-columns: 1fr;
+   .table thead th,
+   .table tbody td {
+      padding: 10px;
    }
 }
 </style>
 
-<script>
-// Smooth scroll for anchor links
-document.addEventListener('DOMContentLoaded', function() {
-   const links = document.querySelectorAll('a[href^="#"]');
-   
-   links.forEach(link => {
-      link.addEventListener('click', function(e) {
-         e.preventDefault();
-         const target = document.querySelector(this.getAttribute('href'));
-         if (target) {
-            target.scrollIntoView({
-               behavior: 'smooth',
-               block: 'start'
-            });
-         }
-      });
-   });
-});
-</script>
+
 @endsection

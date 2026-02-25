@@ -10,7 +10,9 @@
         
         const $btn = $(this);
         const productId = $btn.data('product-id');
-        const quantity = $('#product-quantity').val() || 1;
+        // Get quantity from product details page, default to 1 if not found
+        const quantityElement = $('#product-quantity');
+        const quantity = quantityElement.length > 0 ? quantityElement.val() : 1;
         const selectedColor = $('input[name="product_color"]:checked').val();
         const selectedSize = $('input[name="product_size"]:checked').val();
         
@@ -34,7 +36,7 @@
             data: {
                 product_id: productId,
                 quantity: quantity,
-                product_color_id: selectedColor,
+                color_id: selectedColor,
                 size: selectedSize,
                 _token: $('meta[name="csrf-token"]').attr('content')
             },
@@ -42,6 +44,9 @@
                 if (response.success) {
                     // Update cart count
                     $('.cart-count').text(response.cart_count);
+                    
+                    // Refresh sidebar cart
+                    refreshSidebarCart();
                     
                     // Show success message
                     showMessage('Product added to cart successfully!', 'success');
@@ -96,6 +101,9 @@
                     // Update wishlist count
                     $('.wishlist-count').text(response.wishlist_count);
                     
+                    // Refresh sidebar wishlist
+                    refreshSidebarWishlist();
+                    
                     // Show success message
                     showMessage(response.message || 'Product added to wishlist successfully!', 'success');
                     
@@ -116,6 +124,44 @@
             }
         });
     });
+
+    // Function to refresh sidebar cart
+    function refreshSidebarCart() {
+        $.ajax({
+            url: '/cart/sidebar-items',
+            method: 'GET',
+            success: function(response) {
+                if (response.success) {
+                    $('.sidebar-action-list').each(function() {
+                        const $parent = $(this).closest('.sidebar-cart');
+                        if ($parent.length) {
+                            $parent.find('.sidebar-action-list').html(response.html);
+                            // Update sidebar totals
+                            $parent.find('.subtotal-price').text('INR ' + parseFloat(response.cart_total).toFixed(2));
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    // Function to refresh sidebar wishlist
+    function refreshSidebarWishlist() {
+        $.ajax({
+            url: '/wishlist/sidebar-items',
+            method: 'GET',
+            success: function(response) {
+                if (response.success) {
+                    $('.sidebar-action-list').each(function() {
+                        const $parent = $(this).closest('.sidebar-wishlist');
+                        if ($parent.length) {
+                            $parent.find('.sidebar-action-list').html(response.html);
+                        }
+                    });
+                }
+            }
+        });
+    }
 
     // Helper function to show messages
     function showMessage(message, type) {
