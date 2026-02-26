@@ -224,7 +224,7 @@
                      </div>
                      <div class="action-list action-list-header1">
                         <div class="action-item action-item-cart">
-                           <a href="{{ route('cart.index') }}" class="view-cart-button">
+                           <a href="{{ route('cart.index') }}">
                               <i class="fal fa-shopping-bag"></i>
                               @auth
                                  @php
@@ -237,7 +237,7 @@
                            </a>
                         </div>
                         <div class="action-item action-item-wishlist">
-                           <a href="{{ route('wishlist.index') }}" class="view-wishlist-button">
+                           <a href="{{ route('wishlist.index') }}">
                               <i class="fal fa-heart"></i>
                               @auth
                                  @php

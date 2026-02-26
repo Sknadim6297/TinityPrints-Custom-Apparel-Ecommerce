@@ -22,18 +22,74 @@
                     </div>
                 </div>
                 <div class="mobile-menu d-lg-none fix"></div>
-                <div class="offset-profile-action d-md-none">
+                <div class="offset-profile-action d-lg-none">
                     <div class="offset-widget mb-40">
+                        @auth
+                            <div class="mobile-user-info mb-20 text-center">
+                                <div class="user-icon" style="display: inline-block; margin-bottom: 10px;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="38"
+                                        viewBox="0 0 16.077 19">
+                                        <g id="avatar" transform="translate(-39.385)">
+                                            <g id="Group_6" data-name="Group 6" transform="translate(39.385)">
+                                                <path id="Path_32" data-name="Path 32"
+                                                    d="M50.288,8.81a4.872,4.872,0,1,0-5.729,0,8.052,8.052,0,0,0-5.174,7.511A2.683,2.683,0,0,0,42.064,19H52.782a2.683,2.683,0,0,0,2.679-2.679A8.052,8.052,0,0,0,50.288,8.81ZM44.013,4.872a3.41,3.41,0,1,1,3.41,3.41A3.414,3.414,0,0,1,44.013,4.872Zm8.769,12.667H42.064a1.219,1.219,0,0,1-1.218-1.218A6.577,6.577,0,1,1,54,16.32,1.219,1.219,0,0,1,52.782,17.538Z"
+                                                    transform="translate(-39.385)" fill="#171717"></path>
+                                            </g>
+                                        </g>
+                                    </svg>
+                                </div>
+                                <div class="user-name" style="font-weight: 600; font-size: 16px;">{{ Auth::user()->name }}</div>
+                            </div>
+                        @endauth
+                        <div class="action-list action-list-header1 mb-20">
+                            @auth
+                                <div class="action-item">
+                                    <a href="{{ route('orders') }}" class="action-btn-text">My Orders</a>
+                                </div>
+                                <div class="action-item">
+                                    <a href="{{ route('profile.edit') }}" class="action-btn-text">Profile</a>
+                                </div>
+                                <div class="action-item">
+                                    <a href="{{ route('contact') }}" class="action-btn-text">Support</a>
+                                </div>
+                                <div class="action-item">
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+                                        <button type="submit" class="action-btn-text">Logout</button>
+                                    </form>
+                                </div>
+                            @else
+                                <div class="action-item">
+                                    <a href="{{ route('login') }}" class="action-btn-text">Sign in</a>
+                                </div>
+                            @endauth
+                        </div>
                         <div class="action-list action-list-header1">
                             <div class="action-item action-item-cart">
-                            <a href="javascript:void(0)" class="view-cart-button">
-                                <i class="fal fa-shopping-bag"></i>
-                                <span class="action-item-number">3</span></a>
+                                <a href="{{ route('cart.index') }}">
+                                    <i class="fal fa-shopping-bag"></i>
+                                    @auth
+                                        @php
+                                            $cartCount = \App\Models\Cart::where('user_id', auth()->id())->sum('quantity');
+                                        @endphp
+                                        <span class="action-item-number cart-count">{{ $cartCount }}</span>
+                                    @else
+                                        <span class="action-item-number cart-count">0</span>
+                                    @endauth
+                                </a>
                             </div>
                             <div class="action-item action-item-wishlist">
-                            <a href="javascript:void(0)" class="view-wishlist-button">
-                                <i class="fal fa-heart"></i>
-                                <span class="action-item-number">2</span></a>
+                                <a href="{{ route('wishlist.index') }}">
+                                    <i class="fal fa-heart"></i>
+                                    @auth
+                                        @php
+                                            $wishlistCount = \App\Models\Wishlist::where('user_id', auth()->id())->count();
+                                        @endphp
+                                        <span class="action-item-number wishlist-count">{{ $wishlistCount }}</span>
+                                    @else
+                                        <span class="action-item-number wishlist-count">0</span>
+                                    @endauth
+                                </a>
                             </div>
                         </div>
                     </div>

@@ -22,18 +22,74 @@
                   </div>
                </div>
                <div class="mobile-menu d-lg-none fix"></div>
-               <div class="offset-profile-action d-md-none">
+               <div class="offset-profile-action d-lg-none">
                   <div class="offset-widget mb-40">
+                     @auth
+                        <div class="mobile-user-info mb-20 text-center">
+                           <div class="user-icon" style="display: inline-block; margin-bottom: 10px;">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="38"
+                                 viewBox="0 0 16.077 19">
+                                 <g id="avatar" transform="translate(-39.385)">
+                                    <g id="Group_6" data-name="Group 6" transform="translate(39.385)">
+                                       <path id="Path_32" data-name="Path 32"
+                                          d="M50.288,8.81a4.872,4.872,0,1,0-5.729,0,8.052,8.052,0,0,0-5.174,7.511A2.683,2.683,0,0,0,42.064,19H52.782a2.683,2.683,0,0,0,2.679-2.679A8.052,8.052,0,0,0,50.288,8.81ZM44.013,4.872a3.41,3.41,0,1,1,3.41,3.41A3.414,3.414,0,0,1,44.013,4.872Zm8.769,12.667H42.064a1.219,1.219,0,0,1-1.218-1.218A6.577,6.577,0,1,1,54,16.32,1.219,1.219,0,0,1,52.782,17.538Z"
+                                          transform="translate(-39.385)" fill="#171717"></path>
+                                    </g>
+                                 </g>
+                              </svg>
+                           </div>
+                           <div class="user-name" style="font-weight: 600; font-size: 16px;">{{ Auth::user()->name }}</div>
+                        </div>
+                     @endauth
+                     <div class="action-list action-list-header1 mb-20">
+                        @auth
+                           <div class="action-item">
+                              <a href="{{ route('orders') }}" class="action-btn-text">My Orders</a>
+                           </div>
+                           <div class="action-item">
+                              <a href="{{ route('profile.edit') }}" class="action-btn-text">Profile</a>
+                           </div>
+                           <div class="action-item">
+                              <a href="{{ route('contact') }}" class="action-btn-text">Support</a>
+                           </div>
+                           <div class="action-item">
+                              <form method="POST" action="{{ route('logout') }}">
+                                 @csrf
+                                 <button type="submit" class="action-btn-text">Logout</button>
+                              </form>
+                           </div>
+                        @else
+                           <div class="action-item">
+                              <a href="{{ route('login') }}" class="action-btn-text">Sign in</a>
+                           </div>
+                        @endauth
+                     </div>
                      <div class="action-list action-list-header1">
                         <div class="action-item action-item-cart">
-                           <a href="javascript:void(0)" class="view-cart-button">
+                           <a href="{{ route('cart.index') }}">
                               <i class="fal fa-shopping-bag"></i>
-                              <span class="action-item-number">3</span></a>
+                              @auth
+                                 @php
+                                    $cartCount = \App\Models\Cart::where('user_id', auth()->id())->sum('quantity');
+                                 @endphp
+                                 <span class="action-item-number cart-count">{{ $cartCount }}</span>
+                              @else
+                                 <span class="action-item-number cart-count">0</span>
+                              @endauth
+                           </a>
                         </div>
                         <div class="action-item action-item-wishlist">
-                           <a href="javascript:void(0)" class="view-wishlist-button">
+                           <a href="{{ route('wishlist.index') }}">
                               <i class="fal fa-heart"></i>
-                              <span class="action-item-number">2</span></a>
+                              @auth
+                                 @php
+                                    $wishlistCount = \App\Models\Wishlist::where('user_id', auth()->id())->count();
+                                 @endphp
+                                 <span class="action-item-number wishlist-count">{{ $wishlistCount }}</span>
+                              @else
+                                 <span class="action-item-number wishlist-count">0</span>
+                              @endauth
+                           </a>
                         </div>
                      </div>
                   </div>
@@ -82,7 +138,14 @@
                <div class="col-lg-6">
                   <div class="product-details-tab-wrapper mb-30">
                      @php
-                        $productImages = $product->images->take(5);
+                        $activeColors = $product->colors->where('is_active', true);
+                        $colorsForImages = $activeColors->count() > 0 ? $activeColors : $product->colors;
+                        $productImages = $colorsForImages
+                           ->flatMap(function ($color) {
+                              return $color->images->where('image_type', 'front');
+                           })
+                           ->values()
+                           ->take(5);
                         $imageCount = $productImages->count();
                      @endphp
                      <div class="product-details-tab">
@@ -133,22 +196,30 @@
                      <p class="mb-30">{{ $product->description ?: 'No description available for this product.' }}</p>
                      
                      @if($product->sizes->where('is_available', true)->count() > 0)
-                        <div class="available-sizes">
-                           <span>Available Sizes : </span>
-                           <div class="product-available-sizes">
+                        <div class="available-sizes mb-20">
+                           <span class="mb-10 d-block" style="font-weight: 600;">Select Size: <span class="text-danger">*</span></span>
+                           <div class="product-available-sizes" style="display: flex; gap: 10px; flex-wrap: wrap;">
                               @foreach($product->sizes->where('is_available', true) as $size)
-                                 <span>{{ strtoupper($size->size) }}</span>
+                                 <label class="size-option" style="cursor: pointer;">
+                                    <input type="radio" name="product_size" value="{{ $size->size }}" style="display: none;" required>
+                                    <span class="size-badge" style="display: inline-block; padding: 8px 16px; border: 2px solid #ddd; border-radius: 4px; font-weight: 600; transition: all 0.3s;">
+                                       {{ strtoupper($size->size) }}
+                                    </span>
+                                 </label>
                               @endforeach
                            </div>
                         </div>
                      @endif
 
                      @if($product->colors->where('is_active', true)->count() > 0)
-                        <div class="available-sizes mt-20">
-                           <span>Available Colors : </span>
-                           <div class="product-color-options">
+                        <div class="available-colors mb-20">
+                           <span class="mb-10 d-block" style="font-weight: 600;">Select Color: <span class="text-danger">*</span></span>
+                           <div class="product-color-options" style="display: flex; gap: 10px; flex-wrap: wrap;">
                               @foreach($product->colors->where('is_active', true) as $color)
-                                 <span class="color-badge" style="background-color: {{ $color->hex_code }}; width: 30px; height: 30px; display: inline-block; border-radius: 50%; border: 2px solid #ddd; margin-right: 5px;" title="{{ $color->color_name }}"></span>
+                                 <label class="color-option" style="cursor: pointer;" title="{{ $color->color_name }}">
+                                    <input type="radio" name="product_color" value="{{ $color->id }}" style="display: none;" required>
+                                    <span class="color-badge" style="width: 40px; height: 40px; display: inline-block; border-radius: 50%; background-color: {{ $color->hex_code }}; border: 3px solid #ddd; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"></span>
+                                 </label>
                               @endforeach
                            </div>
                         </div>
@@ -414,5 +485,119 @@
          color: #ffb321;
          font-size: 16px;
       }
+
+      /* Size and Color Selection Styles */
+      .size-option input[type="radio"]:checked + .size-badge {
+         border-color: #171717;
+         background-color: #171717;
+         color: #fff;
+      }
+      .size-option:hover .size-badge {
+         border-color: #171717;
+      }
+      .color-option input[type="radio"]:checked + .color-badge {
+         border-color: #171717 !important;
+         border-width: 3px !important;
+         box-shadow: 0 0 0 2px #fff, 0 0 0 4px #171717;
+      }
+      .color-option:hover .color-badge {
+         transform: scale(1.1);
+      }
+      .selection-error {
+         color: #dc3545;
+         font-size: 14px;
+         margin-top: 5px;
+         display: none;
+      }
    </style>
+
+   <!-- Product Details JavaScript -->
+   <script>
+      document.addEventListener('DOMContentLoaded', function() {
+         // Size and Color Selection
+         const sizeOptions = document.querySelectorAll('.size-option');
+         const colorOptions = document.querySelectorAll('.color-option');
+         const addToCartBtn = document.querySelector('.add-to-cart-btn');
+         
+         // Handle size selection
+         sizeOptions.forEach(option => {
+            option.addEventListener('click', function() {
+               const radio = this.querySelector('input[type="radio"]');
+               radio.checked = true;
+               removeError('size');
+            });
+         });
+         
+         // Handle color selection
+         colorOptions.forEach(option => {
+            option.addEventListener('click', function() {
+               const radio = this.querySelector('input[type="radio"]');
+               radio.checked = true;
+               removeError('color');
+            });
+         });
+         
+         // Validate before adding to cart
+         if (addToCartBtn) {
+            addToCartBtn.addEventListener('click', function(e) {
+               let isValid = true;
+               
+               // Check if size selection exists and is required
+               const sizeRadios = document.querySelectorAll('input[name="product_size"]');
+               if (sizeRadios.length > 0) {
+                  const selectedSize = document.querySelector('input[name="product_size"]:checked');
+                  if (!selectedSize) {
+                     showError('size', 'Please select a size');
+                     isValid = false;
+                  }
+               }
+               
+               // Check if color selection exists and is required
+               const colorRadios = document.querySelectorAll('input[name="product_color"]');
+               if (colorRadios.length > 0) {
+                  const selectedColor = document.querySelector('input[name="product_color"]:checked');
+                  if (!selectedColor) {
+                     showError('color', 'Please select a color');
+                     isValid = false;
+                  }
+               }
+               
+               if (!isValid) {
+                  e.stopImmediatePropagation();
+                  e.preventDefault();
+               }
+            });
+         }
+         
+         function showError(type, message) {
+            const container = type === 'size' ? 
+               document.querySelector('.available-sizes') : 
+               document.querySelector('.available-colors');
+            
+            if (container) {
+               let errorEl = container.querySelector('.selection-error');
+               if (!errorEl) {
+                  errorEl = document.createElement('div');
+                  errorEl.className = 'selection-error';
+                  container.appendChild(errorEl);
+               }
+               errorEl.textContent = message;
+               errorEl.style.display = 'block';
+            }
+         }
+         
+         function removeError(type) {
+            const container = type === 'size' ? 
+               document.querySelector('.available-sizes') : 
+               document.querySelector('.available-colors');
+            
+            if (container) {
+               const errorEl = container.querySelector('.selection-error');
+               if (errorEl) {
+                  errorEl.style.display = 'none';
+               }
+            }
+         }
+      });
+   </script>
 @endsection
