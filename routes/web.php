@@ -4,6 +4,8 @@ use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\CartController;
 use App\Http\Controllers\Frontend\WishlistController;
 use App\Http\Controllers\Frontend\ReviewController;
+use App\Http\Controllers\Frontend\CheckoutController;
+use App\Http\Controllers\Frontend\OrderController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -38,10 +40,12 @@ Route::delete('/wishlist/{id}', [WishlistController::class, 'destroy'])->name('w
 // Review Routes
 Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 
-// Checkout Route (placeholder view)
-Route::get('/checkout', function () {
-    return view('frontend.checkout');
-})->name('checkout');
+// Checkout Routes (authenticated users only)
+Route::middleware('auth')->group(function () {
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
+    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+    Route::get('/order-success/{order}', [CheckoutController::class, 'success'])->name('order.success');
+});
 
 // Auth Routes - Redirect dashboard to home for regular users
 Route::get('/dashboard', function () {
@@ -52,9 +56,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    Route::get('/orders', function () {
-        return view('frontend.orders');
-    })->name('orders');
+    
+    // User Orders Routes
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders');
+    Route::get('/orders/{id}', [OrderController::class, 'show'])->name('order.details');
 });
 
 require __DIR__.'/auth.php';

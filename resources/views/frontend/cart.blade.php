@@ -28,6 +28,9 @@
     <!-- Cart Area Start -->
     <section class="cart-area pt-100 pb-100">
         <div class="container">
+            <!-- Alert Container for Cart Messages -->
+            <div id="cart-message-container"></div>
+
             @if(session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     {{ session('success') }}
@@ -259,11 +262,13 @@
                 </div>
             `;
             
-            $('.container').prepend(alertHtml);
+            // Clear previous messages and show new one in specific container
+            $('#cart-message-container').html(alertHtml);
             
+            // Auto-dismiss after 3 seconds
             setTimeout(function() {
-                $('.alert').fadeOut('slow', function() {
-                    $(this).remove();
+                $('#cart-message-container').fadeOut('slow', function() {
+                    $(this).html('').show();
                 });
             }, 3000);
         }

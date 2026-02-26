@@ -188,6 +188,14 @@ class CartController extends Controller
             ->where('is_active', true)
             ->first();
 
+        // Check if coupon has been used by this user before
+        if ($coupon->hasBeenUsedByUser(auth()->id())) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You have already used this coupon. Each coupon can be used only once.'
+            ], 422);
+        }
+
         if (!$coupon) {
             return response()->json([
                 'success' => false,
@@ -246,16 +254,23 @@ class CartController extends Controller
 
         $total = $subtotal - $discount;
 
-        // Store coupon in session
-        session(['applied_coupon' => [
-            'code' => $coupon->code,
-            'discount' => $discount,
-            'discount_type' => $coupon->discount_type,
-            'discount_value' => $coupon->discount_value
-        ]]);
+        // Store coupon in session (for both cart and checkout)
+        session([
+            'applied_coupon' => [
+                'code' => $coupon->code,
+                'discount' => $discount,
+                'discount_type' => $coupon->discount_type,
+                'discount_value' => $coupon->discount_value
+            ],
+            'coupon_code' => $coupon->code,
+            'coupon_discount' => $discount
+        ]);
 
         // Increment usage count
         $coupon->increment('usage_count');
+
+        // Mark coupon as used by this user (per-user tracking)
+        $coupon->markAsUsedByUser(auth()->id());
 
         return response()->json([
             'success' => true,
@@ -289,17 +304,12 @@ class CartController extends Controller
         $appliedCoupon = session('applied_coupon');
         $appliedCode = $appliedCoupon ? $appliedCoupon['code'] : null;
 
-        // Fetch all active coupons
-        $coupons = Coupon::where('is_active', true)
+        // Fetch all active coupons (including those not meeting min requirements)
+        $allCoupons = Coupon::where('is_active', true)
             ->where(function ($query) {
                 // Coupon not expired
                 $query->whereNull('expires_at')
                     ->orWhere('expires_at', '>=', now());
-            })
-            ->where(function ($query) use ($subtotal) {
-                // Check minimum order value - coupon is valid if min_order_value is null or less than subtotal
-                $query->whereNull('min_order_value')
-                    ->orWhere('min_order_value', '<=', $subtotal);
             })
             ->where(function ($query) {
                 // Check customer email restriction - coupon is valid for all or specific email
@@ -307,28 +317,40 @@ class CartController extends Controller
                     ->orWhere('customer_email', auth()->user()->email);
             })
             ->get()
-            // Filter to exclude already applied coupon
-            ->filter(function ($coupon) use ($appliedCode) {
-                return $appliedCode === null || $coupon->code !== $appliedCode;
-            })
-            ->map(function ($coupon) {
+            ->map(function ($coupon) use ($subtotal, $appliedCode) {
+                $isApplied = $appliedCode && $coupon->code === $appliedCode;
+                $meetsMinimum = !$coupon->min_order_value || $subtotal >= $coupon->min_order_value;
+                $hasBeenUsed = $coupon->hasBeenUsedByUser(auth()->id());
+                $isAvailable = !$isApplied && $meetsMinimum && !$hasBeenUsed;
+                
                 return [
                     'code' => $coupon->code,
                     'discount_type' => $coupon->discount_type,
                     'discount_value' => $coupon->discount_value,
                     'min_order_value' => $coupon->min_order_value,
-                    'expires_at' => $coupon->expires_at
+                    'expires_at' => $coupon->expires_at,
+                    'is_available' => $isAvailable,
+                    'is_applied' => $isApplied,
+                    'meets_minimum' => $meetsMinimum,
+                    'has_been_used' => $hasBeenUsed,
+                    'required_amount' => $coupon->min_order_value ? max(0, $coupon->min_order_value - $subtotal) : 0
                 ];
             })
             ->sortByDesc(function ($coupon) {
-                // Sort by discount amount (highest first)
-                return (float)$coupon['discount_value'];
+                // Sort by availability first, then discount amount
+                return [$coupon['is_available'], (float)$coupon['discount_value']];
             })
             ->values();
 
+        // Separate available and unavailable coupons
+        $availableCoupons = $allCoupons->where('is_available', true)->values();
+        $unavailableCoupons = $allCoupons->where('is_available', false)->values();
+
         return response()->json([
             'success' => true,
-            'coupons' => $coupons
+            'coupons' => $availableCoupons,
+            'unavailable_coupons' => $unavailableCoupons,
+            'current_subtotal' => $subtotal
         ]);
     }
 
@@ -351,7 +373,7 @@ class CartController extends Controller
         });
 
         // Remove coupon from session
-        session()->forget('applied_coupon');
+        session()->forget(['applied_coupon', 'coupon_code', 'coupon_discount']);
 
         return response()->json([
             'success' => true,

@@ -11,7 +11,7 @@ class OrderController extends Controller
 {
     public function index()
     {
-        $orders = Order::with(['product', 'designRequest'])
+        $orders = Order::with(['product', 'designRequest', 'items.product', 'user'])
             ->orderBy('created_at', 'desc')
             ->paginate(12);
 
