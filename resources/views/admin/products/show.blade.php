@@ -42,7 +42,7 @@
                         </div>
                         <div>
                             <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Price</p>
-                            <p class="font-semibold text-gray-900 dark:text-gray-100 text-lg mt-1">${{ number_format($product->base_price, 2) }}</p>
+                            <p class="font-semibold text-gray-900 dark:text-gray-100 text-lg mt-1">₹{{ number_format($product->base_price, 2) }}</p>
                         </div>
                         <div>
                             <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Sleeve Type</p>
@@ -50,7 +50,14 @@
                         </div>
                         <div>
                             <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Fit Type</p>
-                            <p class="font-semibold text-gray-900 dark:text-gray-100 mt-1">{{ ucfirst(str_replace('_', ' ', $product->fit_type)) }}</p>
+                            <p class="font-semibold text-gray-900 dark:text-gray-100 mt-1">
+                                @php
+                                    $fitDisplay = $product->fit_type;
+                                    if ($fitDisplay === 'normal') $fitDisplay = 'regular';
+                                    if ($fitDisplay === 'slight_oversize') $fitDisplay = 'oversize';
+                                @endphp
+                                {{ ucfirst(str_replace('_', ' ', $fitDisplay)) }}
+                            </p>
                         </div>
                         <div>
                             <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Edition Type</p>

@@ -6,6 +6,7 @@ use App\Http\Controllers\Frontend\WishlistController;
 use App\Http\Controllers\Frontend\ReviewController;
 use App\Http\Controllers\Frontend\CheckoutController;
 use App\Http\Controllers\Frontend\OrderController;
+use App\Http\Controllers\Frontend\CustomDesignController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -14,7 +15,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/shop', [HomeController::class, 'shop'])->name('shop');
 Route::get('/shop/{category}', [HomeController::class, 'shop'])->name('shop.category');
 Route::get('/product/{id}', [HomeController::class, 'productDetails'])->name('product.details');
-Route::get('/custom-design', [HomeController::class, 'customDesign'])->name('custom-design');
+Route::get('/custom-design', [CustomDesignController::class, 'create'])->name('custom-design');
 Route::get('/limited-edition', [HomeController::class, 'limitedEdition'])->name('limited-edition');
 Route::get('/about', [HomeController::class, 'about'])->name('about');
 Route::get('/refund-policy', [HomeController::class, 'refundPolicy'])->name('refund-policy');
@@ -39,6 +40,24 @@ Route::delete('/wishlist/{id}', [WishlistController::class, 'destroy'])->name('w
 
 // Review Routes
 Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+
+// Custom Design Routes (visible to all, but controller enforces auth)
+Route::middleware('auth')->group(function () {
+    Route::post('/custom-design', [CustomDesignController::class, 'store'])->name('custom-design.store');
+    Route::get('/custom-design/{design}', [CustomDesignController::class, 'show'])->name('custom-design.show');
+    Route::put('/custom-design/{design}', [CustomDesignController::class, 'update'])->name('custom-design.update');
+    Route::get('/custom-design/{design}/download/{fileType}', [CustomDesignController::class, 'download'])
+        ->name('custom-design.download')
+        ->where('fileType', 'front|back');
+    
+    // Custom Design Payment Routes
+    Route::post('/custom-design/{design}/payment', [CustomDesignController::class, 'initiatePayment'])
+        ->name('custom-design.payment.initiate');
+    Route::get('/custom-design/{design}/checkout', [CustomDesignController::class, 'checkout'])
+        ->name('custom-design.checkout');
+    Route::post('/custom-design/{design}/checkout', [CustomDesignController::class, 'processPayment'])
+        ->name('custom-design.payment.process');
+});
 
 // Checkout Routes (authenticated users only)
 Route::middleware('auth')->group(function () {

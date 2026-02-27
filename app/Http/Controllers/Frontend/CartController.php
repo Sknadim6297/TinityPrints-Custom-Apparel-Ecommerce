@@ -252,7 +252,10 @@ class CartController extends Controller
             $discount = ($subtotal * $coupon->discount_value) / 100;
         }
 
-        $total = $subtotal - $discount;
+        // Cap discount to not exceed subtotal
+        $discount = min($discount, $subtotal);
+
+        $total = max(0, $subtotal - $discount);
 
         // Store coupon in session (for both cart and checkout)
         session([

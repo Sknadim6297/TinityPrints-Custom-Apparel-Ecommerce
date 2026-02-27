@@ -232,7 +232,7 @@
                         </div>
                         <div class="irc-item-content">
                            <div class="irc-item-heading">Free Shipping</div>
-                           <p>On All Order Over $599</p>
+                           <p>On All Order Over ₹599</p>
                         </div>
                      </div>
                   </div>

@@ -35,7 +35,10 @@ class CheckoutController extends Controller
         $discountAmount = session('coupon_discount', 0);
         $couponCode = session('coupon_code', null);
 
-        $total = $subtotal - $discountAmount;
+        // Cap discount to not exceed subtotal
+        $discountAmount = min($discountAmount, $subtotal);
+
+        $total = max(0, $subtotal - $discountAmount);
 
         // Get user's saved addresses
         $savedAddresses = UserAddress::where('user_id', auth()->id())
@@ -86,7 +89,10 @@ class CheckoutController extends Controller
 
         $discountAmount = session('coupon_discount', 0);
         $couponCode = session('coupon_code', null);
-        $total = $subtotal - $discountAmount;
+
+        // Cap discount to not exceed subtotal
+        $discountAmount = min($discountAmount, $subtotal);
+        $total = max(0, $subtotal - $discountAmount);
 
         DB::beginTransaction();
 

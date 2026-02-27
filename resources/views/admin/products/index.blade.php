@@ -223,7 +223,7 @@
                             <!-- Price -->
                             <div class="mb-3">
                                 <span class="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                                    ${{ number_format($product->base_price, 2) }}
+                                    ₹{{ number_format($product->base_price, 2) }}
                                 </span>
                             </div>
 

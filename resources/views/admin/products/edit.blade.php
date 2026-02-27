@@ -57,7 +57,7 @@
                     </div>
 
                     <div>
-                        <label for="base_price" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Base Price ($)</label>
+                        <label for="base_price" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Base Price (₹)</label>
                         <input id="base_price" type="number" name="base_price" value="{{ $product->base_price }}" step="0.01" min="0.01" required
                                class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400">
                     </div>
@@ -77,8 +77,8 @@
                         <label for="fit_type" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Fit Type</label>
                         <select id="fit_type" name="fit_type" required
                                 class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400">
-                            <option value="normal" {{ $product->fit_type == 'normal' ? 'selected' : '' }}>Normal</option>
-                            <option value="slight_oversize" {{ $product->fit_type == 'slight_oversize' ? 'selected' : '' }}>Slight Oversize</option>
+                            <option value="regular" {{ $product->fit_type == 'regular' || $product->fit_type == 'normal' ? 'selected' : '' }}>Regular</option>
+                            <option value="oversize" {{ $product->fit_type == 'oversize' || $product->fit_type == 'slight_oversize' ? 'selected' : '' }}>Oversize</option>
                         </select>
                     </div>
 

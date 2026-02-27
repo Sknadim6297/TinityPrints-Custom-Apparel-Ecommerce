@@ -91,6 +91,14 @@
                                         {{ $request->payment_unlocked ? 'Unlocked' : 'Locked' }}
                                     </p>
                                 </div>
+                                @if($request->price)
+                                <div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Price</p>
+                                    <p class="font-bold text-lg text-green-600 dark:text-green-400">
+                                        ₹{{ number_format($request->price, 2) }}
+                                    </p>
+                                </div>
+                                @endif
                             </div>
                         </div>
 
@@ -174,6 +182,23 @@
                                       form="design-action-{{ $request->id }}"
                                       class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400"
                                       placeholder="Remarks for approval, rejection or changes...">{{ old('remarks') }}</textarea>
+                        </div>
+
+                        <div class="mt-4">
+                            <label for="price_{{ $request->id }}" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                                Design Price (₹) <span class="text-red-500">*</span>
+                            </label>
+                            <input type="number" 
+                                   id="price_{{ $request->id }}" 
+                                   name="price" 
+                                   form="design-action-{{ $request->id }}"
+                                   value="{{ old('price', $request->price) }}"
+                                   min="1" 
+                                   step="0.01"
+                                   required
+                                   class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400"
+                                   placeholder="Enter price (e.g., 499.00)">
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Required for approval. This will be shown to the customer.</p>
                         </div>
 
                         <div class="mt-4 flex flex-col sm:flex-row gap-2">

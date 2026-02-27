@@ -110,7 +110,7 @@
                 <div class="flex items-center justify-between">
                     <div class="flex-1">
                         <p class="text-blue-100 text-xs sm:text-sm font-medium mb-1">Monthly Sales</p>
-                        <p class="text-2xl sm:text-4xl font-bold">${{ number_format($stats['monthly_sales'], 0) }}</p>
+                        <p class="text-2xl sm:text-4xl font-bold">₹{{ number_format($stats['monthly_sales'], 0) }}</p>
                     </div>
                     <div class="bg-blue-500 bg-opacity-30 rounded-full p-2 sm:p-4 flex-shrink-0">
                         <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -217,7 +217,7 @@
                 data: {
                     labels: @json($stats['monthly_chart_data']['labels']),
                     datasets: [{
-                        label: 'Sales ($)',
+                        label: 'Sales (₹)',
                         data: @json($stats['monthly_chart_data']['data']),
                         borderColor: 'rgb(239, 68, 68)',
                         backgroundColor: 'rgba(239, 68, 68, 0.1)',

@@ -142,10 +142,10 @@
                         $colorsForImages = $activeColors->count() > 0 ? $activeColors : $product->colors;
                         $productImages = $colorsForImages
                            ->flatMap(function ($color) {
-                              return $color->images->where('image_type', 'front');
+                              return $color->images->whereIn('image_type', ['front', 'back']);
                            })
                            ->values()
-                           ->take(5);
+                           ->take(10);
                         $imageCount = $productImages->count();
                      @endphp
                      <div class="product-details-tab">

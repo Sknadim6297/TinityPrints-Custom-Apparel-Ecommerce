@@ -19,9 +19,16 @@ class DesignApprovalController extends Controller
 
     public function approve(Request $request, DesignRequest $designRequest)
     {
+        $validated = $request->validate([
+            'price' => 'required|numeric|min:1|max:999999.99',
+            'remarks' => 'nullable|string|max:1000',
+        ]);
+
         $designRequest->update([
             'status' => 'approved',
+            'price' => $validated['price'],
             'remarks' => $request->input('remarks'),
+            'admin_remark' => $request->input('remarks'),
             'payment_unlocked' => true,
             'file_locked' => true,
             'reviewed_by' => auth()->guard('admin')->id(),
