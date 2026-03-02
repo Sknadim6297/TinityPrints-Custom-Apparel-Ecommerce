@@ -17,13 +17,10 @@ class LoginHistory extends Model
         'device',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'login_time' => 'datetime',
-            'logout_time' => 'datetime',
-        ];
-    }
+    protected $casts = [
+        'login_time' => 'datetime',
+        'logout_time' => 'datetime',
+    ];
 
     public function user()
     {

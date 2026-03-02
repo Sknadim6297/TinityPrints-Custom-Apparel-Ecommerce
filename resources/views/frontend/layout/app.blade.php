@@ -40,7 +40,8 @@
          gap: 5px;
       }
       .user-profile-trigger:hover {
-         color: #171717;
+         <meta name="csrf-token" content="{{ csrf_token() }}">
+         <meta name="user-auth" content="{{ Auth::check() ? 'true' : 'false' }}">
          text-decoration: none;
       }
       .user-profile-trigger .user-icon {
@@ -104,6 +105,7 @@
    <script src="{{ asset('frontend/assets/js/imagesloaded.pkgd.min.js') }}"></script>
    <script src="{{ asset('frontend/assets/js/main.js') }}"></script>
    <script src="{{ asset('frontend/assets/js/cart-wishlist.js') }}"></script>
+   <script src="{{ asset('frontend/assets/js/auth-protection.js') }}"></script>
    @stack('scripts')
 </body>
 </html>

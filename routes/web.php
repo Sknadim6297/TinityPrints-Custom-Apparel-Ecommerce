@@ -38,26 +38,28 @@ Route::post('/wishlist', [WishlistController::class, 'store'])->name('wishlist.s
 Route::get('/wishlist/sidebar-items', [WishlistController::class, 'getSidebarItems'])->name('wishlist.sidebar-items');
 Route::delete('/wishlist/{id}', [WishlistController::class, 'destroy'])->name('wishlist.destroy');
 
-// Review Routes
-Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
-
-// Custom Design Routes (visible to all, but controller enforces auth)
+// Cart Routes (Protected - requires authentication)
 Route::middleware('auth')->group(function () {
-    Route::post('/custom-design', [CustomDesignController::class, 'store'])->name('custom-design.store');
-    Route::get('/custom-design/{design}', [CustomDesignController::class, 'show'])->name('custom-design.show');
-    Route::put('/custom-design/{design}', [CustomDesignController::class, 'update'])->name('custom-design.update');
-    Route::get('/custom-design/{design}/download/{fileType}', [CustomDesignController::class, 'download'])
-        ->name('custom-design.download')
-        ->where('fileType', 'front|back');
-    
-    // Custom Design Payment Routes
-    Route::post('/custom-design/{design}/payment', [CustomDesignController::class, 'initiatePayment'])
-        ->name('custom-design.payment.initiate');
-    Route::get('/custom-design/{design}/checkout', [CustomDesignController::class, 'checkout'])
-        ->name('custom-design.checkout');
-    Route::post('/custom-design/{design}/checkout', [CustomDesignController::class, 'processPayment'])
-        ->name('custom-design.payment.process');
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
+    Route::patch('/cart/{id}', [CartController::class, 'update'])->name('cart.update');
+    Route::delete('/cart/{id}', [CartController::class, 'destroy'])->name('cart.destroy');
+    Route::get('/cart/sidebar-items', [CartController::class, 'getSidebarItems'])->name('cart.sidebar-items');
+    Route::post('/cart/apply-coupon', [CartController::class, 'applyCoupon'])->name('cart.apply-coupon');
+    Route::get('/cart/available-coupons', [CartController::class, 'getAvailableCoupons'])->name('cart.available-coupons');
+    Route::post('/cart/remove-coupon', [CartController::class, 'removeCoupon'])->name('cart.remove-coupon');
 });
+
+// Wishlist Routes (Protected - requires authentication)
+Route::middleware('auth')->group(function () {
+    Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
+    Route::post('/wishlist', [WishlistController::class, 'store'])->name('wishlist.store');
+    Route::get('/wishlist/sidebar-items', [WishlistController::class, 'getSidebarItems'])->name('wishlist.sidebar-items');
+    Route::delete('/wishlist/{id}', [WishlistController::class, 'destroy'])->name('wishlist.destroy');
+});
+
+// Review Routes (Protected - requires authentication)
+Route::post('/reviews', [ReviewController::class, 'store'])->middleware('auth')->name('reviews.store');
 
 // Checkout Routes (authenticated users only)
 Route::middleware('auth')->group(function () {
