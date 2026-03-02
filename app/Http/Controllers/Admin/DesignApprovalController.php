@@ -136,6 +136,27 @@ class DesignApprovalController extends Controller
             ->with('success', 'Design file updated. Re-approval required.');
     }
 
+    public function download(DesignRequest $designRequest, string $fileType)
+    {
+        $path = $fileType === 'front'
+            ? ($designRequest->front_design_file ?: $designRequest->design_file_path)
+            : $designRequest->back_design_file;
+
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+        $disk = Storage::disk('public');
+
+        if (!$path || !$disk->exists($path)) {
+            return redirect()->route('admin.design-approvals.index')
+                ->with('error', ucfirst($fileType).' design file not found.');
+        }
+
+        if (method_exists($disk, 'download')) {
+            return $disk->download($path);
+        }
+
+        return response()->download($disk->path($path));
+    }
+
     public function toggleLock(Request $request, DesignRequest $designRequest)
     {
         $locked = (bool) $request->input('locked');

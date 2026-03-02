@@ -134,8 +134,19 @@
                               <tr>
                                  <td>
                                     <div class="product-info-cell">
-                                       <img src="{{ $item->product->images->first() ? \Illuminate\Support\Facades\Storage::url($item->product->images->first()->image_path) : asset('frontend/assets/img/product/product-img1.jpg') }}" 
-                                            alt="{{ $item->product_name }}">
+                                       @if($order->design_request_id && $order->designRequest && $order->designRequest->front_design_file)
+                                          {{-- Custom Design Order - Show uploaded design --}}
+                                          <img src="{{ \Illuminate\Support\Facades\Storage::url($order->designRequest->front_design_file) }}" 
+                                               alt="{{ $item->product_name }}" style="object-fit: contain;">
+                                       @elseif($item->product && $item->product->images && $item->product->images->first())
+                                          {{-- Regular Shop Order - Show product image --}}
+                                          <img src="{{ \Illuminate\Support\Facades\Storage::url($item->product->images->first()->image_path) }}" 
+                                               alt="{{ $item->product_name }}">
+                                       @else
+                                          {{-- Fallback placeholder --}}
+                                          <img src="{{ asset('frontend/assets/img/product/product-img1.jpg') }}" 
+                                               alt="{{ $item->product_name }}">
+                                       @endif
                                        <span>{{ $item->product_name }}</span>
                                     </div>
                                  </td>

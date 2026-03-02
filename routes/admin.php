@@ -104,6 +104,9 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
     Route::middleware('admin.role:design_approver,super_admin')->group(function () {
         Route::get('design-approvals', [DesignApprovalController::class, 'index'])
             ->name('design-approvals.index');
+        Route::get('design-approvals/{designRequest}/download/{fileType}', [DesignApprovalController::class, 'download'])
+            ->name('design-approvals.download')
+            ->where('fileType', 'front|back');
         Route::post('design-approvals/{designRequest}/approve', [DesignApprovalController::class, 'approve'])
             ->name('design-approvals.approve');
         Route::post('design-approvals/{designRequest}/reject', [DesignApprovalController::class, 'reject'])

@@ -270,6 +270,9 @@ class CustomDesignController extends Controller
                 'customer_name' => $design->customer_name,
                 'email' => $design->email,
                 'phone' => $design->phone,
+                'product_name' => 'Custom Design T-Shirt #' . $design->id,
+                'product_size' => strtoupper($design->selected_size),
+                'quantity' => 1,
                 'shipping_address' => $validated['shipping_address'],
                 'shipping_city' => $validated['shipping_city'],
                 'shipping_state' => $validated['shipping_state'],
@@ -280,6 +283,8 @@ class CustomDesignController extends Controller
                 'payment_method' => $validated['payment_method'],
                 'payment_status' => $validated['payment_method'] === 'cod' ? 'pending' : 'paid',
                 'order_status' => $validated['payment_method'] === 'cod' ? 'payment_pending' : 'paid',
+                'design_request_id' => $design->id,
+                'custom_design_status' => 'approved',
             ]);
 
             // Create order item for the custom design
@@ -297,7 +302,7 @@ class CustomDesignController extends Controller
             // Update design with order reference
             $design->update([
                 'order_id' => $order->id,
-                'payment_status' => $validated['payment_method'] === 'cod' ? 'pending' : 'paid',
+                'payment_status' => $validated['payment_method'] === 'cod' ? 'unpaid' : 'paid',
             ]);
 
             // Clear session
