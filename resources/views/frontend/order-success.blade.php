@@ -34,7 +34,7 @@
                <!-- Success Header -->
                <div class="success-header text-center mb-40">
                   <div class="success-icon mb-30">
-                     <i class="fas fa-check-circle"></i>
+                     <i class="fal fa-check-circle"></i>
                   </div>
                   <h2 class="success-title mb-15">Thank You!</h2>
                   <p class="success-subtitle">Your order has been placed successfully</p>
@@ -51,7 +51,7 @@
                   <div class="col-md-6 mb-20">
                      <div class="info-card">
                         <div class="info-card-icon">
-                           <i class="fas fa-rupee-sign"></i>
+                           <i class="fal fa-rupee-sign"></i>
                         </div>
                         <div class="info-card-content">
                            <div class="info-card-label">Total Amount</div>
@@ -62,7 +62,7 @@
                   <div class="col-md-6 mb-20">
                      <div class="info-card">
                         <div class="info-card-icon">
-                           <i class="fas fa-wallet"></i>
+                           <i class="fal fa-wallet"></i>
                         </div>
                         <div class="info-card-content">
                            <div class="info-card-label">Payment Method</div>
@@ -81,7 +81,7 @@
                      <div class="col-md-6 mb-30">
                         <div class="detail-box">
                            <div class="detail-box-header">
-                              <i class="fas fa-shipping-fast"></i>
+                              <i class="fal fa-shipping-fast"></i>
                               <h6>Shipping Address</h6>
                            </div>
                            <div class="detail-box-content">
@@ -97,16 +97,16 @@
                      <div class="col-md-6 mb-30">
                         <div class="detail-box">
                            <div class="detail-box-header">
-                              <i class="fas fa-address-book"></i>
+                              <i class="fal fa-address-book"></i>
                               <h6>Contact Information</h6>
                            </div>
                            <div class="detail-box-content">
                               <p class="mb-2">
-                                 <i class="fas fa-phone-alt text-muted me-2"></i>
+                                 <i class="fal fa-phone-alt text-muted me-2"></i>
                                  <strong>Phone:</strong> {{ $order->phone }}
                               </p>
                               <p class="mb-0">
-                                 <i class="fas fa-envelope text-muted me-2"></i>
+                                 <i class="fal fa-envelope text-muted me-2"></i>
                                  <strong>Email:</strong> {{ $order->email }}
                               </p>
                            </div>
@@ -186,17 +186,17 @@
 
                <!-- Email Confirmation Notice -->
                <div class="confirmation-notice mb-40">
-                  <i class="fas fa-info-circle"></i>
+                  <i class="fal fa-info-circle"></i>
                   <p>You will receive an email confirmation at <strong>{{ $order->email }}</strong> shortly. You can track your order status in your profile.</p>
                </div>
 
                <!-- Action Buttons -->
                <div class="order-actions text-center">
                   <a href="{{ route('orders') }}" class="fill-btn me-3">
-                     <i class="fas fa-list me-2"></i> View My Orders
+                     <i class="fal fa-list me-2"></i> View My Orders
                   </a>
                   <a href="{{ route('shop') }}" class="border-btn">
-                     <i class="fas fa-shopping-bag me-2"></i> Continue Shopping
+                     <i class="fal fa-shopping-bag me-2"></i> Continue Shopping
                   </a>
                </div>
             </div>

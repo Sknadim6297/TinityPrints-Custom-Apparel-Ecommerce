@@ -108,8 +108,8 @@
                                  <img src="{{ $productImage ? Storage::url($productImage) : asset('frontend/assets/img/product/product-img1.jpg') }}" alt="{{ $product->name }}">
                               </a>
                               <div class="product-action">
-                                 <a href="{{ route('product.details', $product->id) }}" class="quick-view-btn"><i class="fal fa-eye"></i></a>
-                                 <button type="button" class="wishlist-btn add-to-wishlist-btn" data-product-id="{{ $product->id }}"><i class="fal fa-heart"></i></button>
+                                 <a href="{{ route('product.details', $product->id) }}" class="quick-view-btn"><i class="far fa-eye"></i></a>
+                                 <button type="button" class="wishlist-btn add-to-wishlist-btn" data-product-id="{{ $product->id }}"><i class="far fa-heart"></i></button>
                               </div>
                               <div class="product-action-bottom">
                                  <button type="button" class="add-cart-btn add-to-cart-btn" data-product-id="{{ $product->id }}"><i class="fal fa-shopping-bag"></i>Add to Cart</button>
@@ -141,7 +141,7 @@
                         @empty
                         <div class="col-12">
                            <div class="text-center py-5">
-                              <i class="fas fa-box-open" style="font-size: 64px; color: var(--clr-common-border); margin-bottom: 20px;"></i>
+                              <i class="fal fa-box-open" style="font-size: 64px; color: var(--clr-common-border); margin-bottom: 20px;"></i>
                               <h3 style="color: var(--clr-common-heading);">No products found</h3>
                               <p style="color: var(--clr-common-text);">Try adjusting your filters or check back later for new products.</p>
                               <a href="{{ route('shop') }}" class="btn mt-3" 
@@ -164,7 +164,7 @@
                               <div class="filter-widget-content">
                                  <div class="filter-widget-search">
                                     <input type="text" name="search" placeholder="Search here.." value="{{ request('search') }}">
-                                    <button type="submit"><i class="fas fa-search"></i></button>
+                                    <button type="submit"><i class="fal fa-search"></i></button>
                                  </div>
                               </div>
                            </div>
@@ -178,11 +178,11 @@
                                        <span class="category-items-number">{{ $totalProducts ?? 0 }}</span>
                                     </a>
                                     <a href="{{ route('shop', ['category' => 't-shirt'] + request()->except('category')) }}" class="category-item {{ request('category') == 't-shirt' ? 'active' : '' }}">
-                                       <div class="category-name"><i class="fas fa-tshirt mr-2"></i>T-Shirts</div> 
+                                       <div class="category-name"><i class="fal fa-tshirt mr-2"></i>T-Shirts</div> 
                                        <span class="category-items-number">{{ $categoryStats['t-shirt'] ?? 0 }}</span>
                                     </a>
                                     <a href="{{ route('shop', ['category' => 'accessories'] + request()->except('category')) }}" class="category-item {{ request('category') == 'accessories' ? 'active' : '' }}">
-                                       <div class="category-name"><i class="fas fa-gem mr-2"></i>Accessories</div> 
+                                       <div class="category-name"><i class="fal fa-gem mr-2"></i>Accessories</div> 
                                        <span class="category-items-number">{{ $categoryStats['accessories'] ?? 0 }}</span>
                                     </a>
                                  </div>
@@ -190,7 +190,7 @@
                            </div>
                            
                            <div class="filter-widget">
-                              <h4 class="filter-widget-title drop-btn"><i class="fas fa-fire mr-2" style="color: #ffc107;"></i>Limited Edition</h4>
+                              <h4 class="filter-widget-title drop-btn"><i class="fal fa-fire mr-2" style="color: #ffc107;"></i>Limited Edition</h4>
                               <div class="filter-widget-content">
                                  <div class="category-items">
                                     <a href="{{ route('shop', ['limited_edition' => 'yes'] + request()->except('limited_edition')) }}" class="category-item {{ request('limited_edition') == 'yes' ? 'active' : '' }}" style="{{ request('limited_edition') == 'yes' ? 'background-color: #fff3cd; border-left-color: #ffc107;' : '' }}">
@@ -261,7 +261,7 @@
                                                  {{ $isChecked ? 'checked' : '' }}
                                                  onchange="document.getElementById('filter-form').submit()" style="display: none;">
                                           @if($isChecked)
-                                          <i class="fas fa-check" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: {{ $textColor }}; font-weight: bold;"></i>
+                                          <i class="fal fa-check" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: {{ $textColor }}; font-weight: bold;"></i>
                                           @endif
                                        </label>
                                        @endforeach
@@ -303,7 +303,7 @@
                            <div class="filter-widget">
                               <a href="{{ route('shop') }}" class="btn w-100" 
                                  style="background-color: transparent; border: 2px solid var(--clr-common-heading); color: var(--clr-common-heading); padding: 12px; border-radius: 8px; font-weight: 600; text-align: center; transition: all 0.3s; display: block;">
-                                 <i class="fas fa-times-circle mr-2"></i>Clear All Filters
+                                 <i class="fal fa-times-circle mr-2"></i>Clear All Filters
                               </a>
                            </div>
                         </div>

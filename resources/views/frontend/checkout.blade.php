@@ -75,11 +75,11 @@
                                              @endif
                                              <p class="mb-1 mt-2">{{ $address->address }}</p>
                                              @if($address->landmark)
-                                                <p class="mb-1 text-muted small"><i class="fas fa-map-marker-alt"></i> Landmark: {{ $address->landmark }}</p>
+                                                <p class="mb-1 text-muted small"><i class="fal fa-map-marker-alt"></i> Landmark: {{ $address->landmark }}</p>
                                              @endif
                                              <p class="mb-1">{{ $address->city }}, {{ $address->state }} {{ $address->postal_code }}</p>
                                              <p class="mb-0">{{ $address->country }}</p>
-                                             <p class="mb-0 text-muted small"><i class="fas fa-phone"></i> {{ $address->phone }}</p>
+                                             <p class="mb-0 text-muted small"><i class="fal fa-phone"></i> {{ $address->phone }}</p>
                                           </div>
                                        </div>
                                     </label>
@@ -88,7 +88,7 @@
                            @endforeach
                         </div>
                         <button type="button" class="border-btn mt-3" data-bs-toggle="collapse" data-bs-target="#newAddressForm">
-                           <i class="fas fa-plus"></i> Add New Address
+                           <i class="fal fa-plus"></i> Add New Address
                         </button>
                      </div>
                   @endif
@@ -239,14 +239,14 @@
                                   {{ old('payment_method', 'cod') == 'cod' ? 'checked' : '' }} required>
                            <label for="cod" class="payment-option-label">
                               <div class="payment-icon">
-                                 <i class="fas fa-money-bill-wave"></i>
+                                 <i class="fal fa-money-bill-wave"></i>
                               </div>
                               <div class="payment-content">
                                  <span class="payment-title">Cash on Delivery</span>
                                  <span class="payment-subtitle">Pay when you receive your order</span>
                               </div>
                               <div class="payment-check">
-                                 <i class="fas fa-check-circle"></i>
+                                 <i class="fal fa-check-circle"></i>
                               </div>
                            </label>
                         </div>
@@ -257,14 +257,14 @@
                                   {{ old('payment_method') == 'online' ? 'checked' : '' }}>
                            <label for="online" class="payment-option-label">
                               <div class="payment-icon">
-                                 <i class="fas fa-credit-card"></i>
+                                 <i class="fal fa-credit-card"></i>
                               </div>
                               <div class="payment-content">
                                  <span class="payment-title">Online Payment</span>
                                  <span class="payment-subtitle">Pay via Card/UPI/Wallet</span>
                               </div>
                               <div class="payment-check">
-                                 <i class="fas fa-check-circle"></i>
+                                 <i class="fal fa-check-circle"></i>
                               </div>
                            </label>
                         </div>
@@ -275,14 +275,14 @@
                                   {{ old('payment_method') == 'bank_transfer' ? 'checked' : '' }}>
                            <label for="bank_transfer" class="payment-option-label">
                               <div class="payment-icon">
-                                 <i class="fas fa-university"></i>
+                                 <i class="fal fa-university"></i>
                               </div>
                               <div class="payment-content">
                                  <span class="payment-title">Bank Transfer</span>
                                  <span class="payment-subtitle">Direct bank transfer</span>
                               </div>
                               <div class="payment-check">
-                                 <i class="fas fa-check-circle"></i>
+                                 <i class="fal fa-check-circle"></i>
                               </div>
                            </label>
                         </div>
@@ -349,11 +349,11 @@
                      </div>
 
                      <button type="submit" class="fill-btn w-100 mt-4">
-                        <i class="fas fa-lock me-2"></i> Place Order
+                        <i class="fal fa-lock me-2"></i> Place Order
                      </button>
 
                      <p class="text-center text-muted small mt-3 mb-0">
-                        <i class="fas fa-shield-alt me-1"></i> Your information is secure with us
+                        <i class="fal fa-shield-alt me-1"></i> Your information is secure with us
                      </p>
                   </div>
                </div>

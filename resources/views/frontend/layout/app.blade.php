@@ -9,6 +9,7 @@
    <meta name="description" content="">
    <meta name="viewport" content="width=device-width, initial-scale=1">
    <meta name="csrf-token" content="{{ csrf_token() }}">
+   <meta name="user-auth" content="{{ Auth::check() ? 'true' : 'false' }}">
    
    <!-- Place favicon.ico in the root directory -->
    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('frontend/assets/img/favicon.png') }}">
@@ -23,9 +24,8 @@
    <link rel="stylesheet" href="{{ asset('frontend/assets/css/magnific-popup.css') }}">
    <link rel="stylesheet" href="{{ asset('frontend/assets/css/ui-range-slider.css') }}">
    <link rel="stylesheet" href="{{ asset('frontend/assets/css/nice-select.css') }}">
+   <!-- Font Awesome 5 Pro - Local -->
    <link rel="stylesheet" href="{{ asset('frontend/assets/css/fontAwesome5Pro.css') }}">
-   <!-- Font Awesome 6 CDN -->
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
    <link rel="stylesheet" href="{{ asset('frontend/assets/css/flaticon.css') }}">
    <link rel="stylesheet" href="{{ asset('frontend/assets/css/default.css') }}">
    <link rel="stylesheet" href="{{ asset('frontend/assets/css/style.css') }}">
@@ -40,8 +40,6 @@
          gap: 5px;
       }
       .user-profile-trigger:hover {
-         <meta name="csrf-token" content="{{ csrf_token() }}">
-         <meta name="user-auth" content="{{ Auth::check() ? 'true' : 'false' }}">
          text-decoration: none;
       }
       .user-profile-trigger .user-icon {

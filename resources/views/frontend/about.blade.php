@@ -80,7 +80,7 @@
                         </div>
                         <div class="action-item action-item-wishlist">
                            <a href="{{ route('wishlist.index') }}">
-                              <i class="fal fa-heart"></i>
+                              <i class="far fa-heart"></i>
                               @auth
                                  @php
                                     $wishlistCount = \App\Models\Wishlist::where('user_id', auth()->id())->count();

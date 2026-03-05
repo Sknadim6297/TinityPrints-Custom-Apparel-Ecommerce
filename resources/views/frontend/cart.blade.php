@@ -141,8 +141,8 @@
                                     <!-- Applied Coupon Display -->
                                     <div id="applied_coupon_box" class="mt-3" style="display: none; background-color: #e8f5e9; border-left: 4px solid #4caf50; padding: 15px; border-radius: 5px;">
                                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                                            <h5 style="margin: 0; color: #2e7d32;"><i class="fas fa-check-circle"></i> Coupon Applied</h5>
-                                            <button id="remove_coupon_btn" type="button" style="background: none; border: none; color: #d32f2f; cursor: pointer; font-size: 18px;"><i class="fas fa-times"></i></button>
+                                            <h5 style="margin: 0; color: #2e7d32;"><i class="fal fa-check-circle"></i> Coupon Applied</h5>
+                                            <button id="remove_coupon_btn" type="button" style="background: none; border: none; color: #d32f2f; cursor: pointer; font-size: 18px;"><i class="fal fa-times"></i></button>
                                         </div>
                                         <div style="font-size: 14px; color: #333;">
                                             <p style="margin: 5px 0;"><strong>Code:</strong> <span id="applied_code"></span></p>

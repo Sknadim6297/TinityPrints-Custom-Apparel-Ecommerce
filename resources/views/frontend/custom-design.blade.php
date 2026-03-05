@@ -131,7 +131,7 @@
                         <!-- Design Upload Section -->
                         <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg">
                            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200 mb-4">
-                              <i class="fas fa-image"></i> Design Files
+                              <i class="fal fa-image"></i> Design Files
                            </h3>
 
                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
@@ -140,7 +140,7 @@
                               <!-- Design Upload Section -->
                               <div class="col-md-12">
                                  <div class="section-title mb-30 mt-30">
-                                    <h4><i class="fas fa-image"></i> Upload Your Design Files</h4>
+                                    <h4><i class="fal fa-image"></i> Upload Your Design Files</h4>
                                  </div>
                               </div>
 
@@ -174,7 +174,7 @@
                               <!-- Notes Section -->
                               <div class="col-md-12">
                                  <div class="section-title mb-30 mt-30">
-                                    <h4><i class="fas fa-comment"></i> Additional Instructions</h4>
+                                    <h4><i class="fal fa-comment"></i> Additional Instructions</h4>
                                  </div>
                               </div>
 
@@ -221,7 +221,7 @@
                                        <h5 class="mb-15"><strong>Please fix the following errors:</strong></h5>
                                        <ul class="list-unstyled">
                                           @foreach($errors->all() as $error)
-                                             <li><i class="fas fa-times-circle"></i> {{ $error }}</li>
+                                             <li><i class="fal fa-times-circle"></i> {{ $error }}</li>
                                           @endforeach
                                        </ul>
                                     </div>
@@ -232,7 +232,7 @@
                               <div class="col-md-12">
                                  <div class="custom-design-buttons" style="display: flex; gap: 15px;">
                                     <button type="submit" class="fill-btn">
-                                       <i class="fas fa-cloud-upload-alt"></i> Submit for Review
+                                       <i class="fal fa-cloud-upload-alt"></i> Submit for Review
                                     </button>
                                     <a href="{{ route('home') }}" class="border-btn">
                                        Cancel
@@ -251,7 +251,7 @@
                      <!-- Design Guidelines -->
                      <div class="sidebar-widget">
                         <h4 class="sidebar-widget-title">
-                           <i class="fas fa-lightbulb"></i> Design Guidelines
+                           <i class="fal fa-lightbulb"></i> Design Guidelines
                         </h4>
                         <div class="sidebar-widget-content">
                            <div class="guideline-list">
@@ -282,16 +282,16 @@
                      <!-- Pricing Info -->
                      <div class="sidebar-widget mt-40">
                         <h4 class="sidebar-widget-title">
-                           <i class="fas fa-tag"></i> Pricing
+                           <i class="fal fa-tag"></i> Pricing
                         </h4>
                         <div class="sidebar-widget-content">
                            <div class="pricing-info">
                               <p>Custom design pricing starts at <strong>₹499.00</strong> for a single shirt depending on:</p>
                               <ul class="list-unstyled mt-15">
-                                 <li class="mb-8"><i class="fas fa-check text-success"></i> T-shirt size & fabric quality</li>
-                                 <li class="mb-8"><i class="fas fa-check text-success"></i> Design complexity</li>
-                                 <li class="mb-8"><i class="fas fa-check text-success"></i> Number of colors</li>
-                                 <li><i class="fas fa-check text-success"></i> Quantity of shirts</li>
+                                 <li class="mb-8"><i class="fal fa-check text-success"></i> T-shirt size & fabric quality</li>
+                                 <li class="mb-8"><i class="fal fa-check text-success"></i> Design complexity</li>
+                                 <li class="mb-8"><i class="fal fa-check text-success"></i> Number of colors</li>
+                                 <li><i class="fal fa-check text-success"></i> Quantity of shirts</li>
                               </ul>
                               <p class="mt-15"><small class="text-muted">Final price will be confirmed after design approval.</small></p>
                            </div>
@@ -301,7 +301,7 @@
                      <!-- FAQ -->
                      <div class="sidebar-widget mt-40">
                         <h4 class="sidebar-widget-title">
-                           <i class="fas fa-question-circle"></i> FAQ
+                           <i class="fal fa-question-circle"></i> FAQ
                         </h4>
                         <div class="sidebar-widget-content">
                            <div class="faq-list">
@@ -329,16 +329,16 @@
                <div class="col-lg-8 mx-auto">
                   <div class="login-required-card">
                      <div class="text-center mb-40">
-                        <i class="fas fa-lock" style="font-size: 60px; color: #f4b400;"></i>
+                        <i class="fal fa-lock" style="font-size: 60px; color: #f4b400;"></i>
                         <h2 class="mt-30 mb-20">Sign In Required</h2>
                         <p class="text-muted">You must be logged in to submit a custom design. Please sign in to your account or create a new account to get started.</p>
                      </div>
                      <div style="display: flex; gap: 15px; justify-content: center;">
                         <a href="{{ route('login') }}" class="fill-btn">
-                           <i class="fas fa-sign-in-alt"></i> Sign In
+                           <i class="fal fa-sign-in-alt"></i> Sign In
                         </a>
                         <a href="{{ route('register') }}" class="border-btn">
-                           <i class="fas fa-user-plus"></i> Create Account
+                           <i class="fal fa-user-plus"></i> Create Account
                         </a>
                      </div>
                   </div>

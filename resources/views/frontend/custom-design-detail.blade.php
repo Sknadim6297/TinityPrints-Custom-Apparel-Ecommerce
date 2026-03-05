@@ -52,7 +52,7 @@
                         @if($design->status === 'pending')
                            <div class="alert alert-info mb-0">
                               <div class="d-flex align-items-start">
-                                 <i class="fas fa-hourglass-half me-3" style="font-size: 24px; margin-top: 2px;"></i>
+                                 <i class="fal fa-hourglass-half me-3" style="font-size: 24px; margin-top: 2px;"></i>
                                  <div>
                                     <h6 class="mb-1"><strong>Pending Review</strong></h6>
                                     <p class="mb-0">Your design is being reviewed by our team. This usually takes 24-48 hours.</p>
@@ -63,7 +63,7 @@
                            <div class="alert alert-success mb-0">
                               <div class="d-flex align-items-start justify-content-between">
                                  <div class="d-flex align-items-start">
-                                    <i class="fas fa-check-circle me-3" style="font-size: 24px; margin-top: 2px;"></i>
+                                    <i class="fal fa-check-circle me-3" style="font-size: 24px; margin-top: 2px;"></i>
                                     <div>
                                        <h6 class="mb-1"><strong>Approved! 🎉</strong></h6>
                                        @if($design->price > 0)
@@ -84,7 +84,7 @@
                         @elseif($design->status === 'rejected')
                            <div class="alert alert-danger mb-0">
                               <div class="d-flex align-items-start">
-                                 <i class="fas fa-times-circle me-3" style="font-size: 24px; margin-top: 2px;"></i>
+                                 <i class="fal fa-times-circle me-3" style="font-size: 24px; margin-top: 2px;"></i>
                                  <div>
                                     <h6 class="mb-1"><strong>Design Rejected</strong></h6>
                                     <p class="mb-0">Unfortunately, this design does not meet our quality standards.</p>
@@ -94,7 +94,7 @@
                         @elseif($design->status === 'changes_requested')
                            <div class="alert alert-warning mb-0">
                               <div class="d-flex align-items-start">
-                                 <i class="fas fa-exclamation-circle me-3" style="font-size: 24px; margin-top: 2px;"></i>
+                                 <i class="fal fa-exclamation-circle me-3" style="font-size: 24px; margin-top: 2px;"></i>
                                  <div>
                                     <h6 class="mb-1"><strong>Revision Requested</strong></h6>
                                     <p class="mb-0">Please update your design based on the feedback below.</p>
@@ -138,7 +138,7 @@
                      <!-- Design Files -->
                      <div class="mb-4 pb-4 border-bottom">
                         <h5 class="mb-3">
-                           <i class="fas fa-file-image"></i> Design Files
+                           <i class="fal fa-file-image"></i> Design Files
                         </h5>
 
                         <div class="row">
@@ -147,14 +147,14 @@
                               <div class="p-3 bg-light rounded">
                                  <div class="d-flex justify-content-between align-items-center mb-2">
                                     <strong>Front Design</strong>
-                                    <i class="fas fa-check-circle text-success"></i>
+                                    <i class="fal fa-check-circle text-success"></i>
                                  </div>
                                  <p class="text-muted mb-3" style="font-size: 12px; word-break: break-all;">
                                     {{ basename($design->front_design_file) }}
                                  </p>
                                  <a href="{{ route('custom-design.download', [$design, 'front']) }}" 
                                     class="fill-btn btn-sm">
-                                    <i class="fas fa-download me-1"></i>Download
+                                    <i class="fal fa-download me-1"></i>Download
                                  </a>
                               </div>
                            </div>
@@ -165,9 +165,9 @@
                                  <div class="d-flex justify-content-between align-items-center mb-2">
                                     <strong>Back Design</strong>
                                     @if($design->back_design_file)
-                                       <i class="fas fa-check-circle text-success"></i>
+                                       <i class="fal fa-check-circle text-success"></i>
                                     @else
-                                       <i class="fas fa-minus-circle text-muted"></i>
+                                       <i class="fal fa-minus-circle text-muted"></i>
                                     @endif
                                  </div>
                                  @if($design->back_design_file)
@@ -176,7 +176,7 @@
                                     </p>
                                     <a href="{{ route('custom-design.download', [$design, 'back']) }}" 
                                        class="fill-btn btn-sm">
-                                       <i class="fas fa-download me-1"></i>Download
+                                       <i class="fal fa-download me-1"></i>Download
                                     </a>
                                  @else
                                     <p class="text-muted mb-0" style="font-size: 12px;">Not provided</p>
@@ -190,7 +190,7 @@
                      @if($design->notes)
                         <div class="mb-4 pb-4 border-bottom">
                            <h5 class="mb-3">
-                              <i class="fas fa-sticky-note"></i> Your Notes
+                              <i class="fal fa-sticky-note"></i> Your Notes
                            </h5>
                            <div class="p-3 bg-light rounded">
                               <p class="mb-0" style="white-space: pre-wrap;">{{ $design->notes }}</p>
@@ -203,7 +203,7 @@
                         <div class="mb-4">
                            <div class="alert alert-warning">
                               <h5 class="mb-2">
-                                 <i class="fas fa-comment-dots"></i> Admin Feedback
+                                 <i class="fal fa-comment-dots"></i> Admin Feedback
                               </h5>
                               <p class="mb-0" style="white-space: pre-wrap;">{{ $design->admin_remark }}</p>
                            </div>
@@ -215,13 +215,13 @@
                         @if($design->canPay())
                            <form method="GET" action="{{ route('custom-design.checkout', $design) }}" class="flex-fill">
                               <button type="submit" class="fill-btn w-100">
-                                 <i class="fas fa-credit-card me-2"></i>
+                                 <i class="fal fa-credit-card me-2"></i>
                                  Pay Now (₹{{ number_format($design->price, 2) }})
                               </button>
                            </form>
                         @elseif($design->status === 'approved' && (!$design->price || $design->price <= 0))
                            <div class="alert alert-info mb-0 flex-fill">
-                              <i class="fas fa-info-circle me-2"></i>
+                              <i class="fal fa-info-circle me-2"></i>
                               Waiting for admin to set the price. Payment will be enabled once pricing is complete.
                            </div>
                         @endif
@@ -230,7 +230,7 @@
                            <button type="button" 
                                    class="border-btn flex-fill"
                                    onclick="document.getElementById('revisionForm').classList.remove('d-none')">
-                              <i class="fas fa-upload me-2"></i>
+                              <i class="fal fa-upload me-2"></i>
                               Resubmit Design
                            </button>
                         @endif
@@ -247,7 +247,7 @@
                   <div id="revisionForm" class="card shadow-sm mb-4 d-none">
                      <div class="card-header bg-warning text-white">
                         <h5 class="mb-0">
-                           <i class="fas fa-redo"></i> Resubmit Your Design
+                           <i class="fal fa-redo"></i> Resubmit Your Design
                         </h5>
                      </div>
                      <div class="card-body">
@@ -283,7 +283,7 @@
 
                            <div class="d-flex gap-3">
                               <button type="submit" class="fill-btn flex-fill">
-                                 <i class="fas fa-check me-2"></i>Resubmit
+                                 <i class="fal fa-check me-2"></i>Resubmit
                               </button>
                               <button type="button" 
                                       onclick="document.getElementById('revisionForm').classList.add('d-none')"
@@ -303,7 +303,7 @@
                <div class="card shadow-sm mb-4">
                   <div class="card-header bg-white">
                      <h5 class="mb-0">
-                        <i class="fas fa-lightbulb text-warning"></i> Design Guidelines
+                        <i class="fal fa-lightbulb text-warning"></i> Design Guidelines
                      </h5>
                   </div>
                   <div class="card-body">
@@ -338,16 +338,16 @@
                <div class="card shadow-sm mb-4">
                   <div class="card-header bg-white">
                      <h5 class="mb-0">
-                        <i class="fas fa-tag text-success"></i> Pricing
+                        <i class="fal fa-tag text-success"></i> Pricing
                      </h5>
                   </div>
                   <div class="card-body">
                      <p>Custom design pricing starts at <strong class="text-success">₹499.00</strong> for a single shirt depending on:</p>
                      <ul class="list-unstyled mt-3">
-                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>T-shirt size & fabric quality</li>
-                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Design complexity</li>
-                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Number of colors</li>
-                        <li><i class="fas fa-check text-success me-2"></i>Quantity of shirts</li>
+                        <li class="mb-2"><i class="fal fa-check text-success me-2"></i>T-shirt size & fabric quality</li>
+                        <li class="mb-2"><i class="fal fa-check text-success me-2"></i>Design complexity</li>
+                        <li class="mb-2"><i class="fal fa-check text-success me-2"></i>Number of colors</li>
+                        <li><i class="fal fa-check text-success me-2"></i>Quantity of shirts</li>
                      </ul>
                      <p class="mt-3 mb-0"><small class="text-muted">Final price will be confirmed after design approval.</small></p>
                   </div>
@@ -357,7 +357,7 @@
                <div class="card shadow-sm">
                   <div class="card-header bg-white">
                      <h5 class="mb-0">
-                        <i class="fas fa-question-circle text-info"></i> FAQ
+                        <i class="fal fa-question-circle text-info"></i> FAQ
                      </h5>
                   </div>
                   <div class="card-body">

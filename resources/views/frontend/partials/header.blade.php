@@ -10,7 +10,7 @@
                <div class="col-lg-4">
                   <form action="#" class="filter-search-input header-search-3 d-none d-lg-inline-block">
                      <input type="text" placeholder="Search Products.....">
-                     <button><i class="fas fa-search"></i></button>
+                     <button><i class="fal fa-search"></i></button>
                   </form>
                </div>
                <div class="col-lg-4">
@@ -255,7 +255,7 @@
                <div class="offset-widget offset_searchbar mb-30">
                   <form action="#" class="filter-search-input">
                      <input type="text" placeholder="Search keyword">
-                     <button><i class="fas fa-search"></i></button>
+                     <button><i class="fal fa-search"></i></button>
                   </form>
                </div>
             </div>

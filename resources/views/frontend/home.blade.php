@@ -90,8 +90,8 @@
             </div>
             <!-- If we need navigation buttons -->
             <div class="slider-nav d-none">
-               <div class="slider-button-prev"><i class="fas fa-chevron-left"></i></div>
-               <div class="slider-button-next"><i class="fas fa-chevron-right"></i></div>
+               <div class="slider-button-prev"><i class="fal fa-chevron-left"></i></div>
+               <div class="slider-button-next"><i class="fal fa-chevron-right"></i></div>
             </div>
             <div class="slider2-pagination-container">
                <div class="container">
@@ -119,9 +119,9 @@
                @php($productImage = optional($product->images->first())->image_path)
                @php($productColors = $product->colors ?? collect())
                <div class="single-product">
-                  <div class="product-image pos-rel">
-                     <a href="{{ route('product.details', $product->id) }}" class="">
-                        <img src="{{ $productImage ? Storage::url($productImage) : asset('frontend/assets/img/product/product-img1.jpg') }}" alt="{{ $product->name }}">
+                  <div class="product-image pos-rel" style="aspect-ratio: 1 / 1;">
+                     <a href="{{ route('product.details', $product->id) }}" class="" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                        <img src="{{ $productImage ? Storage::url($productImage) : asset('frontend/assets/img/product/product-img1.jpg') }}" alt="{{ $product->name }}" style="width: 100%; height: 100%; object-fit: cover;">
                      </a>
                      <div class="product-action">
                         <a href="{{ route('product.details', $product->id) }}" class="quick-view-btn"><i class="fal fa-eye"></i></a>
@@ -177,7 +177,7 @@
                <div class="col-lg-6">
                   <div class="limited-drop-content">
                      <span class="limited-badge">
-                        <i class="fas fa-fire"></i> LIMITED EDITION DROP
+                        <i class="fal fa-fire"></i> LIMITED EDITION DROP
                      </span>
                      <h2 class="section-main-title limited-title mb-20">This Month's Exclusive Collection</h2>
                      <p class="limited-desc mb-30">Unique cartoon-style story designs. Once they're gone, they're gone forever!</p>
@@ -202,7 +202,7 @@
                      </div>
 
                      <div class="stock-info mb-30">
-                        <i class="fas fa-bolt"></i> Only 47 pieces left in stock!
+                        <i class="fal fa-bolt"></i> Only 47 pieces left in stock!
                      </div>
 
                      <div>
@@ -211,8 +211,8 @@
                   </div>
                </div>
                <div class="col-lg-6">
-                  <div class="limited-drop-image">
-                     <img src="{{ asset('frontend/assets/img/product_category/product-cat-6.jpg') }}" alt="Limited Edition">
+                  <div class="limited-drop-image" style="width: 100%; max-width: 100%;">
+                     <img src="{{ asset('frontend/assets/img/product_category/product-cat-6.jpg') }}" alt="Limited Edition" style="width: 100%; height: auto; display: block; max-width: 100%;">
                      <div class="limited-badge-corner">LIMITED</div>
                   </div>
                </div>
@@ -228,7 +228,7 @@
                <div class="col-xl-8">
                   <div class="section-title text-center">
                      <h2 class="section-main-title mb-35">
-                        <i class="fas fa-palette"></i> Create Your Own Custom T-Shirt
+                        <i class="fal fa-palette"></i> Create Your Own Custom T-Shirt
                      </h2>
                      <p>Upload your unique design and we'll bring it to life on premium quality fabric</p>
                   </div>
@@ -237,8 +237,8 @@
             
             <div class="row align-items-center mb-60">
                <div class="col-lg-6">
-                  <div class="custom-design-image">
-                     <img src="{{ asset('frontend/assets/img/product_category/product-cat-8.jpg') }}" alt="Custom Design" class="img-fluid custom-img">
+                  <div class="custom-design-image" style="width: 100%; max-width: 100%;">
+                     <img src="{{ asset('frontend/assets/img/product_category/product-cat-8.jpg') }}" alt="Custom Design" class="img-fluid custom-img" style="width: 100%; height: auto; display: block; max-width: 100%;">
                   </div>
                </div>
                <div class="col-lg-6">
@@ -281,28 +281,28 @@
                      <div class="row">
                         <div class="col-md-3 text-center mb-3">
                            <div class="feature-icon">
-                              <i class="fas fa-star"></i>
+                              <i class="fal fa-star"></i>
                            </div>
                            <h5>Premium Quality</h5>
                            <p class="feature-desc">100% cotton fabric</p>
                         </div>
                         <div class="col-md-3 text-center mb-3">
                            <div class="feature-icon">
-                              <i class="fas fa-palette"></i>
+                              <i class="fal fa-palette"></i>
                            </div>
                            <h5>HD Printing</h5>
                            <p class="feature-desc">Vibrant & long-lasting</p>
                         </div>
                         <div class="col-md-3 text-center mb-3">
                            <div class="feature-icon">
-                              <i class="fas fa-user-check"></i>
+                              <i class="fal fa-user-check"></i>
                            </div>
                            <h5>Expert Review</h5>
                            <p class="feature-desc">Professional approval</p>
                         </div>
                         <div class="col-md-3 text-center mb-3">
                            <div class="feature-icon">
-                              <i class="fas fa-shipping-fast"></i>
+                              <i class="fal fa-shipping-fast"></i>
                            </div>
                            <h5>Fast Delivery</h5>
                            <p class="feature-desc">5-7 business days</p>
@@ -322,7 +322,7 @@
                <div class="col-xl-8">
                   <div class="section-title text-center">
                      <h2 class="section-main-title mb-35">
-                        <i class="fas fa-cogs"></i> How It Works
+                        <i class="fal fa-cogs"></i> How It Works
                      </h2>
                      <p>Get your perfect t-shirt in 5 simple steps</p>
                   </div>
@@ -383,7 +383,7 @@
                <div class="col-xl-8">
                   <div class="section-title text-center">
                      <h2 class="section-main-title mb-35">
-                        <i class="fas fa-star"></i> Why Choose Tinnity
+                        <i class="fal fa-star"></i> Why Choose Tinnity
                      </h2>
                      <p>What makes us different from others</p>
                   </div>
@@ -394,7 +394,7 @@
                <div class="col-lg-4 col-md-6 mb-4">
                   <div class="why-choose-card">
                      <div class="choose-icon">
-                        <i class="fas fa-gem"></i>
+                        <i class="fal fa-gem"></i>
                      </div>
                      <h4 class="choose-title">Premium Quality Fabric</h4>
                      <p class="choose-desc">100% premium cotton with superior comfort and durability. Soft on skin, built to last.</p>
@@ -403,7 +403,7 @@
                <div class="col-lg-4 col-md-6 mb-4">
                   <div class="why-choose-card">
                      <div class="choose-icon">
-                        <i class="fas fa-palette"></i>
+                        <i class="fal fa-palette"></i>
                      </div>
                      <h4 class="choose-title">Unique Story Designs</h4>
                      <p class="choose-desc">Exclusive cartoon-style story-based designs you won't find anywhere else.</p>
@@ -412,7 +412,7 @@
                <div class="col-lg-4 col-md-6 mb-4">
                   <div class="why-choose-card">
                      <div class="choose-icon">
-                        <i class="fas fa-fire"></i>
+                        <i class="fal fa-fire"></i>
                      </div>
                      <h4 class="choose-title">Limited Edition Drops</h4>
                      <p class="choose-desc">Monthly exclusive collections with limited quantities. Once sold out, gone forever!</p>
@@ -421,7 +421,7 @@
                <div class="col-lg-4 col-md-6 mb-4">
                   <div class="why-choose-card">
                      <div class="choose-icon">
-                        <i class="fas fa-spray-can"></i>
+                        <i class="fal fa-spray-can"></i>
                      </div>
                      <h4 class="choose-title">Perfume Finish</h4>
                      <p class="choose-desc">Special perfume finish on every t-shirt for a fresh, pleasant wearing experience.</p>
@@ -430,7 +430,7 @@
                <div class="col-lg-4 col-md-6 mb-4">
                   <div class="why-choose-card">
                      <div class="choose-icon">
-                        <i class="fas fa-shield-alt"></i>
+                        <i class="fal fa-shield-alt"></i>
                      </div>
                      <h4 class="choose-title">Secure Payment</h4>
                      <p class="choose-desc">100% secure payment gateway with multiple payment options for your convenience.</p>
@@ -439,7 +439,7 @@
                <div class="col-lg-4 col-md-6 mb-4">
                   <div class="why-choose-card">
                      <div class="choose-icon">
-                        <i class="fas fa-headset"></i>
+                        <i class="fal fa-headset"></i>
                      </div>
                      <h4 class="choose-title">24/7 Support</h4>
                      <p class="choose-desc">Dedicated customer support team ready to help you anytime, anywhere.</p>
@@ -450,16 +450,159 @@
       </section>
       <!-- why choose us section end -->
 
+      <style>
+         /* Image Sizing Fixes */
+         .limited-drop-image img,
+         .custom-design-image img,
+         .product-category-img img,
+         .instagram-item img {
+            width: 100%;
+            height: auto;
+            max-width: 100%;
+            display: block;
+            object-fit: cover;
+         }
+
+         /* Product Image Container Fixes */
+         .product-image {
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+         }
+
+         .product-image img {
+            width: 100%;
+            height: auto;
+            max-width: 100%;
+            display: block;
+            transition: transform 0.3s ease;
+         }
+
+         /* Limited Drop Section */
+         .limited-drop-image {
+            width: 100%;
+            overflow: hidden;
+            border-radius: 8px;
+         }
+
+         .limited-drop-section .col-lg-6 {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+         }
+
+         /* Custom Design Section */
+         .custom-design-image {
+            width: 100%;
+            max-width: 100%;
+            overflow: hidden;
+            border-radius: 8px;
+         }
+
+         .custom-design-promo .col-lg-6 {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+         }
+
+         /* Product Category Cards */
+         .product-category2-single {
+            width: 100%;
+            overflow: hidden;
+         }
+
+         .product-category-img {
+            width: 100%;
+            height: auto;
+            overflow: hidden;
+            display: block;
+         }
+
+         /* Instagram Gallery */
+         .instagram-item {
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+         }
+
+         /* Testimonial Images */
+         .author-thumb img {
+            width: 100%;
+            height: auto;
+            max-width: 100%;
+            border-radius: 50%;
+         }
+
+         /* Member Images */
+         .member-img {
+            width: 100%;
+            height: auto;
+            max-width: 100%;
+            display: block;
+         }
+
+         /* Ensure all images in featured products are responsive */
+         .products-wrapper .single-product {
+            width: 100%;
+         }
+
+         .products-wrapper .product-image {
+            width: 100%;
+            aspect-ratio: 1;
+         }
+
+         /* Category Wrapper Alignment */
+         .product-category2-wrapper {
+            gap: 20px;
+            display: flex;
+            flex-wrap: wrap;
+         }
+
+         .product-category2-single {
+            flex: 1;
+            min-width: 250px;
+         }
+
+         /* Responsive adjustments */
+         @media (max-width: 768px) {
+            .limited-drop-image,
+            .custom-design-image,
+            .product-category2-single {
+               width: 100%;
+               margin: 0 auto;
+            }
+
+            .limited-drop-section .col-lg-6,
+            .custom-design-promo .col-lg-6 {
+               padding: 0 10px;
+            }
+         }
+
+         /* Ensure product cards maintain aspect ratio */
+         .single-product .product-image {
+            background: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 250px;
+         }
+
+         .single-product .product-image img {
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+         }
+      </style>
+
       <!-- category area2 start  -->
-      <div class="category-area2 pb-120">
          <div class="container">
             <div class="row">
                <div class="col-xl-12">
                   <div class="product-category2-wrapper">
                      <div class="product-category2-single pos-rel">
-                        <div class="product-category-img">
-                           <a href="{{ route('limited-edition') }}"><img src="{{ asset('frontend/assets/img/product_category/product-cat-6.jpg') }}"
-                                 alt="product-img"></a>
+                        <div class="product-category-img" style="width: 100%; aspect-ratio: 1 / 1; overflow: hidden;">
+                           <a href="{{ route('limited-edition') }}" style="width: 100%; height: 100%; display: block;"><img src="{{ asset('frontend/assets/img/product_category/product-cat-6.jpg') }}"
+                                 alt="product-img" style="width: 100%; height: 100%; object-fit: cover;"></a>
                         </div>
                         <div class="product-category-inner">
                            <div class="product-category-content">
@@ -471,9 +614,9 @@
                         </div>
                      </div>
                      <div class="product-category2-single pos-rel">
-                        <div class="product-category-img">
-                           <a href="{{ route('shop.category', 'accessories') }}"><img src="{{ asset('frontend/assets/img/bag/1.jpg') }}"
-                                 alt="product-img"></a>
+                        <div class="product-category-img" style="width: 100%; aspect-ratio: 1 / 1; overflow: hidden;">
+                           <a href="{{ route('shop.category', 'accessories') }}" style="width: 100%; height: 100%; display: block;"><img src="{{ asset('frontend/assets/img/bag/1.jpg') }}"
+                                 alt="product-img" style="width: 100%; height: 100%; object-fit: cover;"></a>
                         </div>
                         <div class="product-category-inner">
                            <div class="product-category-content">
@@ -485,9 +628,9 @@
                         </div>
                      </div>
                      <div class="product-category2-single pos-rel">
-                        <div class="product-category-img">
-                           <a href="{{ route('shop.category', 't-shirt') }}"><img src="{{ asset('frontend/assets/img/product_category/product-cat-1.jpg') }}"
-                                 alt="product-img"></a>
+                        <div class="product-category-img" style="width: 100%; aspect-ratio: 1 / 1; overflow: hidden;">
+                           <a href="{{ route('shop.category', 't-shirt') }}" style="width: 100%; height: 100%; display: block;"><img src="{{ asset('frontend/assets/img/product_category/product-cat-1.jpg') }}"
+                                 alt="product-img" style="width: 100%; height: 100%; object-fit: cover;"></a>
                         </div>
                         <div class="product-category-inner">
                            <div class="product-category-content">
@@ -521,8 +664,8 @@
                   <div class="swiper-wrapper">
                      <div class="swiper-slide">
                         <div class="testimonial-item text-center">
-                           <div class="author-thumb mb-30">
-                              <img src="{{ asset('frontend/assets/img/member/member-img-01.jpg') }}" alt="Customer">
+                           <div class="author-thumb mb-30" style="width: 100px; height: 100px; margin: 0 auto;">
+                              <img src="{{ asset('frontend/assets/img/member/member-img-01.jpg') }}" alt="Customer" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
                            </div>
                            <div class="author-text">
                               <p>"The quality is amazing! My custom design turned out exactly as I imagined. The fabric is soft and the print is vibrant. Will definitely order more!"</p>
@@ -535,8 +678,8 @@
                      </div>
                      <div class="swiper-slide">
                         <div class="testimonial-item text-center">
-                           <div class="author-thumb mb-30">
-                              <img src="{{ asset('frontend/assets/img/member/member-img-02.jpg') }}" alt="Customer">
+                           <div class="author-thumb mb-30" style="width: 100px; height: 100px; margin: 0 auto;">
+                              <img src="{{ asset('frontend/assets/img/member/member-img-02.jpg') }}" alt="Customer" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
                            </div>
                            <div class="author-text">
                               <p>"Love the limited edition collection! The designs are unique and the t-shirts fit perfectly. Great quality and fast shipping too."</p>
@@ -549,8 +692,8 @@
                      </div>
                      <div class="swiper-slide">
                         <div class="testimonial-item text-center">
-                           <div class="author-thumb mb-30">
-                              <img src="{{ asset('frontend/assets/img/member/member-img-04.jpg') }}" alt="Customer">
+                           <div class="author-thumb mb-30" style="width: 100px; height: 100px; margin: 0 auto;">
+                              <img src="{{ asset('frontend/assets/img/member/member-img-04.jpg') }}" alt="Customer" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
                            </div>
                            <div class="author-text">
                               <p>"Excellent customer service and amazing products. The t-shirts are comfortable and stylish. Highly recommend Tinnity!"</p>
@@ -564,8 +707,8 @@
                   </div>
                   <!-- Add Navigation -->
                   <div class="testimonial-pagination"></div>
-                  <div class="testimonial-button-prev"><i class="fas fa-arrow-left"></i></div>
-                  <div class="testimonial-button-next"><i class="fas fa-arrow-right"></i></div>
+                  <div class="testimonial-button-prev"><i class="fal fa-arrow-left"></i></div>
+                  <div class="testimonial-button-next"><i class="fal fa-arrow-right"></i></div>
                </div>
             </div>
          </div>
@@ -588,64 +731,64 @@
 
             <div class="row">
                <div class="col-lg-3 col-md-4 col-sm-6 mb-30">
-                  <div class="instagram-item">
-                     <img src="{{ asset('frontend/assets/img/member/member-img-01.jpg') }}" alt="Instagram" class="instagram-img">
+                  <div class="instagram-item" style="width: 100%; aspect-ratio: 1 / 1;">
+                     <img src="{{ asset('frontend/assets/img/member/member-img-01.jpg') }}" alt="Instagram" class="instagram-img" style="width: 100%; height: 100%; object-fit: cover;">
                      <div class="instagram-overlay">
                         <i class="fab fa-instagram"></i>
                      </div>
                   </div>
                </div>
                <div class="col-lg-3 col-md-4 col-sm-6 mb-30">
-                  <div class="instagram-item">
-                     <img src="{{ asset('frontend/assets/img/member/member-img-02.jpg') }}" alt="Instagram" class="instagram-img">
+                  <div class="instagram-item" style="width: 100%; aspect-ratio: 1 / 1;">
+                     <img src="{{ asset('frontend/assets/img/member/member-img-02.jpg') }}" alt="Instagram" class="instagram-img" style="width: 100%; height: 100%; object-fit: cover;">
                      <div class="instagram-overlay">
                         <i class="fab fa-instagram"></i>
                      </div>
                   </div>
                </div>
                <div class="col-lg-3 col-md-4 col-sm-6 mb-30">
-                  <div class="instagram-item">
-                     <img src="{{ asset('frontend/assets/img/member/member-img-04.jpg') }}" alt="Instagram" class="instagram-img">
+                  <div class="instagram-item" style="width: 100%; aspect-ratio: 1 / 1;">
+                     <img src="{{ asset('frontend/assets/img/member/member-img-04.jpg') }}" alt="Instagram" class="instagram-img" style="width: 100%; height: 100%; object-fit: cover;">
                      <div class="instagram-overlay">
                         <i class="fab fa-instagram"></i>
                      </div>
                   </div>
                </div>
                <div class="col-lg-3 col-md-4 col-sm-6 mb-30">
-                  <div class="instagram-item">
-                     <img src="{{ asset('frontend/assets/img/member/member-img-01.jpg') }}" alt="Instagram" class="instagram-img">
+                  <div class="instagram-item" style="width: 100%; aspect-ratio: 1 / 1;">
+                     <img src="{{ asset('frontend/assets/img/member/member-img-01.jpg') }}" alt="Instagram" class="instagram-img" style="width: 100%; height: 100%; object-fit: cover;">
                      <div class="instagram-overlay">
                         <i class="fab fa-instagram"></i>
                      </div>
                   </div>
                </div>
                <div class="col-lg-3 col-md-4 col-sm-6 mb-30">
-                  <div class="instagram-item">
-                     <img src="{{ asset('frontend/assets/img/member/member-img-02.jpg') }}" alt="Instagram" class="instagram-img">
+                  <div class="instagram-item" style="width: 100%; aspect-ratio: 1 / 1;">
+                     <img src="{{ asset('frontend/assets/img/member/member-img-02.jpg') }}" alt="Instagram" class="instagram-img" style="width: 100%; height: 100%; object-fit: cover;">
                      <div class="instagram-overlay">
                         <i class="fab fa-instagram"></i>
                      </div>
                   </div>
                </div>
                <div class="col-lg-3 col-md-4 col-sm-6 mb-30">
-                  <div class="instagram-item">
-                     <img src="{{ asset('frontend/assets/img/member/member-img-04.jpg') }}" alt="Instagram" class="instagram-img">
+                  <div class="instagram-item" style="width: 100%; aspect-ratio: 1 / 1;">
+                     <img src="{{ asset('frontend/assets/img/member/member-img-04.jpg') }}" alt="Instagram" class="instagram-img" style="width: 100%; height: 100%; object-fit: cover;">
                      <div class="instagram-overlay">
                         <i class="fab fa-instagram"></i>
                      </div>
                   </div>
                </div>
                <div class="col-lg-3 col-md-4 col-sm-6 mb-30">
-                  <div class="instagram-item">
-                     <img src="{{ asset('frontend/assets/img/member/member-img-01.jpg') }}" alt="Instagram" class="instagram-img">
+                  <div class="instagram-item" style="width: 100%; aspect-ratio: 1 / 1;">
+                     <img src="{{ asset('frontend/assets/img/member/member-img-01.jpg') }}" alt="Instagram" class="instagram-img" style="width: 100%; height: 100%; object-fit: cover;">
                      <div class="instagram-overlay">
                         <i class="fab fa-instagram"></i>
                      </div>
                   </div>
                </div>
                <div class="col-lg-3 col-md-4 col-sm-6 mb-30">
-                  <div class="instagram-item">
-                     <img src="{{ asset('frontend/assets/img/member/member-img-02.jpg') }}" alt="Instagram" class="instagram-img">
+                  <div class="instagram-item" style="width: 100%; aspect-ratio: 1 / 1;">
+                     <img src="{{ asset('frontend/assets/img/member/member-img-02.jpg') }}" alt="Instagram" class="instagram-img" style="width: 100%; height: 100%; object-fit: cover;">
                      <div class="instagram-overlay">
                         <i class="fab fa-instagram"></i>
                      </div>
@@ -669,7 +812,7 @@
                <div class="col-xl-8">
                   <div class="newsletter-content text-center">
                      <div class="newsletter-icon">
-                        <i class="fas fa-bullhorn"></i>
+                        <i class="fal fa-bullhorn"></i>
                      </div>
                      <h2 class="section-main-title newsletter-title mb-35">Get Notified for Limited Drops</h2>
                      <p class="newsletter-desc mb-40">Subscribe to our newsletter and never miss exclusive limited edition collections</p>
@@ -682,7 +825,7 @@
                      </form>
 
                      <div class="newsletter-note">
-                        <i class="fas fa-check-circle"></i> Join 10,000+ subscribers • No spam • Unsubscribe anytime
+                        <i class="fal fa-check-circle"></i> Join 10,000+ subscribers • No spam • Unsubscribe anytime
                      </div>
                   </div>
                </div>
@@ -701,7 +844,7 @@
                         <div class="col-lg-8">
                            <div class="contact-cta-content">
                               <h2 class="cta-title">
-                                 <i class="fas fa-headset"></i> Need Help? We're Here!
+                                 <i class="fal fa-headset"></i> Need Help? We're Here!
                               </h2>
                               <p class="cta-desc">Have questions? Our support team is ready to assist you 24/7</p>
                            </div>

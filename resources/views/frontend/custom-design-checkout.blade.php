@@ -183,14 +183,14 @@
 
                         <!-- Place Order Button -->
                         <button type="submit" class="fill-btn w-100">
-                           <i class="fas fa-lock me-2"></i>
+                           <i class="fal fa-lock me-2"></i>
                            Place Order
                         </button>
 
                         <!-- Security Info -->
                         <div class="mt-3 text-center">
                            <small class="text-muted">
-                              <i class="fas fa-shield-alt text-success"></i>
+                              <i class="fal fa-shield-alt text-success"></i>
                               Your information is secure and protected
                            </small>
                         </div>

@@ -31,7 +31,7 @@
          <div class="col-lg-6">
             <div class="limited-edition-content">
                <span class="badge mb-20" style="background:#ff6b6b;color:#fff;">
-                  <i class="fas fa-fire"></i> EXCLUSIVE COLLECTION
+                  <i class="fal fa-fire"></i> EXCLUSIVE COLLECTION
                </span>
                <h2 class="hero-title mb-30">Limited Edition Drops</h2>
                <p class="hero-description mb-40">
@@ -39,15 +39,15 @@
                </p>
                <div class="hero-features">
                   <div class="feature-badge">
-                     <i class="fas fa-gem"></i>
+                     <i class="fal fa-gem"></i>
                      <span>Premium Quality</span>
                   </div>
                   <div class="feature-badge">
-                     <i class="fas fa-clock"></i>
+                     <i class="fal fa-clock"></i>
                      <span>Limited Time Only</span>
                   </div>
                   <div class="feature-badge">
-                     <i class="fas fa-certificate"></i>
+                     <i class="fal fa-certificate"></i>
                      <span>Exclusive Designs</span>
                   </div>
                </div>
@@ -83,8 +83,8 @@
                   <img src="{{ $productImage ? Storage::url($productImage) : asset('frontend/assets/img/product/product-img1.jpg') }}" alt="{{ $product->name }}">
                </a>
                <div class="product-action">
-                  <a href="{{ route('product.details', $product->id) }}" class="quick-view-btn"><i class="fal fa-eye"></i></a>
-                  <button type="button" class="wishlist-btn add-to-wishlist-btn" data-product-id="{{ $product->id }}"><i class="fal fa-heart"></i></button>
+                  <a href="{{ route('product.details', $product->id) }}" class="quick-view-btn"><i class="far fa-eye"></i></a>
+                  <button type="button" class="wishlist-btn add-to-wishlist-btn" data-product-id="{{ $product->id }}"><i class="far fa-heart"></i></button>
                </div>
                <div class="product-action-bottom">
                   <button type="button" class="add-cart-btn add-to-cart-btn" data-product-id="{{ $product->id }}"><i class="fal fa-shopping-bag"></i>Add to Cart</button>
@@ -155,7 +155,7 @@
          <div class="col-xl-8">
             <div class="newsletter-content text-center">
                <div class="newsletter-icon">
-                  <i class="fas fa-bullhorn"></i>
+                  <i class="fal fa-bullhorn"></i>
                </div>
                <h2 class="section-main-title newsletter-title mb-35">Get Early Access to Limited Drops</h2>
                <p class="newsletter-desc mb-40">Subscribe to our newsletter and be the first to know about new limited edition releases</p>
@@ -167,7 +167,7 @@
                   </div>
                </form>
                <div class="newsletter-note">
-                  <i class="fas fa-check-circle"></i> Join 10,000+ subscribers • No spam • Unsubscribe anytime
+                  <i class="fal fa-check-circle"></i> Join 10,000+ subscribers • No spam • Unsubscribe anytime
                </div>
             </div>
          </div>

@@ -172,8 +172,8 @@ document.addEventListener('DOMContentLoaded', function() {
      * Protect cart access
      */
     function protectCartAccess() {
-        const cartLink = document.querySelector('a[href="/cart"], a[href="{{ route("cart.index") }}"]');
-        if (cartLink) {
+        const cartLinks = document.querySelectorAll('a[href="/cart"]');
+        cartLinks.forEach(function(cartLink) {
             cartLink.addEventListener('click', function(e) {
                 if (!isAuthenticated()) {
                     e.preventDefault();
@@ -181,15 +181,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     return false;
                 }
             });
-        }
+        });
     }
 
     /**
      * Protect wishlist access
      */
     function protectWishlistAccess() {
-        const wishlistLink = document.querySelector('a[href="/wishlist"], a[href="{{ route("wishlist.index") }}"]');
-        if (wishlistLink) {
+        const wishlistLinks = document.querySelectorAll('a[href="/wishlist"]');
+        wishlistLinks.forEach(function(wishlistLink) {
             wishlistLink.addEventListener('click', function(e) {
                 if (!isAuthenticated()) {
                     e.preventDefault();
@@ -197,7 +197,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     return false;
                 }
             });
-        }
+        });
     }
 
     /**

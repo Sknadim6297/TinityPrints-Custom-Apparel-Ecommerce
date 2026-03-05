@@ -197,12 +197,17 @@
                      
                      @if($product->sizes->where('is_available', true)->count() > 0)
                         <div class="available-sizes mb-20">
-                           <span class="mb-10 d-block" style="font-weight: 600;">Select Size: <span class="text-danger">*</span></span>
+                           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                              <span style="font-weight: 600;">Select Size: <span class="text-danger">*</span></span>
+                              <button type="button" class="btn-link" data-bs-toggle="modal" data-bs-target="#sizeChartModal" style="font-size: 14px; color: #171717; text-decoration: underline; padding: 0; border: none; cursor: pointer; background: none;">
+                                 View Size Chart
+                              </button>
+                           </div>
                            <div class="product-available-sizes" style="display: flex; gap: 10px; flex-wrap: wrap;">
                               @foreach($product->sizes->where('is_available', true) as $size)
                                  <label class="size-option" style="cursor: pointer;">
                                     <input type="radio" name="product_size" value="{{ $size->size }}" style="display: none;" required>
-                                    <span class="size-badge" style="display: inline-block; padding: 8px 16px; border: 2px solid #ddd; border-radius: 4px; font-weight: 600; transition: all 0.3s;">
+                                    <span class="size-badge" style="display: inline-block; border: 2px solid #ddd; border-radius: 4px; font-weight: 600; transition: all 0.3s;">
                                        {{ strtoupper($size->size) }}
                                     </span>
                                  </label>
@@ -228,9 +233,9 @@
                      <div class="product-quantity-cart mb-25 mt-30">
                         <div class="product-quantity-form">
                            <form id="add-to-cart-form">
-                              <button class="cart-minus" type="button"><i class="far fa-minus"></i></button>
+                              <button class="cart-minus" type="button"><i class="fal fa-minus"></i></button>
                               <input class="cart-input" id="product-quantity" type="text" value="1" readonly>
-                              <button class="cart-plus" type="button"><i class="far fa-plus"></i></button>
+                              <button class="cart-plus" type="button"><i class="fal fa-plus"></i></button>
                            </form>
                         </div>
                         <button type="button" class="fill-btn add-to-cart-btn" data-product-id="{{ $product->id }}">Add to Cart</button>
@@ -287,7 +292,7 @@
                                        <span class="rating-number">{{ number_format($averageRating, 1) }}</span>
                                        <div class="stars">
                                           @for($i = 1; $i <= 5; $i++)
-                                             <i class="fas fa-star {{ $i <= round($averageRating) ? '' : 'text-muted' }}"></i>
+                                             <i class="fal fa-star {{ $i <= round($averageRating) ? '' : 'text-muted' }}"></i>
                                           @endfor
                                        </div>
                                     </div>
@@ -304,7 +309,7 @@
                                              <h6 class="mb-0">{{ $review->user->name }}</h6>
                                              <div class="review-rating">
                                                 @for($i = 1; $i <= 5; $i++)
-                                                   <i class="fas fa-star {{ $i <= $review->rating ? '' : 'text-muted' }}" style="font-size: 12px;"></i>
+                                                   <i class="fal fa-star {{ $i <= $review->rating ? '' : 'text-muted' }}" style="font-size: 12px;"></i>
                                                 @endfor
                                              </div>
                                           </div>
@@ -356,7 +361,7 @@
                                                 <div class="rating-input">
                                                    @for($i = 5; $i >= 1; $i--)
                                                       <input type="radio" name="rating" id="star{{ $i }}" value="{{ $i }}" required>
-                                                      <label for="star{{ $i }}"><i class="fas fa-star"></i></label>
+                                                      <label for="star{{ $i }}"><i class="fal fa-star"></i></label>
                                                    @endfor
                                                 </div>
                                                 @error('rating')
@@ -455,8 +460,143 @@
       </div>
    </main>
 
+   <!-- Size Chart Modal -->
+   <div class="modal fade" id="sizeChartModal" tabindex="-1" aria-labelledby="sizeChartModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+         <div class="modal-content">
+            <div class="modal-header">
+               <h5 class="modal-title" id="sizeChartModalLabel">T-Shirt Size Chart</h5>
+               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+               <p style="margin-bottom: 20px; color: #666;">Select your size based on your chest measurement for the perfect fit.</p>
+               
+               <div class="size-chart-table" style="width: 100%;">
+                  <table style="width: 100%; border-collapse: collapse; text-align: center;">
+                     <thead>
+                        <tr style="background-color: #f5f5f5; border-bottom: 2px solid #ddd;">
+                           <th style="padding: 12px; border: 1px solid #ddd; font-weight: 700; font-size: 14px;">Size</th>
+                           <th style="padding: 12px; border: 1px solid #ddd; font-weight: 700; font-size: 14px;">Chest (inches)</th>
+                           <th style="padding: 12px; border: 1px solid #ddd; font-weight: 700; font-size: 14px;">Chest (cm)</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        <tr style="border-bottom: 1px solid #ddd;">
+                           <td style="padding: 12px; border: 1px solid #ddd; font-weight: 600;">XS</td>
+                           <td style="padding: 12px; border: 1px solid #ddd;">32-34</td>
+                           <td style="padding: 12px; border: 1px solid #ddd;">81-86</td>
+                        </tr>
+                        <tr style="background-color: #fafafa; border-bottom: 1px solid #ddd;">
+                           <td style="padding: 12px; border: 1px solid #ddd; font-weight: 600;">S</td>
+                           <td style="padding: 12px; border: 1px solid #ddd;">34-36</td>
+                           <td style="padding: 12px; border: 1px solid #ddd;">86-91</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #ddd;">
+                           <td style="padding: 12px; border: 1px solid #ddd; font-weight: 600;">M</td>
+                           <td style="padding: 12px; border: 1px solid #ddd;">38-40</td>
+                           <td style="padding: 12px; border: 1px solid #ddd;">96-101</td>
+                        </tr>
+                        <tr style="background-color: #fafafa; border-bottom: 1px solid #ddd;">
+                           <td style="padding: 12px; border: 1px solid #ddd; font-weight: 600;">L</td>
+                           <td style="padding: 12px; border: 1px solid #ddd;">40-42</td>
+                           <td style="padding: 12px; border: 1px solid #ddd;">101-106</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #ddd;">
+                           <td style="padding: 12px; border: 1px solid #ddd; font-weight: 600;">XL</td>
+                           <td style="padding: 12px; border: 1px solid #ddd;">42-44</td>
+                           <td style="padding: 12px; border: 1px solid #ddd;">106-111</td>
+                        </tr>
+                        <tr style="background-color: #fafafa;">
+                           <td style="padding: 12px; border: 1px solid #ddd; font-weight: 600;">XXL</td>
+                           <td style="padding: 12px; border: 1px solid #ddd;">46-50</td>
+                           <td style="padding: 12px; border: 1px solid #ddd;">116-127</td>
+                        </tr>
+                     </tbody>
+                  </table>
+               </div>
+
+               <div style="margin-top: 20px; padding: 15px; background-color: #f0f8ff; border-left: 4px solid #171717; border-radius: 4px;">
+                  <p style="margin: 0; font-size: 14px; color: #333;">
+                     <strong>💡 Sizing Tip:</strong> Measure your chest at the fullest point for the most accurate size. All measurements are taken when the T-shirt is laid flat.
+                  </p>
+               </div>
+            </div>
+            <div class="modal-footer">
+               <button type="button" class="border-btn" data-bs-dismiss="modal">Close</button>
+            </div>
+         </div>
+      </div>
+   </div>
+
    <!-- Reviews rating CSS -->
    <style>
+      /* Size Chart Modal Styles */
+      .modal-content {
+         border-radius: 8px;
+         border: 1px solid #e5e5e5;
+      }
+      
+      .modal-header {
+         border-bottom: 2px solid #f0f0f0;
+         padding: 20px;
+      }
+      
+      .modal-title {
+         font-weight: 700;
+         font-size: 18px;
+         color: #171717;
+      }
+      
+      .size-chart-table {
+         overflow-x: auto;
+      }
+      
+      .size-chart-table table {
+         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+      
+      .size-chart-table th {
+         background-color: #171717;
+         color: white;
+      }
+      
+      .size-chart-table th:first-child {
+         border-top-left-radius: 4px;
+      }
+      
+      .size-chart-table th:last-child {
+         border-top-right-radius: 4px;
+      }
+      
+      .size-chart-table td {
+         font-size: 14px;
+      }
+      
+      .modal-body {
+         padding: 25px;
+      }
+      
+      .modal-footer {
+         border-top: 1px solid #f0f0f0;
+         padding: 15px 25px;
+      }
+      
+      /* Responsive size chart */
+      @media (max-width: 768px) {
+         .size-chart-table {
+            font-size: 12px;
+         }
+         
+         .size-chart-table td,
+         .size-chart-table th {
+            padding: 8px !important;
+         }
+         
+         .modal-body {
+            padding: 15px;
+         }
+      }
+
       .rating-input {
          display: flex;
          flex-direction: row-reverse;
@@ -517,7 +657,6 @@
          // Size and Color Selection
          const sizeOptions = document.querySelectorAll('.size-option');
          const colorOptions = document.querySelectorAll('.color-option');
-         const addToCartBtn = document.querySelector('.add-to-cart-btn');
          
          // Handle size selection
          sizeOptions.forEach(option => {
@@ -537,37 +676,32 @@
             });
          });
          
-         // Validate before adding to cart
-         if (addToCartBtn) {
-            addToCartBtn.addEventListener('click', function(e) {
-               let isValid = true;
-               
-               // Check if size selection exists and is required
-               const sizeRadios = document.querySelectorAll('input[name="product_size"]');
-               if (sizeRadios.length > 0) {
-                  const selectedSize = document.querySelector('input[name="product_size"]:checked');
-                  if (!selectedSize) {
-                     showError('size', 'Please select a size');
-                     isValid = false;
-                  }
+         // Add validation function to window so cart-wishlist.js can use it
+         window.validateProductSelection = function() {
+            let isValid = true;
+            
+            // Check if size selection exists and is required
+            const sizeRadios = document.querySelectorAll('input[name="product_size"]');
+            if (sizeRadios.length > 0) {
+               const selectedSize = document.querySelector('input[name="product_size"]:checked');
+               if (!selectedSize) {
+                  showError('size', 'Please select a size');
+                  isValid = false;
                }
-               
-               // Check if color selection exists and is required
-               const colorRadios = document.querySelectorAll('input[name="product_color"]');
-               if (colorRadios.length > 0) {
-                  const selectedColor = document.querySelector('input[name="product_color"]:checked');
-                  if (!selectedColor) {
-                     showError('color', 'Please select a color');
-                     isValid = false;
-                  }
+            }
+            
+            // Check if color selection exists and is required
+            const colorRadios = document.querySelectorAll('input[name="product_color"]');
+            if (colorRadios.length > 0) {
+               const selectedColor = document.querySelector('input[name="product_color"]:checked');
+               if (!selectedColor) {
+                  showError('color', 'Please select a color');
+                  isValid = false;
                }
-               
-               if (!isValid) {
-                  e.stopImmediatePropagation();
-                  e.preventDefault();
-               }
-            });
-         }
+            }
+            
+            return isValid;
+         };
          
          function showError(type, message) {
             const container = type === 'size' ? 

@@ -31,7 +31,7 @@
                         </div>
                         <div class="action-item action-item-wishlist">
                            <a href="javascript:void(0)" class="view-wishlist-button">
-                              <i class="fal fa-heart"></i>
+                              <i class="far fa-heart"></i>
                               <span class="action-item-number">2</span></a>
                         </div>
                      </div>
