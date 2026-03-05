@@ -117,13 +117,18 @@
                                 <label for="password" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                                     Password
                                 </label>
-                                <input id="password" 
-                                       type="password" 
-                                       name="password" 
-                                       required 
-                                       autocomplete="current-password"
-                                       class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 dark:focus:ring-red-400 focus:border-transparent transition-all duration-200"
-                                       placeholder="••••••••">
+                                <div class="relative">
+                                    <input id="password" 
+                                           type="password" 
+                                           name="password" 
+                                           required 
+                                           autocomplete="current-password"
+                                           class="w-full px-4 py-3 pr-12 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 dark:focus:ring-red-400 focus:border-transparent transition-all duration-200"
+                                           placeholder="••••••••">
+                                    <button type="button" id="toggle_admin_password" class="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+                                        <i id="admin_password_icon" class="fal fa-eye"></i>
+                                    </button>
+                                </div>
                                 @error('password')
                                     <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                                 @enderror
@@ -162,5 +167,24 @@
             [x-cloak] { display: none !important; }
             html, body { transition: background-color 0.2s ease, color 0.2s ease; }
         </style>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const passwordInput = document.getElementById('password');
+                const toggleButton = document.getElementById('toggle_admin_password');
+                const icon = document.getElementById('admin_password_icon');
+
+                if (!passwordInput || !toggleButton || !icon) {
+                    return;
+                }
+
+                toggleButton.addEventListener('click', function () {
+                    const isPassword = passwordInput.type === 'password';
+                    passwordInput.type = isPassword ? 'text' : 'password';
+                    icon.classList.toggle('fa-eye', !isPassword);
+                    icon.classList.toggle('fa-eye-slash', isPassword);
+                });
+            });
+        </script>
     </body>
 </html>

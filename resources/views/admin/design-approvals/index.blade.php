@@ -6,7 +6,7 @@
         <div class="mb-6 md:mb-8">
             <h2 class="font-semibold text-2xl sm:text-3xl text-gray-800 dark:text-gray-200">Design Approvals</h2>
             <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-2">
-                Review custom designs and unlock payment only after approval.
+                Review custom design requests and manage approvals
             </p>
         </div>
 
@@ -16,190 +16,118 @@
             </div>
         @endif
 
+        <div class="mb-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 border border-gray-100 dark:border-gray-700">
+            <form action="{{ route('admin.design-approvals.index') }}" method="GET" class="flex flex-col sm:flex-row gap-3">
+                <div class="flex-1">
+                    <input
+                        type="text"
+                        name="search"
+                        placeholder="Search by customer, phone, email, status, size..."
+                        value="{{ $search ?? '' }}"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 text-sm"
+                    >
+                </div>
+                <div class="flex gap-2">
+                    <button type="submit" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors text-sm font-medium">
+                        Search
+                    </button>
+                    @if($search)
+                        <a href="{{ route('admin.design-approvals.index') }}" class="px-4 py-2 bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-lg transition-colors text-sm font-medium">
+                            Clear
+                        </a>
+                    @endif
+                </div>
+            </form>
+        </div>
+
         @if($designRequests->count() === 0)
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-300">
                 No design requests yet.
             </div>
         @else
-            <div class="space-y-4">
-                @foreach($designRequests as $request)
-                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 border border-gray-100 dark:border-gray-700">
-                        <div class="flex flex-col lg:flex-row lg:items-start gap-4">
-                            @php
-                                $path = $request->design_file_path;
-                                $previewUrl = (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, '/'))
-                                    ? $path
-                                    : Storage::url($path);
-                                $fileExt = $request->file_format ?: strtolower(pathinfo($path, PATHINFO_EXTENSION));
-                                $isImage = in_array($fileExt, ['png', 'jpg', 'jpeg', 'webp']);
-                            @endphp
-                            <div class="sm:w-56 lg:w-40">
-                                @if($isImage)
-                                    <img src="{{ $previewUrl }}" alt="Design preview" class="w-full h-32 sm:h-36 lg:h-28 object-contain bg-gray-50 dark:bg-gray-700/40 rounded-lg border border-gray-200 dark:border-gray-600">
-                                @else
-                                    <div class="w-full h-32 sm:h-36 lg:h-28 flex items-center justify-center bg-gray-50 dark:bg-gray-700/40 rounded-lg border border-gray-200 dark:border-gray-600">
-                                        <span class="text-xs font-semibold text-gray-600 dark:text-gray-300">
-                                            {{ strtoupper($fileExt ?: 'FILE') }}
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr>
+                                <th class="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">Request ID</th>
+                                <th class="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">Customer</th>
+                                <th class="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">Size</th>
+                                <th class="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">Design</th>
+                                <th class="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">Status</th>
+                                <th class="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">Date</th>
+                                <th class="px-4 sm:px-6 py-3 text-center text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($designRequests as $request)
+                                @php
+                                    $statusColors = [
+                                        'approved' => 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
+                                        'pending' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
+                                        'rejected' => 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
+                                        'changes_requested' => 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300',
+                                    ];
+                                    $statusColor = $statusColors[$request->status] ?? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+
+                                    $frontPath = $request->front_design_file ?: $request->design_file_path;
+                                    $backPath = $request->back_design_file;
+                                    $frontExt = $frontPath ? strtolower(pathinfo($frontPath, PATHINFO_EXTENSION)) : null;
+                                    $backExt = $backPath ? strtolower(pathinfo($backPath, PATHINFO_EXTENSION)) : null;
+                                    $frontIsImage = in_array($frontExt, ['png', 'jpg', 'jpeg', 'webp']);
+                                    $backIsImage = in_array($backExt, ['png', 'jpg', 'jpeg', 'webp']);
+                                @endphp
+                                <tr class="border-b border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                                    <td class="px-4 sm:px-6 py-3 whitespace-nowrap align-middle text-sm font-semibold text-gray-900 dark:text-gray-100">
+                                        <div class="text-sm font-semibold text-gray-900 dark:text-gray-100">#{{ $request->id }}</div>
+                                    </td>
+                                    <td class="px-4 sm:px-6 py-3 align-middle">
+                                        <div class="text-sm font-medium text-gray-900 dark:text-gray-100 leading-tight">{{ $request->customer_name }}</div>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400 leading-tight mt-0.5">{{ $request->phone }}</div>
+                                    </td>
+                                    <td class="px-4 sm:px-6 py-3 whitespace-nowrap align-middle">
+                                        <div class="text-sm text-gray-900 dark:text-gray-100">{{ $request->selected_size }}</div>
+                                    </td>
+                                    <td class="px-4 sm:px-6 py-3 align-middle">
+                                        <div class="flex items-center gap-3">
+                                            @if($frontPath && $frontIsImage)
+                                                <div class="flex flex-col items-center gap-0.5">
+                                                    <img src="{{ Storage::url($frontPath) }}" alt="Front" class="w-8 h-8 object-cover bg-gray-100 dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600 hover:shadow-md transition-shadow cursor-pointer" title="Front Design">
+                                                    <span class="text-xs font-medium text-gray-600 dark:text-gray-400">F</span>
+                                                </div>
+                                            @endif
+                                            @if($backPath && $backIsImage)
+                                                <div class="flex flex-col items-center gap-0.5">
+                                                    <img src="{{ Storage::url($backPath) }}" alt="Back" class="w-8 h-8 object-cover bg-gray-100 dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600 hover:shadow-md transition-shadow cursor-pointer" title="Back Design">
+                                                    <span class="text-xs font-medium text-gray-600 dark:text-gray-400">B</span>
+                                                </div>
+                                            @endif
+                                            @if(!$frontPath && !$backPath)
+                                                <span class="text-xs text-gray-400 italic">—</span>
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <td class="px-4 sm:px-6 py-3 whitespace-nowrap align-middle">
+                                        <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusColor }}">
+                                            {{ ucwords(str_replace('_', ' ', $request->status)) }}
                                         </span>
-                                    </div>
-                                @endif
-                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Design File Preview</p>
-                                <a href="{{ $previewUrl }}" class="mt-2 inline-flex items-center text-xs font-semibold text-yellow-600 dark:text-yellow-400 hover:text-yellow-700" download>
-                                    Download print-ready design
-                                </a>
-                            </div>
-
-                            <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <div>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">Customer Name</p>
-                                    <p class="font-semibold text-gray-900 dark:text-gray-100">{{ $request->customer_name }}</p>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">Phone</p>
-                                    <p class="font-semibold text-gray-900 dark:text-gray-100">{{ $request->phone }}</p>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">Email</p>
-                                    <p class="font-semibold text-gray-900 dark:text-gray-100">{{ $request->email }}</p>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">Selected Size</p>
-                                    <p class="font-semibold text-gray-900 dark:text-gray-100">{{ strtoupper($request->selected_size) }}</p>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">Front Label</p>
-                                    <p class="font-semibold text-gray-900 dark:text-gray-100">{{ $request->front_label ?? '—' }}</p>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">Back Label</p>
-                                    <p class="font-semibold text-gray-900 dark:text-gray-100">{{ $request->back_label ?? '—' }}</p>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">Status</p>
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                        {{ $request->status === 'approved' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200' : '' }}
-                                        {{ $request->status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200' : '' }}
-                                        {{ $request->status === 'rejected' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200' : '' }}
-                                        {{ $request->status === 'changes_requested' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200' : '' }}
-                                    ">
-                                        {{ ucwords(str_replace('_', ' ', $request->status)) }}
-                                    </span>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">Payment</p>
-                                    <p class="font-semibold {{ $request->payment_unlocked ? 'text-green-600 dark:text-green-400' : 'text-gray-600 dark:text-gray-400' }}">
-                                        {{ $request->payment_unlocked ? 'Unlocked' : 'Locked' }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-3">
-                            <div class="lg:col-span-2 rounded-lg border border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-700/30">
-                                <div class="flex items-center justify-between mb-3">
-                                    <h4 class="text-sm font-bold text-gray-800 dark:text-gray-200">Print File Checks</h4>
-                                    <span class="text-xs font-semibold {{ $request->file_locked ? 'text-green-600 dark:text-green-400' : 'text-gray-600 dark:text-gray-400' }}">
-                                        {{ $request->file_locked ? 'File Locked' : 'File Unlocked' }}
-                                    </span>
-                                </div>
-                                <form method="POST" action="{{ route('admin.design-approvals.update-checks', $request) }}" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                    @csrf
-                                    @method('PATCH')
-                                    <div>
-                                        <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Format (PNG / PSD / AI)</label>
-                                        <select name="file_format" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                            <option value="">Select</option>
-                                            @foreach(['png', 'psd', 'ai'] as $format)
-                                                <option value="{{ $format }}" {{ ($request->file_format === $format || $fileExt === $format) ? 'selected' : '' }}>
-                                                    {{ strtoupper($format) }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">DPI</label>
-                                        <input type="number" name="dpi" value="{{ $request->dpi }}" min="72" max="1200"
-                                               class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                    </div>
-                                    <div>
-                                        <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Print Width</label>
-                                        <input type="number" name="print_width" value="{{ $request->print_width }}" step="0.01" min="0.1"
-                                               class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                    </div>
-                                    <div>
-                                        <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Print Height</label>
-                                        <input type="number" name="print_height" value="{{ $request->print_height }}" step="0.01" min="0.1"
-                                               class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                    </div>
-                                    <div>
-                                        <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Unit</label>
-                                        <select name="print_unit" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                            @foreach(['in' => 'Inches', 'cm' => 'Centimeters', 'mm' => 'Millimeters'] as $unit => $label)
-                                                <option value="{{ $unit }}" {{ $request->print_unit === $unit ? 'selected' : '' }}>{{ $label }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="sm:col-span-2 flex justify-end">
-                                        <button type="submit" class="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg font-semibold text-sm">
-                                            Save File Checks
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-
-                            <div class="rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-                                <h4 class="text-sm font-bold text-gray-800 dark:text-gray-200 mb-3">File Management</h4>
-                                <form method="POST" action="{{ route('admin.design-approvals.update-file', $request) }}" enctype="multipart/form-data" class="space-y-3">
-                                    @csrf
-                                    <input type="file" name="design_file" accept=".png,.psd,.ai" class="w-full text-xs text-gray-700 dark:text-gray-200">
-                                    <button type="submit" class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm">
-                                        Replace File (Re-approval Required)
-                                    </button>
-                                </form>
-                                <form method="POST" action="{{ route('admin.design-approvals.toggle-lock', $request) }}" class="mt-3">
-                                    @csrf
-                                    <input type="hidden" name="locked" value="{{ $request->file_locked ? 0 : 1 }}">
-                                    <button type="submit" class="w-full px-4 py-2 {{ $request->file_locked ? 'bg-gray-600 hover:bg-gray-700' : 'bg-green-600 hover:bg-green-700' }} text-white rounded-lg font-semibold text-sm">
-                                        {{ $request->file_locked ? 'Unlock File' : 'Lock File' }}
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-
-                        <div class="mt-4">
-                            <label for="remarks_{{ $request->id }}" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                                Add Remarks
-                            </label>
-                            <textarea id="remarks_{{ $request->id }}" name="remarks" rows="2"
-                                      form="design-action-{{ $request->id }}"
-                                      class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400"
-                                      placeholder="Remarks for approval, rejection or changes...">{{ old('remarks') }}</textarea>
-                        </div>
-
-                        <div class="mt-4 flex flex-col sm:flex-row gap-2">
-                            <form id="design-action-{{ $request->id }}" method="POST" action="{{ route('admin.design-approvals.approve', $request) }}" class="inline">
-                                @csrf
-                                <button type="submit" class="w-full sm:w-auto px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold text-sm">
-                                    Approve Design
-                                </button>
-                            </form>
-                            <form method="POST" action="{{ route('admin.design-approvals.reject', $request) }}" class="inline">
-                                @csrf
-                                <input type="hidden" name="remarks" value="" />
-                                <button type="submit" onclick="this.closest('form').querySelector('input[name=remarks]').value = document.getElementById('remarks_{{ $request->id }}').value;" class="w-full sm:w-auto px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold text-sm">
-                                    Reject Design
-                                </button>
-                            </form>
-                            <form method="POST" action="{{ route('admin.design-approvals.request-changes', $request) }}" class="inline">
-                                @csrf
-                                <input type="hidden" name="remarks" value="" />
-                                <button type="submit" onclick="this.closest('form').querySelector('input[name=remarks]').value = document.getElementById('remarks_{{ $request->id }}').value;" class="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm">
-                                    Request Changes
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                @endforeach
+                                    </td>
+                                    <td class="px-4 sm:px-6 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 align-middle">
+                                        {{ $request->created_at->format('M d, Y') }}
+                                    </td>
+                                    <td class="px-4 sm:px-6 py-3 whitespace-nowrap text-center align-middle">
+                                        <a href="{{ route('admin.design-approvals.show', $request) }}" 
+                                           class="inline-flex items-center px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-md hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors text-xs font-medium" 
+                                           title="View Details">
+                                            <i class="fa fa-eye text-base"></i>
+                                            <span>View</span>
+                                        </a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <div class="mt-6">

@@ -31,7 +31,7 @@
                         </div>
                         <div class="action-item action-item-wishlist">
                            <a href="javascript:void(0)" class="view-wishlist-button">
-                              <i class="fal fa-heart"></i>
+                              <i class="far fa-heart"></i>
                               <span class="action-item-number">2</span></a>
                         </div>
                      </div>
@@ -108,13 +108,19 @@
                               </div>
                            </div>
                            <div class="col-md-12">
-                              <div class="signup-wrapper">
-                                 <input type="password" name="password" placeholder="Password" required>
+                              <div class="signup-wrapper" style="position: relative;">
+                                 <input id="register-password" type="password" name="password" placeholder="Password" required style="padding-right: 45px;">
+                                 <button type="button" id="toggle-register-password" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: transparent; border: 0; color: #666;">
+                                    <i id="register-password-icon" class="fal fa-eye"></i>
+                                 </button>
                               </div>
                            </div>
                            <div class="col-md-12">
-                              <div class="signup-wrapper">
-                                 <input type="password" name="password_confirmation" placeholder="Confirm Password" required>
+                              <div class="signup-wrapper" style="position: relative;">
+                                 <input id="register-password-confirmation" type="password" name="password_confirmation" placeholder="Confirm Password" required style="padding-right: 45px;">
+                                 <button type="button" id="toggle-register-password-confirmation" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: transparent; border: 0; color: #666;">
+                                    <i id="register-password-confirmation-icon" class="fal fa-eye"></i>
+                                 </button>
                               </div>
                            </div>
                         </div>
@@ -183,5 +189,34 @@
 
 
    </main>
+
+   <script>
+      document.addEventListener('DOMContentLoaded', function () {
+         const passwordInput = document.getElementById('register-password');
+         const confirmInput = document.getElementById('register-password-confirmation');
+         const passwordToggleButton = document.getElementById('toggle-register-password');
+         const confirmToggleButton = document.getElementById('toggle-register-password-confirmation');
+         const passwordIcon = document.getElementById('register-password-icon');
+         const confirmIcon = document.getElementById('register-password-confirmation-icon');
+
+         if (!passwordInput || !confirmInput || !passwordToggleButton || !confirmToggleButton || !passwordIcon || !confirmIcon) {
+            return;
+         }
+
+         passwordToggleButton.addEventListener('click', function () {
+            const isPassword = passwordInput.type === 'password';
+            passwordInput.type = isPassword ? 'text' : 'password';
+            passwordIcon.classList.toggle('fa-eye', !isPassword);
+            passwordIcon.classList.toggle('fa-eye-slash', isPassword);
+         });
+
+         confirmToggleButton.addEventListener('click', function () {
+            const isPassword = confirmInput.type === 'password';
+            confirmInput.type = isPassword ? 'text' : 'password';
+            confirmIcon.classList.toggle('fa-eye', !isPassword);
+            confirmIcon.classList.toggle('fa-eye-slash', isPassword);
+         });
+      });
+   </script>
 
 @endsection

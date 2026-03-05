@@ -12,16 +12,44 @@ class DesignApprovalController extends Controller
 {
     public function index()
     {
-        $designRequests = DesignRequest::orderBy('created_at', 'desc')->paginate(12);
+        $search = request('search');
 
-        return view('admin.design-approvals.index', compact('designRequests'));
+        $designRequests = DesignRequest::query();
+
+        if ($search) {
+            $designRequests->where(function ($query) use ($search) {
+                $query->where('customer_name', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('status', 'like', "%{$search}%")
+                    ->orWhere('selected_size', 'like', "%{$search}%");
+            });
+        }
+
+        $designRequests = $designRequests->orderBy('created_at', 'desc')
+            ->paginate(12)
+            ->withQueryString();
+
+        return view('admin.design-approvals.index', compact('designRequests', 'search'));
+    }
+
+    public function show(DesignRequest $designRequest)
+    {
+        return view('admin.design-approvals.show', compact('designRequest'));
     }
 
     public function approve(Request $request, DesignRequest $designRequest)
     {
+        $validated = $request->validate([
+            'price' => 'required|numeric|min:1|max:999999.99',
+            'remarks' => 'nullable|string|max:1000',
+        ]);
+
         $designRequest->update([
             'status' => 'approved',
+            'price' => $validated['price'],
             'remarks' => $request->input('remarks'),
+            'admin_remark' => $request->input('remarks'),
             'payment_unlocked' => true,
             'file_locked' => true,
             'reviewed_by' => auth()->guard('admin')->id(),
@@ -127,6 +155,27 @@ class DesignApprovalController extends Controller
 
         return redirect()->route('admin.design-approvals.index')
             ->with('success', 'Design file updated. Re-approval required.');
+    }
+
+    public function download(DesignRequest $designRequest, string $fileType)
+    {
+        $path = $fileType === 'front'
+            ? ($designRequest->front_design_file ?: $designRequest->design_file_path)
+            : $designRequest->back_design_file;
+
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+        $disk = Storage::disk('public');
+
+        if (!$path || !$disk->exists($path)) {
+            return redirect()->route('admin.design-approvals.index')
+                ->with('error', ucfirst($fileType).' design file not found.');
+        }
+
+        if (method_exists($disk, 'download')) {
+            return $disk->download($path);
+        }
+
+        return response()->download($disk->path($path));
     }
 
     public function toggleLock(Request $request, DesignRequest $designRequest)

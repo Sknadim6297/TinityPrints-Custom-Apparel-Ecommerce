@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Coupon extends Model
 {
@@ -24,4 +25,29 @@ class Coupon extends Model
         'discount_value' => 'decimal:2',
         'min_order_value' => 'decimal:2',
     ];
+
+    /**
+     * Get users who have used this coupon
+     */
+    public function usedByUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'coupon_user_usage', 'coupon_id', 'user_id')
+            ->withTimestamps();
+    }
+
+    /**
+     * Check if a user has already used this coupon
+     */
+    public function hasBeenUsedByUser($userId): bool
+    {
+        return $this->usedByUsers()->where('user_id', $userId)->exists();
+    }
+
+    /**
+     * Mark coupon as used by a user
+     */
+    public function markAsUsedByUser($userId): void
+    {
+        $this->usedByUsers()->attach($userId);
+    }
 }

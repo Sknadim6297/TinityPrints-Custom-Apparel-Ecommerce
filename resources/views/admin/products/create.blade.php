@@ -110,8 +110,8 @@
                                 required
                                 class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400 transition-all duration-200">
                             <option value="">Select Fit Type</option>
-                            <option value="normal" {{ old('fit_type') == 'normal' ? 'selected' : '' }}>Normal</option>
-                            <option value="slight_oversize" {{ old('fit_type') == 'slight_oversize' ? 'selected' : '' }}>Slight Oversize</option>
+                            <option value="regular" {{ old('fit_type') == 'regular' || old('fit_type') == 'normal' ? 'selected' : '' }}>Regular</option>
+                            <option value="oversize" {{ old('fit_type') == 'oversize' || old('fit_type') == 'slight_oversize' ? 'selected' : '' }}>Oversize</option>
                         </select>
                         @error('fit_type')
                             <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
@@ -121,7 +121,7 @@
                     <!-- Base Price -->
                     <div>
                         <label for="base_price" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                            Base Price ($) *
+                            Base Price (₹) *
                         </label>
                         <input id="base_price" 
                                type="number" 
@@ -339,12 +339,13 @@
 
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                                    Hex Code (Optional)
+                                    Color Picker (Optional)
                                 </label>
-                                <input type="text" 
+                                <input type="color" 
                                        name="colors[0][hex_code]" 
-                                       class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400"
-                                       placeholder="#FFFFFF">
+                                       value="#FFFFFF"
+                                       class="w-full h-12 px-2 py-1 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 cursor-pointer"
+                                       title="Choose a color">
                             </div>
 
                             <div>
@@ -439,7 +440,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if (name) {
                 const newName = name.replace(/\[\d+\]/, `[${colorIndex}]`);
                 input.setAttribute('name', newName);
-                input.value = '';
+                // Keep default color for color picker, clear others
+                if (input.type !== 'color') {
+                    input.value = '';
+                }
             }
         });
 

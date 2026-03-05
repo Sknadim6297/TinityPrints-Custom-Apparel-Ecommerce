@@ -7,26 +7,38 @@
     // Add to Cart AJAX
     $(document).on('click', '.add-to-cart-btn', function(e) {
         e.preventDefault();
+        e.stopPropagation();
         
         const $btn = $(this);
         const productId = $btn.data('product-id');
-        const quantity = $('#product-quantity').val() || 1;
+        
+        // Validate product selection (size/color) if validation function exists
+        if (typeof window.validateProductSelection === 'function') {
+            if (!window.validateProductSelection()) {
+                return false;
+            }
+        }
+        
+        // Get quantity from product details page, default to 1 if not found
+        const quantityElement = $('#product-quantity');
+        const quantity = quantityElement.length > 0 ? quantityElement.val() : 1;
         const selectedColor = $('input[name="product_color"]:checked').val();
         const selectedSize = $('input[name="product_size"]:checked').val();
         
         // Check if user is authenticated
-        const isAuthenticated = $('body').find('.user-profile-trigger').length > 0 || 
+        const isAuthenticated = $('meta[name="user-auth"]').attr('content') === 'true' ||
+                               $('body').find('.user-profile-trigger').length > 0 || 
                                $('body').find('a[href*="logout"]').length > 0;
         
         if (!isAuthenticated) {
             window.location.href = '/login';
-            return;
+            return false;
         }
 
         // Disable button during request
         $btn.prop('disabled', true);
-        const originalText = $btn.text();
-        $btn.text('Adding...');
+        const originalText = $btn.html();
+        $btn.html('Adding...');
 
         $.ajax({
             url: '/cart',
@@ -43,42 +55,52 @@
                     // Update cart count
                     $('.cart-count').text(response.cart_count);
                     
+                    // Refresh sidebar cart
+                    refreshSidebarCart();
+                    
                     // Show success message
                     showMessage('Product added to cart successfully!', 'success');
                     
                     // Reset button
-                    $btn.text(originalText);
+                    $btn.html(originalText);
                     $btn.prop('disabled', false);
                 }
             },
             error: function(xhr) {
                 // Reset button
-                $btn.text(originalText);
+                $btn.html(originalText);
                 $btn.prop('disabled', false);
                 
                 if (xhr.status === 401) {
                     window.location.href = '/login';
                 } else {
-                    showMessage('Error adding product to cart. Please try again.', 'error');
+                    const errorMessage = xhr.responseJSON && xhr.responseJSON.message 
+                        ? xhr.responseJSON.message 
+                        : 'Error adding product to cart. Please try again.';
+                    showMessage(errorMessage, 'error');
                 }
             }
         });
+        
+        return false;
     });
 
     // Add to Wishlist AJAX
     $(document).on('click', '.add-to-wishlist-btn', function(e) {
         e.preventDefault();
+        e.stopPropagation();
         
         const $btn = $(this);
         const productId = $btn.data('product-id');
         
         // Check if user is authenticated
-        const isAuthenticated = $('body').find('.user-profile-trigger').length > 0 || 
+        const isAuthenticated = $('meta[name="user-auth"]').attr('content') === 'true' ||
+                               $('body').find('.user-profile-trigger').length > 0 || 
                                $('body').find('a[href*="logout"]').length > 0;
         
         if (!isAuthenticated) {
             window.location.href = '/login';
-            return;
+            return false;
         }
 
         // Disable button during request
@@ -95,6 +117,9 @@
                 if (response.success) {
                     // Update wishlist count
                     $('.wishlist-count').text(response.wishlist_count);
+                    
+                    // Refresh sidebar wishlist
+                    refreshSidebarWishlist();
                     
                     // Show success message
                     showMessage(response.message || 'Product added to wishlist successfully!', 'success');
@@ -115,7 +140,47 @@
                 }
             }
         });
+        
+        return false;
     });
+
+    // Function to refresh sidebar cart
+    function refreshSidebarCart() {
+        $.ajax({
+            url: '/cart/sidebar-items',
+            method: 'GET',
+            success: function(response) {
+                if (response.success) {
+                    $('.sidebar-action-list').each(function() {
+                        const $parent = $(this).closest('.sidebar-cart');
+                        if ($parent.length) {
+                            $parent.find('.sidebar-action-list').html(response.html);
+                            // Update sidebar totals
+                            $parent.find('.subtotal-price').text('INR ' + parseFloat(response.cart_total).toFixed(2));
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    // Function to refresh sidebar wishlist
+    function refreshSidebarWishlist() {
+        $.ajax({
+            url: '/wishlist/sidebar-items',
+            method: 'GET',
+            success: function(response) {
+                if (response.success) {
+                    $('.sidebar-action-list').each(function() {
+                        const $parent = $(this).closest('.sidebar-wishlist');
+                        if ($parent.length) {
+                            $parent.find('.sidebar-action-list').html(response.html);
+                        }
+                    });
+                }
+            }
+        });
+    }
 
     // Helper function to show messages
     function showMessage(message, type) {

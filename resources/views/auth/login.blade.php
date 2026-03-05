@@ -31,7 +31,7 @@
                         </div>
                         <div class="action-item action-item-wishlist">
                            <a href="javascript:void(0)" class="view-wishlist-button">
-                              <i class="fal fa-heart"></i>
+                              <i class="far fa-heart"></i>
                               <span class="action-item-number">2</span></a>
                         </div>
                      </div>
@@ -94,8 +94,11 @@
                         <div class="signup-wrapper">
                            <input type="text" name="login" value="{{ old('login') }}" placeholder="Email or Phone" required autocomplete="username">
                         </div>
-                        <div class="signup-wrapper">
-                           <input type="password" name="password" placeholder="Password" required autocomplete="current-password">
+                        <div class="signup-wrapper" style="position: relative;">
+                           <input id="login-password" type="password" name="password" placeholder="Password" required autocomplete="current-password" style="padding-right: 45px;">
+                           <button type="button" id="toggle-login-password" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: transparent; border: 0; color: #666;">
+                              <i id="login-password-icon" class="fal fa-eye"></i>
+                           </button>
                         </div>
                         <div class="signup-action">
                            <div class="course-sidebar-list">
@@ -159,4 +162,22 @@
       </div>
       <!-- register area end  -->
    </main>
+   <script>
+      document.addEventListener('DOMContentLoaded', function () {
+         const passwordInput = document.getElementById('login-password');
+         const toggleButton = document.getElementById('toggle-login-password');
+         const icon = document.getElementById('login-password-icon');
+
+         if (!passwordInput || !toggleButton || !icon) {
+            return;
+         }
+
+         toggleButton.addEventListener('click', function () {
+            const isPassword = passwordInput.type === 'password';
+            passwordInput.type = isPassword ? 'text' : 'password';
+            icon.classList.toggle('fa-eye', !isPassword);
+            icon.classList.toggle('fa-eye-slash', isPassword);
+         });
+      });
+   </script>
 @endsection

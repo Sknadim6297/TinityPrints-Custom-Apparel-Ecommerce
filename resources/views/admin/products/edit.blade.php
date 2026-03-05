@@ -19,7 +19,7 @@
             </p>
         </div>
 
-        <form action="{{ route('admin.products.update', $product) }}" method="POST" class="space-y-6">
+        <form action="{{ route('admin.products.update', $product) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
             @method('PUT')
 
@@ -47,38 +47,34 @@
 
                     <div>
                         <label for="category" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Category</label>
-                        <select id="category" name="category" required disabled
-                                class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-600 text-gray-900 dark:text-gray-100">
+                        <select id="category" name="category" required
+                                class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400">
                             <option value="t-shirt" {{ $product->category == 't-shirt' ? 'selected' : '' }}>T-Shirt</option>
                             <option value="accessories" {{ $product->category == 'accessories' ? 'selected' : '' }}>Accessories</option>
                         </select>
-                        <input type="hidden" name="category" value="{{ $product->category }}">
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Cannot be changed</p>
                     </div>
 
                     <div>
-                        <label for="base_price" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Base Price ($)</label>
+                        <label for="base_price" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Base Price (₹)</label>
                         <input id="base_price" type="number" name="base_price" value="{{ $product->base_price }}" step="0.01" min="0.01" required
                                class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400">
                     </div>
 
                     <div>
                         <label for="sleeve_type" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Sleeve Type</label>
-                        <select id="sleeve_type" name="sleeve_type" required disabled
-                                class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-600 text-gray-900 dark:text-gray-100">
+                        <select id="sleeve_type" name="sleeve_type" required
+                                class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400">
                             <option value="full" {{ $product->sleeve_type == 'full' ? 'selected' : '' }}>Full Sleeve</option>
                             <option value="half" {{ $product->sleeve_type == 'half' ? 'selected' : '' }}>Half Sleeve</option>
                         </select>
-                        <input type="hidden" name="sleeve_type" value="{{ $product->sleeve_type }}">
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Cannot be changed</p>
                     </div>
 
                     <div>
                         <label for="fit_type" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Fit Type</label>
                         <select id="fit_type" name="fit_type" required
                                 class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400">
-                            <option value="normal" {{ $product->fit_type == 'normal' ? 'selected' : '' }}>Normal</option>
-                            <option value="slight_oversize" {{ $product->fit_type == 'slight_oversize' ? 'selected' : '' }}>Slight Oversize</option>
+                            <option value="regular" {{ $product->fit_type == 'regular' || $product->fit_type == 'normal' ? 'selected' : '' }}>Regular</option>
+                            <option value="oversize" {{ $product->fit_type == 'oversize' || $product->fit_type == 'slight_oversize' ? 'selected' : '' }}>Oversize</option>
                         </select>
                     </div>
 
@@ -197,38 +193,118 @@
                 </h3>
 
                 @if($product->colors->count() > 0)
-                    <div class="space-y-3">
+                    <div class="space-y-4 mb-6">
                         @foreach($product->colors as $color)
-                            <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded border-2 border-gray-300 dark:border-gray-600" style="background-color: {{ $color->hex_code ?? '#E5E7EB' }}"></div>
+                            @php
+                                $frontImage = $color->images->firstWhere('image_type', 'front');
+                                $backImage = $color->images->firstWhere('image_type', 'back');
+                            @endphp
+                            <div class="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                                     <div>
-                                        <p class="font-semibold text-gray-900 dark:text-gray-100">{{ $color->color_name }}</p>
-                                        @if($color->hex_code)
-                                            <p class="text-xs text-gray-600 dark:text-gray-400">{{ $color->hex_code }}</p>
+                                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Color Name</label>
+                                        <input type="text"
+                                               name="existing_colors[{{ $color->id }}][name]"
+                                               value="{{ old('existing_colors.' . $color->id . '.name', $color->color_name) }}"
+                                               required
+                                               class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400">
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Hex Code</label>
+                                        <input type="color"
+                                               name="existing_colors[{{ $color->id }}][hex_code]"
+                                               value="{{ old('existing_colors.' . $color->id . '.hex_code', $color->hex_code ?: '#ffffff') }}"
+                                               class="w-full h-12 px-2 py-1 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 cursor-pointer">
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Front Image</label>
+                                        @if($frontImage)
+                                            <img src="{{ asset('storage/' . $frontImage->image_path) }}" alt="Front image" class="w-20 h-20 object-cover rounded-lg border border-gray-300 dark:border-gray-600 mb-2">
                                         @endif
+                                        <input type="file"
+                                               name="existing_colors[{{ $color->id }}][front_image]"
+                                               accept="image/*"
+                                               class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400">
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Back Image</label>
+                                        @if($backImage)
+                                            <img src="{{ asset('storage/' . $backImage->image_path) }}" alt="Back image" class="w-20 h-20 object-cover rounded-lg border border-gray-300 dark:border-gray-600 mb-2">
+                                        @endif
+                                        <input type="file"
+                                               name="existing_colors[{{ $color->id }}][back_image]"
+                                               accept="image/*"
+                                               class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400">
                                     </div>
                                 </div>
-                                <a href="{{ route('admin.colors.destroy', $color) }}" 
-                                   onclick="return confirm('Delete this color?')"
-                                   class="inline-flex items-center justify-center w-8 h-8 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors duration-200">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                </a>
+
+                                <div class="mt-4 flex justify-end">
+                                    <button type="button"
+                                            class="delete-color-btn inline-flex items-center px-3 py-2 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors duration-200 font-medium text-sm"
+                                            data-delete-url="{{ route('admin.colors.destroy', $color) }}">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                        Delete Color
+                                    </button>
+                                </div>
                             </div>
                         @endforeach
                     </div>
-                    <a href="{{ route('admin.products.edit', $product) }}#add-color" 
-                       class="mt-4 inline-flex items-center px-4 py-2 bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 rounded-lg hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors duration-200 font-medium text-sm">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                        Add Another Color
-                    </a>
-                @else
-                    <p class="text-gray-600 dark:text-gray-400 mb-4">No colors added yet.</p>
                 @endif
+
+                <div id="new-colors-container" class="space-y-4"></div>
+
+                <button type="button"
+                        id="add-color-btn"
+                        class="mt-4 inline-flex items-center px-4 py-2 bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 rounded-lg hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors duration-200 font-medium text-sm">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Add Another Color
+                </button>
+
+                <template id="new-color-template">
+                    <div class="new-color-item mt-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Color Name</label>
+                                <input type="text" data-field="name"
+                                       class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400"
+                                       placeholder="e.g., Pink">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Hex Code</label>
+                                <input type="color" data-field="hex_code" value="#ffffff"
+                                       class="w-full h-12 px-2 py-1 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 cursor-pointer">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Front Image</label>
+                                <input type="file" data-field="front_image" accept="image/*"
+                                       class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Back Image</label>
+                                <input type="file" data-field="back_image" accept="image/*"
+                                       class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400">
+                            </div>
+                        </div>
+
+                        <button type="button"
+                                class="remove-new-color mt-4 inline-flex items-center px-3 py-2 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors duration-200 font-medium text-sm">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            Remove Color
+                        </button>
+                    </div>
+                </template>
             </div>
 
             <!-- Actions -->
@@ -254,12 +330,62 @@
 document.addEventListener('DOMContentLoaded', function() {
     const limitedEditionCheckbox = document.getElementById('is_limited_edition');
     const dropControlContainer = document.getElementById('drop_control_container');
+    const addColorBtn = document.getElementById('add-color-btn');
+    const newColorsContainer = document.getElementById('new-colors-container');
+    const newColorTemplate = document.getElementById('new-color-template');
+    let newColorIndex = 0;
 
     if (limitedEditionCheckbox) {
         limitedEditionCheckbox.addEventListener('change', function() {
             dropControlContainer.style.display = this.checked ? 'block' : 'none';
         });
     }
+
+    if (addColorBtn && newColorsContainer && newColorTemplate) {
+        addColorBtn.addEventListener('click', function() {
+            const colorBlock = newColorTemplate.content.firstElementChild.cloneNode(true);
+
+            colorBlock.querySelectorAll('[data-field]').forEach((field) => {
+                const fieldName = field.getAttribute('data-field');
+                field.setAttribute('name', `new_colors[${newColorIndex}][${fieldName}]`);
+            });
+
+            const removeButton = colorBlock.querySelector('.remove-new-color');
+            removeButton.addEventListener('click', function() {
+                colorBlock.remove();
+            });
+
+            newColorsContainer.appendChild(colorBlock);
+            newColorIndex++;
+        });
+    }
+
+    document.querySelectorAll('.delete-color-btn').forEach((button) => {
+        button.addEventListener('click', function() {
+            if (!confirm('Delete this color?')) {
+                return;
+            }
+
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = this.dataset.deleteUrl;
+
+            const csrfField = document.createElement('input');
+            csrfField.type = 'hidden';
+            csrfField.name = '_token';
+            csrfField.value = '{{ csrf_token() }}';
+
+            const methodField = document.createElement('input');
+            methodField.type = 'hidden';
+            methodField.name = '_method';
+            methodField.value = 'DELETE';
+
+            form.appendChild(csrfField);
+            form.appendChild(methodField);
+            document.body.appendChild(form);
+            form.submit();
+        });
+    });
 });
 </script>
 @endsection

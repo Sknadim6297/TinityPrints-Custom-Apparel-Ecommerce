@@ -10,7 +10,7 @@
                <div class="col-lg-4">
                   <form action="#" class="filter-search-input header-search-3 d-none d-lg-inline-block">
                      <input type="text" placeholder="Search Products.....">
-                     <button><i class="fas fa-search"></i></button>
+                     <button><i class="fal fa-search"></i></button>
                   </form>
                </div>
                <div class="col-lg-4">
@@ -224,7 +224,7 @@
                      </div>
                      <div class="action-list action-list-header1">
                         <div class="action-item action-item-cart">
-                           <a href="{{ route('cart.index') }}" class="view-cart-button">
+                           <a href="{{ route('cart.index') }}">
                               <i class="fal fa-shopping-bag"></i>
                               @auth
                                  @php
@@ -237,7 +237,7 @@
                            </a>
                         </div>
                         <div class="action-item action-item-wishlist">
-                           <a href="{{ route('wishlist.index') }}" class="view-wishlist-button">
+                           <a href="{{ route('wishlist.index') }}">
                               <i class="fal fa-heart"></i>
                               @auth
                                  @php
@@ -255,7 +255,7 @@
                <div class="offset-widget offset_searchbar mb-30">
                   <form action="#" class="filter-search-input">
                      <input type="text" placeholder="Search keyword">
-                     <button><i class="fas fa-search"></i></button>
+                     <button><i class="fal fa-search"></i></button>
                   </form>
                </div>
             </div>
@@ -326,7 +326,7 @@
                   </div>
                   <div class="sidebar-action-btn">
                      <a href="{{ route('cart.index') }}" class="fill-btn">View cart</a>
-                     <a href="#" class="border-btn">Checkout</a>
+                     <a href="{{ route('checkout') }}" class="border-btn">Checkout</a>
                   </div>
                @endif
             @endauth

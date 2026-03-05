@@ -1,10 +1,13 @@
 <?php
 
+use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\CartController;
 use App\Http\Controllers\Frontend\WishlistController;
 use App\Http\Controllers\Frontend\ReviewController;
-use App\Http\Controllers\ContactController;
+use App\Http\Controllers\Frontend\CheckoutController;
+use App\Http\Controllers\Frontend\OrderController;
+use App\Http\Controllers\Frontend\CustomDesignController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -13,7 +16,19 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/shop', [HomeController::class, 'shop'])->name('shop');
 Route::get('/shop/{category}', [HomeController::class, 'shop'])->name('shop.category');
 Route::get('/product/{id}', [HomeController::class, 'productDetails'])->name('product.details');
-Route::get('/custom-design', [HomeController::class, 'customDesign'])->name('custom-design');
+Route::get('/custom-design', [CustomDesignController::class, 'create'])->name('custom-design');
+Route::middleware('auth')->group(function () {
+    Route::post('/custom-design', [CustomDesignController::class, 'store'])->name('custom-design.store');
+    Route::get('/custom-design/{design}', [CustomDesignController::class, 'show'])->name('custom-design.show');
+    Route::post('/custom-design/{design}', [CustomDesignController::class, 'update'])->name('custom-design.update');
+    Route::get('/custom-design/{design}/download/{fileType}', [CustomDesignController::class, 'download'])
+        ->whereIn('fileType', ['front', 'back'])
+        ->name('custom-design.download');
+    Route::get('/custom-design/{design}/checkout', [CustomDesignController::class, 'checkout'])
+        ->name('custom-design.checkout');
+    Route::post('/custom-design/{design}/payment', [CustomDesignController::class, 'processPayment'])
+        ->name('custom-design.payment.process');
+});
 Route::get('/limited-edition', [HomeController::class, 'limitedEdition'])->name('limited-edition');
 Route::get('/about', [HomeController::class, 'about'])->name('about');
 Route::get('/refund-policy', [HomeController::class, 'refundPolicy'])->name('refund-policy');
@@ -26,19 +41,46 @@ Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
 Route::patch('/cart/{id}', [CartController::class, 'update'])->name('cart.update');
 Route::delete('/cart/{id}', [CartController::class, 'destroy'])->name('cart.destroy');
+Route::get('/cart/sidebar-items', [CartController::class, 'getSidebarItems'])->name('cart.sidebar-items');
+Route::post('/cart/apply-coupon', [CartController::class, 'applyCoupon'])->name('cart.apply-coupon');
+Route::get('/cart/available-coupons', [CartController::class, 'getAvailableCoupons'])->name('cart.available-coupons');
+Route::post('/cart/remove-coupon', [CartController::class, 'removeCoupon'])->name('cart.remove-coupon');
 
 // Wishlist Routes
 Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
 Route::post('/wishlist', [WishlistController::class, 'store'])->name('wishlist.store');
+Route::get('/wishlist/sidebar-items', [WishlistController::class, 'getSidebarItems'])->name('wishlist.sidebar-items');
 Route::delete('/wishlist/{id}', [WishlistController::class, 'destroy'])->name('wishlist.destroy');
 
-// Review Routes
-Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+// Cart Routes (Protected - requires authentication)
+Route::middleware('auth')->group(function () {
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
+    Route::patch('/cart/{id}', [CartController::class, 'update'])->name('cart.update');
+    Route::delete('/cart/{id}', [CartController::class, 'destroy'])->name('cart.destroy');
+    Route::get('/cart/sidebar-items', [CartController::class, 'getSidebarItems'])->name('cart.sidebar-items');
+    Route::post('/cart/apply-coupon', [CartController::class, 'applyCoupon'])->name('cart.apply-coupon');
+    Route::get('/cart/available-coupons', [CartController::class, 'getAvailableCoupons'])->name('cart.available-coupons');
+    Route::post('/cart/remove-coupon', [CartController::class, 'removeCoupon'])->name('cart.remove-coupon');
+});
 
-// Checkout Route (placeholder view)
-Route::get('/checkout', function () {
-    return view('frontend.checkout');
-})->name('checkout');
+// Wishlist Routes (Protected - requires authentication)
+Route::middleware('auth')->group(function () {
+    Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
+    Route::post('/wishlist', [WishlistController::class, 'store'])->name('wishlist.store');
+    Route::get('/wishlist/sidebar-items', [WishlistController::class, 'getSidebarItems'])->name('wishlist.sidebar-items');
+    Route::delete('/wishlist/{id}', [WishlistController::class, 'destroy'])->name('wishlist.destroy');
+});
+
+// Review Routes (Protected - requires authentication)
+Route::post('/reviews', [ReviewController::class, 'store'])->middleware('auth')->name('reviews.store');
+
+// Checkout Routes (authenticated users only)
+Route::middleware('auth')->group(function () {
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
+    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+    Route::get('/order-success/{order}', [CheckoutController::class, 'success'])->name('order.success');
+});
 
 // Auth Routes - Redirect dashboard to home for regular users
 Route::get('/dashboard', function () {
@@ -49,9 +91,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    Route::get('/orders', function () {
-        return view('frontend.orders');
-    })->name('orders');
+    
+    // User Orders Routes
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders');
+    Route::get('/orders/{id}', [OrderController::class, 'show'])->name('order.details');
+    Route::post('/orders/{order}/refund-request', [OrderController::class, 'requestRefund'])
+        ->name('orders.refund.request');
+    Route::patch('/refund-requests/{refund}/customer-response', [OrderController::class, 'respondRefundRequest'])
+        ->whereNumber('refund')
+        ->name('orders.refund.respond');
 });
 
 require __DIR__.'/auth.php';

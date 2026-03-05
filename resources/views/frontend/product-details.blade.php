@@ -22,18 +22,74 @@
                   </div>
                </div>
                <div class="mobile-menu d-lg-none fix"></div>
-               <div class="offset-profile-action d-md-none">
+               <div class="offset-profile-action d-lg-none">
                   <div class="offset-widget mb-40">
+                     @auth
+                        <div class="mobile-user-info mb-20 text-center">
+                           <div class="user-icon" style="display: inline-block; margin-bottom: 10px;">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="38"
+                                 viewBox="0 0 16.077 19">
+                                 <g id="avatar" transform="translate(-39.385)">
+                                    <g id="Group_6" data-name="Group 6" transform="translate(39.385)">
+                                       <path id="Path_32" data-name="Path 32"
+                                          d="M50.288,8.81a4.872,4.872,0,1,0-5.729,0,8.052,8.052,0,0,0-5.174,7.511A2.683,2.683,0,0,0,42.064,19H52.782a2.683,2.683,0,0,0,2.679-2.679A8.052,8.052,0,0,0,50.288,8.81ZM44.013,4.872a3.41,3.41,0,1,1,3.41,3.41A3.414,3.414,0,0,1,44.013,4.872Zm8.769,12.667H42.064a1.219,1.219,0,0,1-1.218-1.218A6.577,6.577,0,1,1,54,16.32,1.219,1.219,0,0,1,52.782,17.538Z"
+                                          transform="translate(-39.385)" fill="#171717"></path>
+                                    </g>
+                                 </g>
+                              </svg>
+                           </div>
+                           <div class="user-name" style="font-weight: 600; font-size: 16px;">{{ Auth::user()->name }}</div>
+                        </div>
+                     @endauth
+                     <div class="action-list action-list-header1 mb-20">
+                        @auth
+                           <div class="action-item">
+                              <a href="{{ route('orders') }}" class="action-btn-text">My Orders</a>
+                           </div>
+                           <div class="action-item">
+                              <a href="{{ route('profile.edit') }}" class="action-btn-text">Profile</a>
+                           </div>
+                           <div class="action-item">
+                              <a href="{{ route('contact') }}" class="action-btn-text">Support</a>
+                           </div>
+                           <div class="action-item">
+                              <form method="POST" action="{{ route('logout') }}">
+                                 @csrf
+                                 <button type="submit" class="action-btn-text">Logout</button>
+                              </form>
+                           </div>
+                        @else
+                           <div class="action-item">
+                              <a href="{{ route('login') }}" class="action-btn-text">Sign in</a>
+                           </div>
+                        @endauth
+                     </div>
                      <div class="action-list action-list-header1">
                         <div class="action-item action-item-cart">
-                           <a href="javascript:void(0)" class="view-cart-button">
+                           <a href="{{ route('cart.index') }}">
                               <i class="fal fa-shopping-bag"></i>
-                              <span class="action-item-number">3</span></a>
+                              @auth
+                                 @php
+                                    $cartCount = \App\Models\Cart::where('user_id', auth()->id())->sum('quantity');
+                                 @endphp
+                                 <span class="action-item-number cart-count">{{ $cartCount }}</span>
+                              @else
+                                 <span class="action-item-number cart-count">0</span>
+                              @endauth
+                           </a>
                         </div>
                         <div class="action-item action-item-wishlist">
-                           <a href="javascript:void(0)" class="view-wishlist-button">
+                           <a href="{{ route('wishlist.index') }}">
                               <i class="fal fa-heart"></i>
-                              <span class="action-item-number">2</span></a>
+                              @auth
+                                 @php
+                                    $wishlistCount = \App\Models\Wishlist::where('user_id', auth()->id())->count();
+                                 @endphp
+                                 <span class="action-item-number wishlist-count">{{ $wishlistCount }}</span>
+                              @else
+                                 <span class="action-item-number wishlist-count">0</span>
+                              @endauth
+                           </a>
                         </div>
                      </div>
                   </div>
@@ -82,7 +138,14 @@
                <div class="col-lg-6">
                   <div class="product-details-tab-wrapper mb-30">
                      @php
-                        $productImages = $product->images->take(5);
+                        $activeColors = $product->colors->where('is_active', true);
+                        $colorsForImages = $activeColors->count() > 0 ? $activeColors : $product->colors;
+                        $productImages = $colorsForImages
+                           ->flatMap(function ($color) {
+                              return $color->images->whereIn('image_type', ['front', 'back']);
+                           })
+                           ->values()
+                           ->take(10);
                         $imageCount = $productImages->count();
                      @endphp
                      <div class="product-details-tab">
@@ -133,22 +196,35 @@
                      <p class="mb-30">{{ $product->description ?: 'No description available for this product.' }}</p>
                      
                      @if($product->sizes->where('is_available', true)->count() > 0)
-                        <div class="available-sizes">
-                           <span>Available Sizes : </span>
-                           <div class="product-available-sizes">
+                        <div class="available-sizes mb-20">
+                           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                              <span style="font-weight: 600;">Select Size: <span class="text-danger">*</span></span>
+                              <button type="button" class="btn-link" data-bs-toggle="modal" data-bs-target="#sizeChartModal" style="font-size: 14px; color: #171717; text-decoration: underline; padding: 0; border: none; cursor: pointer; background: none;">
+                                 View Size Chart
+                              </button>
+                           </div>
+                           <div class="product-available-sizes" style="display: flex; gap: 10px; flex-wrap: wrap;">
                               @foreach($product->sizes->where('is_available', true) as $size)
-                                 <span>{{ strtoupper($size->size) }}</span>
+                                 <label class="size-option" style="cursor: pointer;">
+                                    <input type="radio" name="product_size" value="{{ $size->size }}" style="display: none;" required>
+                                    <span class="size-badge" style="display: inline-block; border: 2px solid #ddd; border-radius: 4px; font-weight: 600; transition: all 0.3s;">
+                                       {{ strtoupper($size->size) }}
+                                    </span>
+                                 </label>
                               @endforeach
                            </div>
                         </div>
                      @endif
 
                      @if($product->colors->where('is_active', true)->count() > 0)
-                        <div class="available-sizes mt-20">
-                           <span>Available Colors : </span>
-                           <div class="product-color-options">
+                        <div class="available-colors mb-20">
+                           <span class="mb-10 d-block" style="font-weight: 600;">Select Color: <span class="text-danger">*</span></span>
+                           <div class="product-color-options" style="display: flex; gap: 10px; flex-wrap: wrap;">
                               @foreach($product->colors->where('is_active', true) as $color)
-                                 <span class="color-badge" style="background-color: {{ $color->hex_code }}; width: 30px; height: 30px; display: inline-block; border-radius: 50%; border: 2px solid #ddd; margin-right: 5px;" title="{{ $color->color_name }}"></span>
+                                 <label class="color-option" style="cursor: pointer;" title="{{ $color->color_name }}">
+                                    <input type="radio" name="product_color" value="{{ $color->id }}" style="display: none;" required>
+                                    <span class="color-badge" style="width: 40px; height: 40px; display: inline-block; border-radius: 50%; background-color: {{ $color->hex_code }}; border: 3px solid #ddd; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"></span>
+                                 </label>
                               @endforeach
                            </div>
                         </div>
@@ -157,9 +233,9 @@
                      <div class="product-quantity-cart mb-25 mt-30">
                         <div class="product-quantity-form">
                            <form id="add-to-cart-form">
-                              <button class="cart-minus" type="button"><i class="far fa-minus"></i></button>
+                              <button class="cart-minus" type="button"><i class="fal fa-minus"></i></button>
                               <input class="cart-input" id="product-quantity" type="text" value="1" readonly>
-                              <button class="cart-plus" type="button"><i class="far fa-plus"></i></button>
+                              <button class="cart-plus" type="button"><i class="fal fa-plus"></i></button>
                            </form>
                         </div>
                         <button type="button" class="fill-btn add-to-cart-btn" data-product-id="{{ $product->id }}">Add to Cart</button>
@@ -216,7 +292,7 @@
                                        <span class="rating-number">{{ number_format($averageRating, 1) }}</span>
                                        <div class="stars">
                                           @for($i = 1; $i <= 5; $i++)
-                                             <i class="fas fa-star {{ $i <= round($averageRating) ? '' : 'text-muted' }}"></i>
+                                             <i class="fal fa-star {{ $i <= round($averageRating) ? '' : 'text-muted' }}"></i>
                                           @endfor
                                        </div>
                                     </div>
@@ -233,7 +309,7 @@
                                              <h6 class="mb-0">{{ $review->user->name }}</h6>
                                              <div class="review-rating">
                                                 @for($i = 1; $i <= 5; $i++)
-                                                   <i class="fas fa-star {{ $i <= $review->rating ? '' : 'text-muted' }}" style="font-size: 12px;"></i>
+                                                   <i class="fal fa-star {{ $i <= $review->rating ? '' : 'text-muted' }}" style="font-size: 12px;"></i>
                                                 @endfor
                                              </div>
                                           </div>
@@ -285,7 +361,7 @@
                                                 <div class="rating-input">
                                                    @for($i = 5; $i >= 1; $i--)
                                                       <input type="radio" name="rating" id="star{{ $i }}" value="{{ $i }}" required>
-                                                      <label for="star{{ $i }}"><i class="fas fa-star"></i></label>
+                                                      <label for="star{{ $i }}"><i class="fal fa-star"></i></label>
                                                    @endfor
                                                 </div>
                                                 @error('rating')
@@ -384,8 +460,143 @@
       </div>
    </main>
 
+   <!-- Size Chart Modal -->
+   <div class="modal fade" id="sizeChartModal" tabindex="-1" aria-labelledby="sizeChartModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+         <div class="modal-content">
+            <div class="modal-header">
+               <h5 class="modal-title" id="sizeChartModalLabel">T-Shirt Size Chart</h5>
+               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+               <p style="margin-bottom: 20px; color: #666;">Select your size based on your chest measurement for the perfect fit.</p>
+               
+               <div class="size-chart-table" style="width: 100%;">
+                  <table style="width: 100%; border-collapse: collapse; text-align: center;">
+                     <thead>
+                        <tr style="background-color: #f5f5f5; border-bottom: 2px solid #ddd;">
+                           <th style="padding: 12px; border: 1px solid #ddd; font-weight: 700; font-size: 14px;">Size</th>
+                           <th style="padding: 12px; border: 1px solid #ddd; font-weight: 700; font-size: 14px;">Chest (inches)</th>
+                           <th style="padding: 12px; border: 1px solid #ddd; font-weight: 700; font-size: 14px;">Chest (cm)</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        <tr style="border-bottom: 1px solid #ddd;">
+                           <td style="padding: 12px; border: 1px solid #ddd; font-weight: 600;">XS</td>
+                           <td style="padding: 12px; border: 1px solid #ddd;">32-34</td>
+                           <td style="padding: 12px; border: 1px solid #ddd;">81-86</td>
+                        </tr>
+                        <tr style="background-color: #fafafa; border-bottom: 1px solid #ddd;">
+                           <td style="padding: 12px; border: 1px solid #ddd; font-weight: 600;">S</td>
+                           <td style="padding: 12px; border: 1px solid #ddd;">34-36</td>
+                           <td style="padding: 12px; border: 1px solid #ddd;">86-91</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #ddd;">
+                           <td style="padding: 12px; border: 1px solid #ddd; font-weight: 600;">M</td>
+                           <td style="padding: 12px; border: 1px solid #ddd;">38-40</td>
+                           <td style="padding: 12px; border: 1px solid #ddd;">96-101</td>
+                        </tr>
+                        <tr style="background-color: #fafafa; border-bottom: 1px solid #ddd;">
+                           <td style="padding: 12px; border: 1px solid #ddd; font-weight: 600;">L</td>
+                           <td style="padding: 12px; border: 1px solid #ddd;">40-42</td>
+                           <td style="padding: 12px; border: 1px solid #ddd;">101-106</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #ddd;">
+                           <td style="padding: 12px; border: 1px solid #ddd; font-weight: 600;">XL</td>
+                           <td style="padding: 12px; border: 1px solid #ddd;">42-44</td>
+                           <td style="padding: 12px; border: 1px solid #ddd;">106-111</td>
+                        </tr>
+                        <tr style="background-color: #fafafa;">
+                           <td style="padding: 12px; border: 1px solid #ddd; font-weight: 600;">XXL</td>
+                           <td style="padding: 12px; border: 1px solid #ddd;">46-50</td>
+                           <td style="padding: 12px; border: 1px solid #ddd;">116-127</td>
+                        </tr>
+                     </tbody>
+                  </table>
+               </div>
+
+               <div style="margin-top: 20px; padding: 15px; background-color: #f0f8ff; border-left: 4px solid #171717; border-radius: 4px;">
+                  <p style="margin: 0; font-size: 14px; color: #333;">
+                     <strong>💡 Sizing Tip:</strong> Measure your chest at the fullest point for the most accurate size. All measurements are taken when the T-shirt is laid flat.
+                  </p>
+               </div>
+            </div>
+            <div class="modal-footer">
+               <button type="button" class="border-btn" data-bs-dismiss="modal">Close</button>
+            </div>
+         </div>
+      </div>
+   </div>
+
    <!-- Reviews rating CSS -->
    <style>
+      /* Size Chart Modal Styles */
+      .modal-content {
+         border-radius: 8px;
+         border: 1px solid #e5e5e5;
+      }
+      
+      .modal-header {
+         border-bottom: 2px solid #f0f0f0;
+         padding: 20px;
+      }
+      
+      .modal-title {
+         font-weight: 700;
+         font-size: 18px;
+         color: #171717;
+      }
+      
+      .size-chart-table {
+         overflow-x: auto;
+      }
+      
+      .size-chart-table table {
+         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+      
+      .size-chart-table th {
+         background-color: #171717;
+         color: white;
+      }
+      
+      .size-chart-table th:first-child {
+         border-top-left-radius: 4px;
+      }
+      
+      .size-chart-table th:last-child {
+         border-top-right-radius: 4px;
+      }
+      
+      .size-chart-table td {
+         font-size: 14px;
+      }
+      
+      .modal-body {
+         padding: 25px;
+      }
+      
+      .modal-footer {
+         border-top: 1px solid #f0f0f0;
+         padding: 15px 25px;
+      }
+      
+      /* Responsive size chart */
+      @media (max-width: 768px) {
+         .size-chart-table {
+            font-size: 12px;
+         }
+         
+         .size-chart-table td,
+         .size-chart-table th {
+            padding: 8px !important;
+         }
+         
+         .modal-body {
+            padding: 15px;
+         }
+      }
+
       .rating-input {
          display: flex;
          flex-direction: row-reverse;
@@ -414,5 +625,113 @@
          color: #ffb321;
          font-size: 16px;
       }
+
+      /* Size and Color Selection Styles */
+      .size-option input[type="radio"]:checked + .size-badge {
+         border-color: #171717;
+         background-color: #171717;
+         color: #fff;
+      }
+      .size-option:hover .size-badge {
+         border-color: #171717;
+      }
+      .color-option input[type="radio"]:checked + .color-badge {
+         border-color: #171717 !important;
+         border-width: 3px !important;
+         box-shadow: 0 0 0 2px #fff, 0 0 0 4px #171717;
+      }
+      .color-option:hover .color-badge {
+         transform: scale(1.1);
+      }
+      .selection-error {
+         color: #dc3545;
+         font-size: 14px;
+         margin-top: 5px;
+         display: none;
+      }
    </style>
+
+   <!-- Product Details JavaScript -->
+   <script>
+      document.addEventListener('DOMContentLoaded', function() {
+         // Size and Color Selection
+         const sizeOptions = document.querySelectorAll('.size-option');
+         const colorOptions = document.querySelectorAll('.color-option');
+         
+         // Handle size selection
+         sizeOptions.forEach(option => {
+            option.addEventListener('click', function() {
+               const radio = this.querySelector('input[type="radio"]');
+               radio.checked = true;
+               removeError('size');
+            });
+         });
+         
+         // Handle color selection
+         colorOptions.forEach(option => {
+            option.addEventListener('click', function() {
+               const radio = this.querySelector('input[type="radio"]');
+               radio.checked = true;
+               removeError('color');
+            });
+         });
+         
+         // Add validation function to window so cart-wishlist.js can use it
+         window.validateProductSelection = function() {
+            let isValid = true;
+            
+            // Check if size selection exists and is required
+            const sizeRadios = document.querySelectorAll('input[name="product_size"]');
+            if (sizeRadios.length > 0) {
+               const selectedSize = document.querySelector('input[name="product_size"]:checked');
+               if (!selectedSize) {
+                  showError('size', 'Please select a size');
+                  isValid = false;
+               }
+            }
+            
+            // Check if color selection exists and is required
+            const colorRadios = document.querySelectorAll('input[name="product_color"]');
+            if (colorRadios.length > 0) {
+               const selectedColor = document.querySelector('input[name="product_color"]:checked');
+               if (!selectedColor) {
+                  showError('color', 'Please select a color');
+                  isValid = false;
+               }
+            }
+            
+            return isValid;
+         };
+         
+         function showError(type, message) {
+            const container = type === 'size' ? 
+               document.querySelector('.available-sizes') : 
+               document.querySelector('.available-colors');
+            
+            if (container) {
+               let errorEl = container.querySelector('.selection-error');
+               if (!errorEl) {
+                  errorEl = document.createElement('div');
+                  errorEl.className = 'selection-error';
+                  container.appendChild(errorEl);
+               }
+               errorEl.textContent = message;
+               errorEl.style.display = 'block';
+            }
+         }
+         
+         function removeError(type) {
+            const container = type === 'size' ? 
+               document.querySelector('.available-sizes') : 
+               document.querySelector('.available-colors');
+            
+            if (container) {
+               const errorEl = container.querySelector('.selection-error');
+               if (errorEl) {
+                  errorEl.style.display = 'none';
+               }
+            }
+         }
+      });
+   </script>
 @endsection

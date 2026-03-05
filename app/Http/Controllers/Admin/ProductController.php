@@ -8,6 +8,7 @@ use App\Models\ProductColor;
 use App\Models\ProductImage;
 use App\Models\ProductSize;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
@@ -15,6 +16,17 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $query = Product::with(['colors.images', 'sizes', 'admin']);
+
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+
+            $query->where(function ($subQuery) use ($search) {
+                $subQuery->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('drop_name', 'like', "%{$search}%")
+                    ->orWhere('brand', 'like', "%{$search}%");
+            });
+        }
 
         // Apply filters
         if ($request->filled('category')) {
@@ -45,6 +57,20 @@ class ProductController extends Controller
             $query->whereNotNull('drop_story')->where('drop_story', '!=', '');
         }
 
+        if ($request->filled('stock_status')) {
+            if ($request->stock_status === 'in_stock') {
+                $query->whereHas('sizes', function ($subQuery) {
+                    $subQuery->where('stock_quantity', '>', 0);
+                });
+            }
+
+            if ($request->stock_status === 'out_of_stock') {
+                $query->whereDoesntHave('sizes', function ($subQuery) {
+                    $subQuery->where('stock_quantity', '>', 0);
+                });
+            }
+        }
+
         // Get segment counts
         $tshirtCount = Product::where('category', 't-shirt')->count();
         $accessoriesCount = Product::where('category', 'accessories')->count();
@@ -53,7 +79,7 @@ class ProductController extends Controller
         $availableSizes = ProductSize::distinct()->pluck('size')->sort();
         $availableColors = ProductColor::distinct()->pluck('color_name')->sort();
 
-        $products = $query->orderBy('created_at', 'desc')->paginate(12);
+        $products = $query->orderBy('created_at', 'desc')->paginate(12)->withQueryString();
 
         return view('admin.products.index', compact(
             'products', 
@@ -75,7 +101,7 @@ class ProductController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'category' => 'nullable|in:t-shirt,accessories',
-            'fit_type' => 'required|in:normal,slight_oversize',
+            'fit_type' => 'required|in:regular,oversize,normal,slight_oversize',
             'sleeve_type' => 'nullable|in:full,half',
             'base_price' => 'required|numeric|min:0.01',
             'is_limited_edition' => 'boolean',
@@ -193,7 +219,7 @@ class ProductController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'category' => 'required|in:t-shirt,accessories',
-            'fit_type' => 'required|in:normal,slight_oversize',
+            'fit_type' => 'required|in:regular,oversize,normal,slight_oversize',
             'sleeve_type' => 'required|in:full,half',
             'base_price' => 'required|numeric|min:0.01',
             'is_limited_edition' => 'boolean',
@@ -207,6 +233,16 @@ class ProductController extends Controller
             'auto_hide_out_of_stock' => 'boolean',
             'size_stocks' => 'nullable|array',
             'size_stocks.*' => 'nullable|integer|min:0',
+            'existing_colors' => 'nullable|array',
+            'existing_colors.*.name' => 'required|string|max:100',
+            'existing_colors.*.hex_code' => 'nullable|regex:/^#[0-9A-Fa-f]{6}$/',
+            'existing_colors.*.front_image' => 'nullable|image|max:5120',
+            'existing_colors.*.back_image' => 'nullable|image|max:5120',
+            'new_colors' => 'nullable|array',
+            'new_colors.*.name' => 'nullable|string|max:100',
+            'new_colors.*.hex_code' => 'nullable|regex:/^#[0-9A-Fa-f]{6}$/',
+            'new_colors.*.front_image' => 'nullable|image|max:5120',
+            'new_colors.*.back_image' => 'nullable|image|max:5120',
         ]);
 
         $product->update([
@@ -250,6 +286,78 @@ class ProductController extends Controller
                         'is_available' => $stockQuantity > 0,
                     ]);
                 }
+            }
+        }
+
+        $existingColors = $request->input('existing_colors', []);
+        foreach ($existingColors as $colorId => $colorData) {
+            $color = $product->colors()->whereKey($colorId)->first();
+
+            if (!$color) {
+                continue;
+            }
+
+            $color->update([
+                'color_name' => $colorData['name'],
+                'hex_code' => $colorData['hex_code'] ?? null,
+            ]);
+
+            if ($request->hasFile("existing_colors.$colorId.front_image")) {
+                $this->replaceColorImage(
+                    $product,
+                    $color,
+                    'front',
+                    $request->file("existing_colors.$colorId.front_image")
+                );
+            }
+
+            if ($request->hasFile("existing_colors.$colorId.back_image")) {
+                $this->replaceColorImage(
+                    $product,
+                    $color,
+                    'back',
+                    $request->file("existing_colors.$colorId.back_image")
+                );
+            }
+        }
+
+        foreach ($request->input('new_colors', []) as $index => $colorData) {
+            $colorName = trim((string) ($colorData['name'] ?? ''));
+            $hasFrontImage = $request->hasFile("new_colors.$index.front_image");
+            $hasBackImage = $request->hasFile("new_colors.$index.back_image");
+            $hasHexCode = !empty($colorData['hex_code']);
+
+            if ($colorName === '' && !$hasFrontImage && !$hasBackImage && !$hasHexCode) {
+                continue;
+            }
+
+            if ($colorName === '') {
+                continue;
+            }
+
+            $newColor = ProductColor::create([
+                'product_id' => $product->id,
+                'color_name' => $colorName,
+                'hex_code' => $colorData['hex_code'] ?? null,
+                'is_active' => true,
+            ]);
+
+            if ($hasFrontImage) {
+                $this->replaceColorImage(
+                    $product,
+                    $newColor,
+                    'front',
+                    $request->file("new_colors.$index.front_image")
+                );
+            }
+
+            if ($hasBackImage) {
+                $this->replaceColorImage(
+                    $product,
+                    $newColor,
+                    'back',
+                    $request->file("new_colors.$index.back_image")
+                );
             }
         }
 
@@ -324,5 +432,24 @@ class ProductController extends Controller
 
         return redirect()->route('admin.products.edit', $product)
             ->with('success', 'Color deleted successfully!');
+    }
+
+    protected function replaceColorImage(Product $product, ProductColor $color, string $imageType, UploadedFile $file): void
+    {
+        $path = $file->store("products/{$product->id}/colors/{$color->id}", 'public');
+
+        $existingImage = $color->images()->where('image_type', $imageType)->first();
+
+        if ($existingImage) {
+            Storage::disk('public')->delete($existingImage->image_path);
+            $existingImage->update(['image_path' => $path]);
+            return;
+        }
+
+        ProductImage::create([
+            'product_color_id' => $color->id,
+            'image_type' => $imageType,
+            'image_path' => $path,
+        ]);
     }
 }

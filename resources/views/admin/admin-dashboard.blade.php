@@ -110,7 +110,7 @@
                 <div class="flex items-center justify-between">
                     <div class="flex-1">
                         <p class="text-blue-100 text-xs sm:text-sm font-medium mb-1">Monthly Sales</p>
-                        <p class="text-2xl sm:text-4xl font-bold">${{ number_format($stats['monthly_sales'], 0) }}</p>
+                        <p class="text-2xl sm:text-4xl font-bold">₹{{ number_format($stats['monthly_sales'], 0) }}</p>
                     </div>
                     <div class="bg-blue-500 bg-opacity-30 rounded-full p-2 sm:p-4 flex-shrink-0">
                         <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -159,13 +159,13 @@
                     </a>
                     
                     @if(auth()->guard('admin')->user()->isOrderManager())
-                        <a href="#" class="block w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-white rounded-lg px-3 sm:px-4 py-2 sm:py-3 font-semibold text-sm sm:text-base hover:from-yellow-500 hover:to-yellow-700 transition-all duration-300 text-center shadow-md hover:shadow-lg">
+                        <a href="{{ route('admin.orders.index') }}" class="block w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-white rounded-lg px-3 sm:px-4 py-2 sm:py-3 font-semibold text-sm sm:text-base hover:from-yellow-500 hover:to-yellow-700 transition-all duration-300 text-center shadow-md hover:shadow-lg">
                             View Orders
                         </a>
                     @endif
                     
                     @if(auth()->guard('admin')->user()->isDesignApprover())
-                        <a href="#" class="block w-full bg-gradient-to-r from-red-400 to-red-600 text-white rounded-lg px-3 sm:px-4 py-2 sm:py-3 font-semibold text-sm sm:text-base hover:from-red-500 hover:to-red-700 transition-all duration-300 text-center shadow-md hover:shadow-lg">
+                        <a href="{{ route('admin.design-approvals.index') }}" class="block w-full bg-gradient-to-r from-red-400 to-red-600 text-white rounded-lg px-3 sm:px-4 py-2 sm:py-3 font-semibold text-sm sm:text-base hover:from-red-500 hover:to-red-700 transition-all duration-300 text-center shadow-md hover:shadow-lg">
                             Review Designs
                         </a>
                     @endif
@@ -175,7 +175,7 @@
                     </a>
                     
                     @if(auth()->guard('admin')->user()->isSuperAdmin())
-                        <a href="#" class="block w-full bg-gradient-to-r from-purple-400 to-purple-600 text-white rounded-lg px-3 sm:px-4 py-2 sm:py-3 font-semibold text-sm sm:text-base hover:from-purple-500 hover:to-purple-700 transition-all duration-300 text-center shadow-md hover:shadow-lg">
+                        <a href="{{ route('admin.customers.index') }}" class="block w-full bg-gradient-to-r from-purple-400 to-purple-600 text-white rounded-lg px-3 sm:px-4 py-2 sm:py-3 font-semibold text-sm sm:text-base hover:from-purple-500 hover:to-purple-700 transition-all duration-300 text-center shadow-md hover:shadow-lg">
                             Manage Admins
                         </a>
                     @endif
@@ -195,8 +195,8 @@
                         </div>
                         <div class="flex justify-between">
                             <span class="text-gray-600 dark:text-gray-400">Status:</span>
-                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200">
-                                Active
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold {{ auth()->guard('admin')->user()->is_active ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200' }}">
+                                {{ auth()->guard('admin')->user()->is_active ? 'Active' : 'Inactive' }}
                             </span>
                         </div>
                     </div>
@@ -217,7 +217,7 @@
                 data: {
                     labels: @json($stats['monthly_chart_data']['labels']),
                     datasets: [{
-                        label: 'Sales ($)',
+                        label: 'Sales (₹)',
                         data: @json($stats['monthly_chart_data']['data']),
                         borderColor: 'rgb(239, 68, 68)',
                         backgroundColor: 'rgba(239, 68, 68, 0.1)',

@@ -187,7 +187,7 @@ class HomeController extends Controller
      */
     public function productDetails($id)
     {
-        $product = Product::with(['colors', 'sizes', 'images'])->findOrFail($id);
+        $product = Product::with(['colors.images', 'sizes'])->findOrFail($id);
         $relatedProducts = Product::where('id', '!=', $id)
             ->where('is_active', true)
             ->take(4)

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->text('description')->nullable();
             $table->enum('category', ['t-shirt', 'accessories']);
-            $table->enum('fit_type', ['normal', 'slight_oversize']);
+            $table->enum('fit_type', ['regular', 'oversize', 'normal', 'slight_oversize']);
             $table->enum('sleeve_type', ['full', 'half']);
             $table->decimal('base_price', 10, 2);
             $table->boolean('is_limited_edition')->default(false);

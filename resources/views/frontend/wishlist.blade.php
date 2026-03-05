@@ -73,7 +73,7 @@
                         
                         <div class="product-action">
                             <button class="quick-view-btn" data-product-id="{{ $product->id }}">
-                                <i class="fal fa-eye"></i>
+                                <i class="far fa-eye"></i>
                             </button>
                         </div>
 
@@ -92,7 +92,7 @@
                             <button class="btn-remove-wishlist" 
                                     data-wishlist-id="{{ $item->id }}"
                                     style="background: white; border: none; border-radius: 50%; width: 35px; height: 35px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); cursor: pointer;">
-                                <i class="fas fa-times" style="color: #ff4444;"></i>
+                                <i class="fal fa-times" style="color: #ff4444;"></i>
                             </button>
                         </div>
                     </div>
@@ -154,7 +154,7 @@
             <div class="col-12">
                 <div class="empty-wishlist text-center py-5">
                     <div class="empty-wishlist-icon mb-4">
-                        <i class="fal fa-heart" style="font-size: 80px; color: #e0e0e0;"></i>
+                        <i class="far fa-heart" style="font-size: 80px; color: #e0e0e0;"></i>
                     </div>
                     <h3 class="mb-3" style="color: var(--clr-common-heading);">Your Wishlist is Empty</h3>
                     <p class="mb-4" style="color: var(--clr-common-text); max-width: 500px; margin: 0 auto;">

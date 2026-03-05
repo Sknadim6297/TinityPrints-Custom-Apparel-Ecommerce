@@ -67,7 +67,14 @@
         <div class="mb-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-6">
             <h3 class="font-semibold text-lg text-gray-800 dark:text-gray-200 mb-4">Filters</h3>
             <form method="GET" class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 gap-4">
+                    <!-- Search -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Search</label>
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Name, brand, story..."
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                    </div>
+
                     <!-- Category Filter -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Category</label>
@@ -122,6 +129,16 @@
                         <select name="story" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <option value="">All Products</option>
                             <option value="1" {{ request('story') === '1' ? 'selected' : '' }}>With Story</option>
+                        </select>
+                    </div>
+
+                    <!-- Stock Filter -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Stock</label>
+                        <select name="stock_status" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                            <option value="">All Stock</option>
+                            <option value="in_stock" {{ request('stock_status') === 'in_stock' ? 'selected' : '' }}>In Stock</option>
+                            <option value="out_of_stock" {{ request('stock_status') === 'out_of_stock' ? 'selected' : '' }}>Out of Stock</option>
                         </select>
                     </div>
                 </div>
@@ -223,7 +240,7 @@
                             <!-- Price -->
                             <div class="mb-3">
                                 <span class="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                                    ${{ number_format($product->base_price, 2) }}
+                                    ₹{{ number_format($product->base_price, 2) }}
                                 </span>
                             </div>
 
@@ -317,7 +334,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                 </svg>
                 <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-3">No Products Found</h3>
-                @if(request()->hasAny(['category', 'sleeve_type', 'size', 'color', 'limited_edition', 'story']))
+                @if(request()->hasAny(['search', 'category', 'sleeve_type', 'size', 'color', 'limited_edition', 'story', 'stock_status']))
                     <p class="text-gray-500 dark:text-gray-400 mb-6">No products match your current filters. Try adjusting your search criteria.</p>
                     <a href="{{ route('admin.products.index') }}" 
                        class="inline-flex items-center bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg transition-colors mr-3">

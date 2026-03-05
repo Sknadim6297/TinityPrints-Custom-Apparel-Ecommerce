@@ -14,7 +14,7 @@
                            <li><a href="#" target="_blank"><i class="fab fa-facebook-f"></i></a></li>
                            <li><a href="#" target="_blank"><i class="fab fa-twitter"></i></a></li>
                            <li><a href="#" target="_blank"><i class="fab fa-instagram"></i></a></li>
-                           <li><a href="#" target="_blank"><i class="fab fa-pinterest-p"></i></a></li>
+                           <li><a href="#" target="_blank"><i class="fal fa-pinterest-p"></i></a></li>
                         </ul>
                      </div>
                   </div>
@@ -28,7 +28,7 @@
                         new collections and product launches.</p>
                      <form action="#" class="subscribe-form subscribe-form-footer2">
                         <input type="text" placeholder="Enter your email">
-                        <button type="submit">Subscribe Now<i class="fas fa-long-arrow-right"></i></button>
+                        <button type="submit">Subscribe Now<i class="fal fa-long-arrow-right"></i></button>
                      </form>
                   </div>
                </div>

@@ -11,11 +11,33 @@ class OrderController extends Controller
 {
     public function index()
     {
-        $orders = Order::with(['product', 'designRequest'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(12);
+        $search = request('search');
 
-        return view('admin.orders.index', compact('orders'));
+        $orders = Order::with(['product', 'designRequest', 'items.product', 'user']);
+
+        if ($search) {
+            $orders->where(function ($query) use ($search) {
+                $query->where('order_number', 'like', "%{$search}%")
+                    ->orWhere('customer_name', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('order_status', 'like', "%{$search}%")
+                    ->orWhere('payment_status', 'like', "%{$search}%");
+            });
+        }
+
+        $orders = $orders->orderBy('created_at', 'desc')
+            ->paginate(12)
+            ->withQueryString();
+
+        return view('admin.orders.index', compact('orders', 'search'));
+    }
+
+    public function show(Order $order)
+    {
+        $order->load(['product', 'designRequest', 'items.product', 'user']);
+        
+        return view('admin.orders.show', compact('order'));
     }
 
     public function update(Request $request, Order $order)
@@ -24,7 +46,7 @@ class OrderController extends Controller
         $previousPaymentStatus = $order->payment_status;
 
         $validated = $request->validate([
-            'order_status' => 'required|in:design_pending,design_approved,payment_pending,paid,printing,packed,shipped,delivered,refund_requested,refunded',
+            'order_status' => 'required|in:design_pending,design_approved,payment_pending,paid,printing,packed,shipped,delivered,refund_requested,under_review,refund_approved,refund_rejected,return_in_process,product_received,refund_completed,refunded',
             'payment_status' => 'required|in:pending,paid,refunded',
             'delivery_status' => 'required|in:pending,in_transit,delivered,failed',
             'tracking_number' => 'nullable|string|max:255',
