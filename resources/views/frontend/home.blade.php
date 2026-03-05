@@ -558,8 +558,12 @@
                   <div class="swiper-wrapper">
                      <div class="swiper-slide">
                         <div class="testimonial-item text-center">
-                           <div class="author-thumb mb-30">
+                           <div class="author-thumb mb-30" style="position:relative;">
                               <img src="{{ asset('frontend/assets/img/member/member-img-01.jpg') }}" alt="Customer">
+                              <div class="author-icons" style="position:absolute;right:10px;bottom:8px;color:#fff;display:flex;gap:8px;align-items:center;font-size:16px;">
+                                 <i class="fas fa-user" aria-hidden="true"></i>
+                                 <i class="fas fa-user-circle" aria-hidden="true"></i>
+                              </div>
                            </div>
                            <div class="author-text">
                               <p>"The quality is amazing! My custom design turned out exactly as I imagined. The fabric is soft and the print is vibrant. Will definitely order more!"</p>
@@ -572,8 +576,12 @@
                      </div>
                      <div class="swiper-slide">
                         <div class="testimonial-item text-center">
-                           <div class="author-thumb mb-30">
+                           <div class="author-thumb mb-30" style="position:relative;">
                               <img src="{{ asset('frontend/assets/img/member/member-img-02.jpg') }}" alt="Customer">
+                              <div class="author-icons" style="position:absolute;right:10px;bottom:8px;color:#fff;display:flex;gap:8px;align-items:center;font-size:16px;">
+                                 <i class="fas fa-user" aria-hidden="true"></i>
+                                 <i class="fas fa-user-circle" aria-hidden="true"></i>
+                              </div>
                            </div>
                            <div class="author-text">
                               <p>"Love the limited edition collection! The designs are unique and the t-shirts fit perfectly. Great quality and fast shipping too."</p>
@@ -586,8 +594,12 @@
                      </div>
                      <div class="swiper-slide">
                         <div class="testimonial-item text-center">
-                           <div class="author-thumb mb-30">
+                           <div class="author-thumb mb-30" style="position:relative;">
                               <img src="{{ asset('frontend/assets/img/member/member-img-04.jpg') }}" alt="Customer">
+                              <div class="author-icons" style="position:absolute;right:10px;bottom:8px;color:#fff;display:flex;gap:8px;align-items:center;font-size:16px;">
+                                 <i class="fas fa-user" aria-hidden="true"></i>
+                                 <i class="fas fa-user-circle" aria-hidden="true"></i>
+                              </div>
                            </div>
                            <div class="author-text">
                               <p>"Excellent customer service and amazing products. The t-shirts are comfortable and stylish. Highly recommend Tinnity!"</p>

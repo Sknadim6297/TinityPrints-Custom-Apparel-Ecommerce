@@ -558,12 +558,15 @@ p {
   color: var(--clr-common-heading);
   border: 1px solid var(--clr-common-heading);
   padding: 0 40px;
-  height: 50px;
-  border-radius: 5px;
+  height: 60px;
   display: inline-block;
-  line-height: 48px;
-  font-weight: 600;
+  line-height: 58px;
+  border-radius: 5px;
+  padding: 0 52px;
+  position: relative;
+  overflow: hidden;
   text-align: center;
+  font-weight: 600;
 }
 .border-btn:hover {
   color: var(--clr-common-white);

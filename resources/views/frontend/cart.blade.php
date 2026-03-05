@@ -94,7 +94,7 @@
                                                 <div class="product-quantity mt-10 mb-10">
                                                     <div class="product-quantity-form">
                                                         <button class="cart-minus" data-id="{{ $item->id }}" type="button">
-                                                            <i class="far fa-minus"></i>
+                                                            <i class="fal fa-minus"></i>
                                                         </button>
                                                         <input class="cart-input" type="text" value="{{ $item->quantity }}" readonly>
                                                         <button class="cart-plus" data-id="{{ $item->id }}" type="button">

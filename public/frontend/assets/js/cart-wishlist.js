@@ -52,10 +52,10 @@
             },
             success: function(response) {
                 if (response.success) {
-                    // Update cart count
-                    $('.cart-count').text(response.cart_count);
+                    // Update all cart count instances on the page
+                    updateAllCartCounts(response.cart_count);
                     
-                    // Refresh sidebar cart
+                    // Refresh sidebar cart in real-time
                     refreshSidebarCart();
                     
                     // Show success message
@@ -151,15 +151,29 @@
             method: 'GET',
             success: function(response) {
                 if (response.success) {
+                    // Update all sidebar cart instances
                     $('.sidebar-action-list').each(function() {
                         const $parent = $(this).closest('.sidebar-cart');
                         if ($parent.length) {
                             $parent.find('.sidebar-action-list').html(response.html);
                             // Update sidebar totals
-                            $parent.find('.subtotal-price').text('INR ' + parseFloat(response.cart_total).toFixed(2));
+                            if (response.cart_total) {
+                                $parent.find('.subtotal-price').text('INR ' + parseFloat(response.cart_total).toFixed(2));
+                            }
                         }
                     });
+                    
+                    // Update cart count badges on the header/navigation
+                    if (response.cart_count) {
+                        updateAllCartCounts(response.cart_count);
+                    }
+                    
+                    // If user is on the cart page, optionally refresh cart data 
+                    // (can be extended to reload the page or update cart items dynamically)
                 }
+            },
+            error: function(xhr) {
+                console.log('Error refreshing sidebar cart:', xhr);
             }
         });
     }
@@ -180,6 +194,17 @@
                 }
             }
         });
+    }
+
+    // Function to update all cart count instances on the page
+    function updateAllCartCounts(cartCount) {
+        // Update all cart count badges
+        $('.cart-count').each(function() {
+            $(this).text(cartCount);
+        });
+        
+        // Update any cart badge elements
+        $('[data-cart-count]').text(cartCount);
     }
 
     // Helper function to show messages
