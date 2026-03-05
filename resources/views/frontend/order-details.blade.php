@@ -40,7 +40,7 @@
                               @if($order->order_status == 'delivered') bg-success
                               @elseif($order->order_status == 'shipped') bg-info
                               @elseif($order->order_status == 'paid' || $order->order_status == 'printing' || $order->order_status == 'packed') bg-primary
-                              @elseif($order->order_status == 'refunded') bg-danger
+                              @elseif(in_array($order->order_status, ['refund_completed', 'refunded', 'refund_rejected'])) bg-danger
                               @else bg-warning
                               @endif" style="font-size: 14px;">
                               {{ ucwords(str_replace('_', ' ', $order->order_status)) }}
@@ -50,8 +50,14 @@
                      <div class="card-body">
                         <h5 class="mb-3">Order Items</h5>
                         @foreach($order->items as $item)
+                           @php
+                              $productImage = optional(optional($item->product)->images)->first();
+                              $itemImageUrl = $productImage
+                                 ? \Illuminate\Support\Facades\Storage::url($productImage->image_path)
+                                 : asset('frontend/assets/img/product/default.jpg');
+                           @endphp
                            <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
-                              <img src="{{ $item->product->images->first() ? \Illuminate\Support\Facades\Storage::url($item->product->images->first()->image_path) : asset('frontend/assets/img/product/default.jpg') }}" 
+                              <img src="{{ $itemImageUrl }}" 
                                    alt="{{ $item->product_name }}" 
                                    style="width: 100px; height: 100px; object-fit: cover;" 
                                    class="rounded">
@@ -105,7 +111,14 @@
                               'printing' => ['label' => 'Processing', 'icon' => 'fa-cogs'],
                               'packed' => ['label' => 'Packed', 'icon' => 'fa-box'],
                               'shipped' => ['label' => 'Shipped', 'icon' => 'fa-truck'],
-                              'delivered' => ['label' => 'Delivered', 'icon' => 'fa-home']
+                              'delivered' => ['label' => 'Delivered', 'icon' => 'fa-home'],
+                              'refund_requested' => ['label' => 'Refund Requested', 'icon' => 'fa-exclamation-circle'],
+                              'under_review' => ['label' => 'Under Review', 'icon' => 'fa-search'],
+                              'refund_approved' => ['label' => 'Refund Approved', 'icon' => 'fa-thumbs-up'],
+                              'refund_rejected' => ['label' => 'Refund Rejected', 'icon' => 'fa-times-circle'],
+                              'return_in_process' => ['label' => 'Return In Process', 'icon' => 'fa-reply'],
+                              'product_received' => ['label' => 'Product Received', 'icon' => 'fa-inbox'],
+                              'refund_completed' => ['label' => 'Refund Completed', 'icon' => 'fa-undo']
                            ];
                            $currentStatus = $order->order_status;
                            $statusKeys = array_keys($statusFlow);
@@ -138,14 +151,48 @@
                            @endforeach
                         </div>
 
-                        @if($order->order_status == 'refunded')
+                        @if(in_array($order->order_status, ['refund_completed', 'refunded']))
                            <div class="alert alert-danger mt-3 mb-0">
-                              <i class="fa fa-exclamation-circle"></i> This order has been refunded
+                              <i class="fa fa-exclamation-circle"></i> This order refund has been completed.
                            </div>
                         @elseif($order->order_status == 'refund_requested')
                            <div class="alert alert-warning mt-3 mb-0">
                               <i class="fa fa-clock"></i> Refund requested
                            </div>
+                        @elseif($order->order_status == 'under_review')
+                           <div class="alert alert-primary mt-3 mb-0">
+                              <i class="fa fa-search"></i> Your refund request is under review.
+                           </div>
+                        @elseif($order->order_status == 'refund_rejected')
+                           <div class="alert alert-danger mt-3 mb-0">
+                              <i class="fa fa-times-circle"></i> Refund request was rejected.
+                           </div>
+                        @endif
+
+                        @if($order->refundRequest)
+                           <div class="mt-3 p-3 bg-light rounded">
+                              <strong class="d-block mb-2">Refund Ticket: {{ $order->refundRequest->ticket_id ?? ('#' . $order->refundRequest->id) }}</strong>
+                              <small class="d-block"><strong>Status:</strong> {{ ucwords(str_replace('_', ' ', $order->refundRequest->status)) }}</small>
+                              @if($order->refundRequest->admin_note)
+                                 <small class="d-block mt-1"><strong>Admin Note:</strong> {{ $order->refundRequest->admin_note }}</small>
+                              @endif
+                           </div>
+                        @endif
+
+                        @if($order->refundRequest && $order->refundRequest->status === 'pending_customer_response')
+                           <form action="{{ route('orders.refund.respond', $order->refundRequest->id) }}" method="POST" enctype="multipart/form-data" class="mt-3">
+                              @csrf
+                              @method('PATCH')
+                              <div class="mb-2">
+                                 <label class="form-label">Additional Details Requested by Admin</label>
+                                 <textarea name="customer_response" class="form-control" rows="3" required></textarea>
+                              </div>
+                              <div class="mb-2">
+                                 <label class="form-label">Upload Additional Evidence (optional)</label>
+                                 <input type="file" name="evidence" class="form-control" accept="image/*,video/*">
+                              </div>
+                              <button type="submit" class="fill-btn btn-sm w-100">Submit Response</button>
+                           </form>
                         @endif
 
                         @if($order->tracking_number)

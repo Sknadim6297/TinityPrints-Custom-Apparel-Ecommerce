@@ -24,7 +24,7 @@ class OrderController extends Controller
         $previousPaymentStatus = $order->payment_status;
 
         $validated = $request->validate([
-            'order_status' => 'required|in:design_pending,design_approved,payment_pending,paid,printing,packed,shipped,delivered,refund_requested,refunded',
+            'order_status' => 'required|in:design_pending,design_approved,payment_pending,paid,printing,packed,shipped,delivered,refund_requested,under_review,refund_approved,refund_rejected,return_in_process,product_received,refund_completed,refunded',
             'payment_status' => 'required|in:pending,paid,refunded',
             'delivery_status' => 'required|in:pending,in_transit,delivered,failed',
             'tracking_number' => 'nullable|string|max:255',

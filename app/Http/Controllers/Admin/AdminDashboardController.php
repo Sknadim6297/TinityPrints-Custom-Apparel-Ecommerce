@@ -33,7 +33,7 @@ class AdminDashboardController extends Controller
             'orders_in_printing' => 0,
             'shipped_orders' => 0,
             'refund_requests' => Schema::hasTable('refund_requests')
-                ? RefundRequest::where('status', 'requested')->count()
+                ? RefundRequest::whereIn('status', ['refund_requested', 'under_review', 'pending_customer_response'])->count()
                 : 0,
             'monthly_sales' => 0,
             'active_limited_editions' => 0,

@@ -81,6 +81,11 @@ Route::middleware('auth')->group(function () {
     // User Orders Routes
     Route::get('/orders', [OrderController::class, 'index'])->name('orders');
     Route::get('/orders/{id}', [OrderController::class, 'show'])->name('order.details');
+    Route::post('/orders/{order}/refund-request', [OrderController::class, 'requestRefund'])
+        ->name('orders.refund.request');
+    Route::patch('/refund-requests/{refund}/customer-response', [OrderController::class, 'respondRefundRequest'])
+        ->whereNumber('refund')
+        ->name('orders.refund.respond');
 });
 
 require __DIR__.'/auth.php';

@@ -41,6 +41,13 @@
                                         'printing' => 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
                                         'paid' => 'bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300',
                                         'payment_pending' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
+                                        'refund_requested' => 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300',
+                                        'under_review' => 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300',
+                                        'refund_approved' => 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300',
+                                        'refund_rejected' => 'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300',
+                                        'return_in_process' => 'bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300',
+                                        'product_received' => 'bg-slate-100 text-slate-800 dark:bg-slate-900/30 dark:text-slate-300',
+                                        'refund_completed' => 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
                                         'refunded' => 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
                                     ];
                                     $statusColor = $statusColors[$order->order_status] ?? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
@@ -189,7 +196,7 @@
                             <div>
                                 <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Order Status</label>
                                 <select name="order_status" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                    @foreach(['payment_pending','paid','printing','packed','shipped','delivered','refund_requested','refunded'] as $status)
+                                    @foreach(['payment_pending','paid','printing','packed','shipped','delivered','refund_requested','under_review','refund_approved','refund_rejected','return_in_process','product_received','refund_completed','refunded'] as $status)
                                         <option value="{{ $status }}" {{ $order->order_status === $status ? 'selected' : '' }}>
                                             {{ ucwords(str_replace('_', ' ', $status)) }}
                                         </option>

@@ -30,6 +30,13 @@
                </div>
             @endif
 
+            @if($errors->has('refund') || $errors->has('reason_code') || $errors->has('description') || $errors->has('evidence'))
+               <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                  {{ $errors->first('refund') ?: $errors->first('reason_code') ?: $errors->first('description') ?: $errors->first('evidence') }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+               </div>
+            @endif
+
             <div class="row">
                <div class="col-12">
                   <h3 class="mb-4">My Orders</h3>
@@ -69,7 +76,13 @@
                                           'printing' => ['badge' => 'primary', 'icon' => 'fa-cogs', 'text' => 'Processing'],
                                           'paid' => ['badge' => 'success', 'icon' => 'fa-check', 'text' => 'Confirmed'],
                                           'payment_pending' => ['badge' => 'warning', 'icon' => 'fa-clock', 'text' => 'Pending Payment'],
-                                          'refunded' => ['badge' => 'danger', 'icon' => 'fa-undo', 'text' => 'Refunded'],
+                                          'under_review' => ['badge' => 'primary', 'icon' => 'fa-search', 'text' => 'Under Review'],
+                                          'refund_approved' => ['badge' => 'success', 'icon' => 'fa-thumbs-up', 'text' => 'Refund Approved'],
+                                          'refund_rejected' => ['badge' => 'danger', 'icon' => 'fa-times-circle', 'text' => 'Refund Rejected'],
+                                          'return_in_process' => ['badge' => 'info', 'icon' => 'fa-reply', 'text' => 'Return In Process'],
+                                          'product_received' => ['badge' => 'secondary', 'icon' => 'fa-inbox', 'text' => 'Product Received'],
+                                          'refund_completed' => ['badge' => 'danger', 'icon' => 'fa-undo', 'text' => 'Refund Completed'],
+                                          'refunded' => ['badge' => 'danger', 'icon' => 'fa-undo', 'text' => 'Refund Completed'],
                                           'refund_requested' => ['badge' => 'warning', 'icon' => 'fa-exclamation', 'text' => 'Refund Requested'],
                                        ];
                                        $config = $statusConfig[$order->order_status] ?? ['badge' => 'secondary', 'icon' => 'fa-circle', 'text' => ucwords(str_replace('_', ' ', $order->order_status))];
@@ -90,11 +103,23 @@
 
                               <!-- Quick Order Progress -->
                               @php
-                                 $progressSteps = ['payment_pending' => 20, 'paid' => 40, 'printing' => 60, 'packed' => 70, 'shipped' => 85, 'delivered' => 100];
+                                 $progressSteps = [
+                                    'payment_pending' => 20,
+                                    'paid' => 40,
+                                    'printing' => 60,
+                                    'packed' => 70,
+                                    'shipped' => 85,
+                                    'delivered' => 100,
+                                    'refund_requested' => 20,
+                                    'under_review' => 35,
+                                    'refund_approved' => 55,
+                                    'refund_rejected' => 100,
+                                    'return_in_process' => 70,
+                                    'product_received' => 85,
+                                    'refund_completed' => 100,
+                                    'refunded' => 100,
+                                 ];
                                  $progress = $progressSteps[$order->order_status] ?? 10;
-                                 if ($order->order_status == 'refunded' || $order->order_status == 'refund_requested') {
-                                    $progress = 100;
-                                 }
                               @endphp
                               <div class="mt-3">
                                  <div class="d-flex justify-content-between align-items-center mb-1">
@@ -121,8 +146,14 @@
                                  <div class="col-md-8">
                                     <h6 class="mb-3">Order Items</h6>
                                     @foreach($order->items as $item)
+                                       @php
+                                          $productImage = optional(optional($item->product)->images)->first();
+                                          $itemImageUrl = $productImage
+                                             ? \Illuminate\Support\Facades\Storage::url($productImage->image_path)
+                                             : asset('frontend/assets/img/product/default.jpg');
+                                       @endphp
                                        <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
-                                          <img src="{{ $item->product->images->first() ? \Illuminate\Support\Facades\Storage::url($item->product->images->first()->image_path) : asset('frontend/assets/img/product/default.jpg') }}" 
+                                          <img src="{{ $itemImageUrl }}" 
                                                alt="{{ $item->product_name }}" 
                                                style="width: 80px; height: 80px; object-fit: cover;" 
                                                class="rounded">
@@ -186,11 +217,56 @@
                                     <strong>Total:</strong> <span class="text-primary fs-5">₹{{ number_format($order->total_amount, 2) }}</span>
                                  </div>
                                  <div>
+                                    @if($order->refundRequest)
+                                       <div class="text-end mb-2">
+                                          <small class="text-muted d-block">Refund Ticket: <strong>{{ $order->refundRequest->ticket_id ?? ('#' . $order->refundRequest->id) }}</strong></small>
+                                          <small class="text-muted d-block">Refund Status: <strong>{{ ucwords(str_replace('_', ' ', $order->refundRequest->status)) }}</strong></small>
+                                       </div>
+                                    @endif
                                     <a href="{{ route('order.details', $order->id) }}" class="fill-btn btn-sm">
                                        <i class="fa fa-eye me-1"></i> View Details
                                     </a>
                                  </div>
                               </div>
+
+                              @php
+                                 $hasActiveRefund = $order->refundRequest && $order->refundRequest->status !== 'refund_rejected';
+                                 $canRequestRefund = !$hasActiveRefund && in_array($order->order_status, ['delivered', 'printing', 'packed', 'shipped', 'paid', 'payment_pending']);
+                              @endphp
+
+                              @if($canRequestRefund)
+                                 <hr>
+                                 <h6 class="mb-3"><i class="fa fa-undo me-1"></i> Request Refund</h6>
+                                 <form action="{{ route('orders.refund.request', $order->id) }}" method="POST" enctype="multipart/form-data" class="row g-3">
+                                    @csrf
+                                    <div class="col-md-4">
+                                       <label class="form-label">Select Reason</label>
+                                       <select name="reason_code" class="form-select" required>
+                                          <option value="">Choose reason</option>
+                                          <option value="defect">Product Defect</option>
+                                          <option value="damaged">Damaged on Delivery</option>
+                                          <option value="wrong_item">Wrong Item Delivered</option>
+                                          <option value="quality_issue">Quality Issue</option>
+                                          <option value="size_issue">Size/Fit Issue</option>
+                                          <option value="changed_mind">Changed Mind</option>
+                                          <option value="other">Other</option>
+                                       </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                       <label class="form-label">Upload Image / Video</label>
+                                       <input type="file" name="evidence" class="form-control" accept="image/*,video/*" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                       <label class="form-label">Short Description</label>
+                                       <input type="text" name="description" class="form-control" maxlength="1500" required placeholder="Describe the issue briefly">
+                                    </div>
+                                    <div class="col-12 text-end">
+                                       <button type="submit" class="fill-btn btn-sm">
+                                          <i class="fa fa-paper-plane me-1"></i> Submit Refund Request
+                                       </button>
+                                    </div>
+                                 </form>
+                              @endif
                            </div>
                         </div>
                      @endforeach

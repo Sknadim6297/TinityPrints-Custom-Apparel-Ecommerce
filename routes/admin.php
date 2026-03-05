@@ -96,6 +96,12 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
             ->name('refunds.status');
         Route::patch('refunds/{refund}/paid', [RefundController::class, 'markPaid'])
             ->name('refunds.paid');
+        Route::patch('refunds/{refund}/return-mode', [RefundController::class, 'setReturnMode'])
+            ->name('refunds.return-mode');
+        Route::patch('refunds/{refund}/product-received', [RefundController::class, 'markProductReceived'])
+            ->name('refunds.product-received');
+        Route::patch('refunds/{refund}/complete', [RefundController::class, 'complete'])
+            ->name('refunds.complete');
         Route::patch('refunds/{refund}/notify', [RefundController::class, 'notify'])
             ->name('refunds.notify');
     });
