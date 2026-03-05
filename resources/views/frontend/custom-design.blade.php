@@ -1,343 +1,386 @@
 @extends('frontend.layout.app')
 
-@section('title', 'Custom Design')
+@section('title', 'Custom Design - Tinnity')
+
 @section('content')
-<!-- page title area start  -->
-<section class="page-title-area" data-background="assets/img/bg/page-title-bg.html">
-   <div class="container">
-      <div class="row">
-         <div class="col-lg-12">
-            <div class="page-title-wrapper text-center">
-               <h1 class="page-title mb-10">Custom Design</h1>
-               <div class="breadcrumb-menu">
-                  <nav aria-label="Breadcrumbs" class="breadcrumb-trail breadcrumbs">
-                     <ul class="trail-items">
-                        <li class="trail-item trail-begin"><a href="{{ route('home') }}"><span>Home</span></a></li>
-                        <li class="trail-item trail-end"><span>Custom Design</span></li>
-                     </ul>
-                  </nav>
-               </div>
-            </div>
-         </div>
-      </div>
-   </div>
-</section>
-<!-- page title area end  -->
-
-<!-- custom design area start -->
-<section class="custom-design-area pt-120 pb-120">
-   <div class="container">
-      <div class="row align-items-start">
-         <div class="col-lg-6 mb-lg-0 mb-60">
-            <div class="custom-design-content">
-               <div class="section-title mb-35">
-                  <h2 class="section-main-title">Create Your Unique Design</h2>
-               </div>
-               <p class="mb-40">Bring your imagination to life with our custom design service. Whether you have a specific vision or need creative guidance, our design team is here to help you create something truly unique.</p>
-               
-               <ul class="custom-process-list">
-                  <li class="process-step">
-                     <span class="step-number">1</span>
-                     <div class="step-content">
-                        <strong class="step-title">Professional Design Team</strong>
-                        <p class="step-desc">Our experienced designers will work with you to create the perfect design for your needs.</p>
-                     </div>
-                  </li>
-                  <li class="process-step">
-                     <span class="step-number">2</span>
-                     <div class="step-content">
-                        <strong class="step-title">High-Quality Materials</strong>
-                        <p class="step-desc">We use only premium fabrics and printing techniques to ensure your design looks amazing and lasts long.</p>
-                     </div>
-                  </li>
-                  <li class="process-step">
-                     <span class="step-number">3</span>
-                     <div class="step-content">
-                        <strong class="step-title">Fast Delivery</strong>
-                        <p class="step-desc">Get your custom designs delivered within 7-14 business days anywhere in the country.</p>
-                     </div>
-                  </li>
-               </ul>
-            </div>
-         </div>
-         
-         <div class="col-lg-6">
-            <div class="custom-design-form-wrapper">
-               <div class="custom-design-form">
-               <h3 class="form-title mb-30">Start Your Custom Design</h3>
-                  <form action="#" method="POST" enctype="multipart/form-data" class="custom-design-form-inner">
-                  @csrf
-                  <div class="row">
-                        <div class="col-md-6 mb-25">
-                           <div class="form-group">
-                              <input type="text" name="name" class="form-control custom-input" placeholder="Your Name*" required>
-                           </div>
-                        </div>
-                        <div class="col-md-6 mb-25">
-                           <div class="form-group">
-                              <input type="email" name="email" class="form-control custom-input" placeholder="Your Email*" required>
-                           </div>
-                     </div>
-                        <div class="col-md-6 mb-25">
-                           <div class="form-group">
-                              <input type="tel" name="phone" class="form-control custom-input" placeholder="Phone Number*" required>
-                     </div>
-                     </div>
-                        <div class="col-md-6 mb-25">
-                           <div class="form-group">
-                              <select name="product_type" class="form-control custom-select no-nice-select" required>
-                           <option value="">Select Product Type*</option>
-                           @foreach($productTypes as $typeValue => $typeLabel)
-                              <option value="{{ $typeValue }}" {{ old('product_type') === $typeValue ? 'selected' : '' }}>
-                                 {{ $typeLabel }}
-                              </option>
-                           @endforeach
-                        </select>
-                     </div>
-                        </div>
-                        <div class="col-md-12 mb-25">
-                           <div class="form-group">
-                              <textarea name="design_description" class="form-control custom-textarea" rows="4" placeholder="Describe your design idea in detail*" required></textarea>
-                           </div>
-                     </div>
-                        <div class="col-md-12 mb-25">
-                           <div class="form-group">
-                        <label class="form-label">Upload Reference Images (Optional)</label>
-                              <div class="file-upload-wrapper">
-                                 <input type="file" name="reference_images[]" class="form-control custom-file-input" multiple accept="image/*">
-                              </div>
-                              <small class="form-text">You can upload multiple images for reference</small>
-                           </div>
-                     </div>
-                        <div class="col-md-6 mb-25">
-                           <div class="form-group">
-                              <select name="quantity" class="form-control custom-select no-nice-select" required>
-                           <option value="">Select Quantity*</option>
-                           <option value="1-5" {{ old('quantity') === '1-5' ? 'selected' : '' }}>1-5 pieces</option>
-                           <option value="6-10" {{ old('quantity') === '6-10' ? 'selected' : '' }}>6-10 pieces</option>
-                           <option value="11-25" {{ old('quantity') === '11-25' ? 'selected' : '' }}>11-25 pieces</option>
-                           <option value="26-50" {{ old('quantity') === '26-50' ? 'selected' : '' }}>26-50 pieces</option>
-                           <option value="50+" {{ old('quantity') === '50+' ? 'selected' : '' }}>50+ pieces</option>
-                        </select>
-                     </div>
-                        </div>
-                        <div class="col-md-6 mb-25">
-                           <div class="form-group">
-                              <select name="budget" class="form-control custom-select no-nice-select">
-                           <option value="">Budget Range</option>
-                           <option value="under-5000" {{ old('budget') === 'under-5000' ? 'selected' : '' }}>Under INR 5000</option>
-                           <option value="5000-10000" {{ old('budget') === '5000-10000' ? 'selected' : '' }}>INR 5000 - 10000</option>
-                           <option value="10000-20000" {{ old('budget') === '10000-20000' ? 'selected' : '' }}>INR 10000 - 20000</option>
-                           <option value="20000+" {{ old('budget') === '20000+' ? 'selected' : '' }}>INR 20000+</option>
-                        </select>
-                           </div>
-                     </div>
-                     <div class="col-md-12">
-                           <button type="submit" class="border-btn custom-submit-btn w-100">Submit Design Request</button>
-                        </div>
-                     </div>
-                  </form>
-                  </div>
-            </div>
-         </div>
-      </div>
-   </div>
-</section>
-<!-- custom design area end -->
-
-<!-- design preview area start -->
-<section class="design-preview-area pt-120 pb-120 bg-gray">
-   <div class="container">
-      <div class="row justify-content-center mb-60">
-         <div class="col-xl-8">
-            <div class="section-title text-center">
-               <h2 class="section-main-title">Design Preview</h2>
-               <p>Latest design request details submitted by customers</p>
-            </div>
-         </div>
-      </div>
-
-      @if($latestDesignRequest)
-          @php
-            $path = $latestDesignRequest->design_file_path ?? '';
-            $hasPath = $path !== '';
-            $previewUrl = $hasPath && (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, '/'))
-               ? $path
-               : ($hasPath ? Storage::url($path) : null);
-            $fileExt = $latestDesignRequest->file_format ?: ($hasPath ? strtolower(pathinfo($path, PATHINFO_EXTENSION)) : null);
-            $isImage = $previewUrl && in_array($fileExt, ['png', 'jpg', 'jpeg', 'webp']);
-          @endphp
+@php($frontendAsset = asset('frontend/assets'))
+<main>
+   <!-- page title area start  -->
+   <section class="page-title-area" data-background="{{ $frontendAsset }}/img/banner/banner-1-1.jpg">
+      <div class="container">
          <div class="row">
-            <div class="col-lg-4 mb-30">
-               <div class="design-preview-card">
-                  <div class="preview-image-wrapper">
-                  @if($isImage)
-                        <img src="{{ $previewUrl }}" alt="Design preview" class="preview-image">
-                  @else
-                        <div class="preview-placeholder">
-                           <i class="fas fa-file-alt"></i>
-                           <span>{{ strtoupper($fileExt ?: 'FILE') }}</span>
-                        </div>
-                  @endif
+            <div class="col-lg-12">
+               <div class="page-title-wrapper text-center">
+                  <h1 class="page-title mb-10">Design Your T-Shirt</h1>
+                  <div class="breadcrumb-menu">
+                     <nav aria-label="Breadcrumbs" class="breadcrumb-trail breadcrumbs">
+                        <ul class="trail-items">
+                           <li class="trail-item trail-begin"><a href="{{ route('home') }}"><span>Home</span></a></li>
+                           <li class="trail-item trail-end"><span>Custom Design</span></li>
+                        </ul>
+                     </nav>
                   </div>
-                  <div class="preview-content">
-                     <h4 class="preview-title">Design File Preview</h4>
-                  @if($previewUrl)
-                        <a href="{{ $previewUrl }}" class="border-btn preview-download-btn" download>
-                           <i class="fas fa-download"></i> Download Design
-                        </a>
-                  @endif
-                  </div>
-               </div>
-            </div>
-            <div class="col-lg-8">
-               <div class="design-details-card">
-                  <div class="details-section">
-                     <h4 class="details-section-title">Customer Information</h4>
-                  <div class="row">
-                        <div class="col-md-6 mb-25">
-                           <div class="detail-item">
-                              <span class="detail-label">Customer Name</span>
-                              <span class="detail-value">{{ $latestDesignRequest->customer_name }}</span>
-                           </div>
-                        </div>
-                        <div class="col-md-6 mb-25">
-                           <div class="detail-item">
-                              <span class="detail-label">Phone</span>
-                              <span class="detail-value">{{ $latestDesignRequest->phone }}</span>
-                           </div>
-                        </div>
-                        <div class="col-md-6 mb-25">
-                           <div class="detail-item">
-                              <span class="detail-label">Email</span>
-                              <span class="detail-value">{{ $latestDesignRequest->email }}</span>
-                           </div>
-                        </div>
-                        <div class="col-md-6 mb-25">
-                           <div class="detail-item">
-                              <span class="detail-label">Selected Size</span>
-                              <span class="detail-value">{{ strtoupper($latestDesignRequest->selected_size) }}</span>
-                           </div>
-                        </div>
-                        <div class="col-md-6 mb-25">
-                           <div class="detail-item">
-                              <span class="detail-label">Front Label</span>
-                              <span class="detail-value">{{ $latestDesignRequest->front_label ?? '—' }}</span>
-                           </div>
-                     </div>
-                        <div class="col-md-6 mb-25">
-                           <div class="detail-item">
-                              <span class="detail-label">Back Label</span>
-                              <span class="detail-value">{{ $latestDesignRequest->back_label ?? '—' }}</span>
-                     </div>
-                     </div>
-                        <div class="col-md-6 mb-25">
-                           <div class="detail-item">
-                              <span class="detail-label">Status</span>
-                              <span class="detail-value status-badge status-{{ strtolower(str_replace('_', '-', $latestDesignRequest->status)) }}">
-                                 {{ ucwords(str_replace('_', ' ', $latestDesignRequest->status)) }}
-                              </span>
-                     </div>
-                     </div>
-                        <div class="col-md-6 mb-25">
-                           <div class="detail-item">
-                              <span class="detail-label">Payment</span>
-                              <span class="detail-value payment-badge {{ $latestDesignRequest->payment_unlocked ? 'unlocked' : 'locked' }}">
-                                 {{ $latestDesignRequest->payment_unlocked ? 'Unlocked' : 'Locked' }}
-                              </span>
-                     </div>
-                     </div>
-                     </div>
-                  </div>
-
-                  <div class="details-section">
-                     <h4 class="details-section-title">Print File Checks</h4>
-                     <div class="row">
-                        <div class="col-md-6 mb-25">
-                           <div class="detail-item">
-                              <span class="detail-label">File Unlocked</span>
-                              <span class="detail-value">{{ $latestDesignRequest->file_locked ? 'No' : 'Yes' }}</span>
-                           </div>
-                        </div>
-                        <div class="col-md-6 mb-25">
-                           <div class="detail-item">
-                              <span class="detail-label">Format</span>
-                              <span class="detail-value format-badge">{{ strtoupper($latestDesignRequest->file_format ?? $fileExt ?? '—') }}</span>
-                           </div>
-                        </div>
-                        <div class="col-md-6 mb-25">
-                           <div class="detail-item">
-                              <span class="detail-label">DPI</span>
-                              <span class="detail-value">{{ $latestDesignRequest->dpi ?? '—' }}</span>
-                           </div>
-                        </div>
-                        <div class="col-md-6 mb-25">
-                           <div class="detail-item">
-                              <span class="detail-label">Print Width</span>
-                              <span class="detail-value">{{ $latestDesignRequest->print_width ?? '—' }}</span>
-                           </div>
-                        </div>
-                        <div class="col-md-6 mb-25">
-                           <div class="detail-item">
-                              <span class="detail-label">Print Height</span>
-                              <span class="detail-value">{{ $latestDesignRequest->print_height ?? '—' }}</span>
-                           </div>
-                        </div>
-                        <div class="col-md-6 mb-25">
-                           <div class="detail-item">
-                              <span class="detail-label">Unit</span>
-                              <span class="detail-value">{{ strtoupper($latestDesignRequest->print_unit ?? '—') }}</span>
-                           </div>
-                        </div>
-                     </div>
-                  </div>
-
-                  <div class="details-section">
-                     <h4 class="details-section-title">File Management</h4>
-                     <div class="remarks-content">
-                        <p>{{ $latestDesignRequest->remarks ?? 'No remarks yet.' }}</p>
-                     </div>
-                  </div>
-               </div>
-            </div>
-         </div>
-      @else
-         <div class="empty-state text-center">
-            <div class="empty-state-icon">
-               <i class="fas fa-file-image"></i>
-            </div>
-            <h3 class="empty-state-title">No Design Requests Yet</h3>
-            <p class="empty-state-text">Please check back after a customer submits a design request.</p>
-         </div>
-      @endif
-   </div>
-</section>
-<!-- design preview area end -->
-
-<!-- newsletter section start -->
-<section class="newsletter-area pt-120 pb-120">
-   <div class="container">
-      <div class="row justify-content-center">
-         <div class="col-xl-8">
-            <div class="newsletter-content text-center">
-               <div class="newsletter-icon">
-                  <i class="fas fa-bullhorn"></i>
-               </div>
-               <h2 class="section-main-title newsletter-title mb-35">Get Notified for Custom Drops</h2>
-               <p class="newsletter-desc mb-40">Subscribe to our newsletter and never miss custom design updates</p>
-               <form action="#" class="newsletter-form-custom">
-                  <div class="newsletter-input-wrapper">
-                     <input type="email" placeholder="Enter your email address" class="newsletter-email-input" required>
-                     <button type="submit" class="border-btn newsletter-submit-btn">Subscribe Now</button>
-                  </div>
-               </form>
-               <div class="newsletter-note">
-                  <i class="fas fa-check-circle"></i> Join 10,000+ subscribers • No spam • Unsubscribe anytime
                </div>
             </div>
          </div>
       </div>
-   </div>
-</section>
-<!-- newsletter section end -->
+   </section>
+   <!-- page title area end  -->
+
+   <!-- custom design form area start -->
+   <section class="custom-design-form-area pt-120 pb-120">
+      <div class="container container-small">
+         @auth
+            <div class="row">
+               <div class="col-lg-8">
+                  <div class="custom-design-wrapper mb-60">
+                     <div class="section-title mb-40">
+                        <h2 class="section-main-title">Upload Your Custom Design</h2>
+                     </div>
+
+                     <div class="custom-design-form">
+                        <form action="{{ route('custom-design.store') }}" method="POST" enctype="multipart/form-data">
+                           @csrf
+
+                           <!-- User Information Section -->
+                           <div class="row">
+                              <div class="col-md-6">
+                                 <div class="single-form-input mb-20">
+                                    <input type="text" 
+                                           name="customer_name" 
+                                           value="{{ old('customer_name', Auth::user()->name) }}"
+                                           placeholder="Full Name *"
+                                           required>
+                                    @error('customer_name')
+                                       <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                 </div>
+                              </div>
+                              <div class="col-md-6">
+                                 <div class="single-form-input mb-20">
+                                    <input type="email" 
+                                           name="email" 
+                                           value="{{ old('email', Auth::user()->email) }}"
+                                           placeholder="Email Address *"
+                                           required>
+                                    @error('email')
+                                       <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                 </div>
+                              </div>
+                              <div class="col-md-6">
+                                 <div class="single-form-input mb-20">
+                                    <input type="tel" 
+                                           name="phone" 
+                                           value="{{ old('phone') }}"
+                                           placeholder="Phone Number *"
+                                           required>
+                                    @error('phone')
+                                       <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                 </div>
+                              </div>
+
+                              <!-- T-Shirt Options Section -->
+                              <div class="col-md-6">
+                                 <div class="single-form-input mb-20">
+                                    <select name="selected_size" required>
+                                       <option value="">Select Size *</option>
+                                       <option value="m" {{ old('selected_size') === 'm' ? 'selected' : '' }}>Medium (M)</option>
+                                       <option value="l" {{ old('selected_size') === 'l' ? 'selected' : '' }}>Large (L)</option>
+                                       <option value="xl" {{ old('selected_size') === 'xl' ? 'selected' : '' }}>Extra Large (XL)</option>
+                                    </select>
+                                    @error('selected_size')
+                                       <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                 </div>
+                              </div>
+
+                              <div class="col-md-6">
+                                 <div class="single-form-input mb-20">
+                                    <select name="sleeve_type" required>
+                                       <option value="">Select Sleeve Type *</option>
+                                       <option value="full" {{ old('sleeve_type') === 'full' ? 'selected' : '' }}>Full Sleeve</option>
+                                       <option value="half" {{ old('sleeve_type') === 'half' ? 'selected' : '' }}>Half Sleeve</option>
+                                    </select>
+                                    @error('sleeve_type')
+                                       <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                 </div>
+                              </div>
+
+                              <div class="col-md-6">
+                                 <div class="single-form-input mb-20">
+                                    <label for="color" class="d-block mb-2">
+                                       <strong>T-Shirt Color *</strong>
+                                    </label>
+                                    <input type="color" 
+                                           id="color"
+                                           name="color" 
+                                           value="{{ old('color', '#FFFFFF') }}"
+                                           style="width: 100%; height: 45px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;"
+                                           required>
+                                    @error('color')
+                                       <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+
+                        <!-- Design Upload Section -->
+                        <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg">
+                           <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200 mb-4">
+                              <i class="fal fa-image"></i> Design Files
+                           </h3>
+
+                           <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                              Supported formats: PNG, JPG, PDF | Max file size: 10MB
+                           </p>
+                              <!-- Design Upload Section -->
+                              <div class="col-md-12">
+                                 <div class="section-title mb-30 mt-30">
+                                    <h4><i class="fal fa-image"></i> Upload Your Design Files</h4>
+                                 </div>
+                              </div>
+
+                              <div class="col-md-6">
+                                 <div class="single-form-input mb-20">
+                                    <label><strong>Front Design *</strong></label>
+                                    <p class="text-muted mb-2"><small>Supported: PNG, JPG, PDF | Max: 10MB</small></p>
+                                    <input type="file" 
+                                           name="front_design_file" 
+                                           accept=".png,.jpg,.jpeg,.pdf"
+                                           required>
+                                    @error('front_design_file')
+                                       <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                 </div>
+                              </div>
+
+                              <div class="col-md-6">
+                                 <div class="single-form-input mb-20">
+                                    <label><strong>Back Design (Optional)</strong></label>
+                                    <p class="text-muted mb-2"><small>Leave empty if only front design</small></p>
+                                    <input type="file" 
+                                           name="back_design_file" 
+                                           accept=".png,.jpg,.jpeg,.pdf">
+                                    @error('back_design_file')
+                                       <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                 </div>
+                              </div>
+
+                              <!-- Notes Section -->
+                              <div class="col-md-12">
+                                 <div class="section-title mb-30 mt-30">
+                                    <h4><i class="fal fa-comment"></i> Additional Instructions</h4>
+                                 </div>
+                              </div>
+
+                              <div class="col-md-12">
+                                 <div class="single-form-input mb-20">
+                                    <label><strong>Notes & Special Requests</strong></label>
+                                    <textarea name="notes" 
+                                              rows="5"
+                                              placeholder="Add any special printing instructions, color preferences, or other details..."></textarea>
+                                    @error('notes')
+                                       <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                 </div>
+                              </div>
+
+                              <!-- Important Information -->
+                              <div class="col-md-12 mb-30">
+                                 <div class="alert alert-warning alert-custom mb-0">
+                                    <h5 class="mb-15"><strong>⚠️ Important Information</strong></h5>
+                                    <ul class="list-unstyled">
+                                       <li class="mb-8">
+                                          <strong>Approval Required:</strong> Your design will be reviewed by our team before you can proceed to payment.
+                                       </li>
+                                       <li class="mb-8">
+                                          <strong>Turnaround Time:</strong> Review and approval typically takes 24-48 hours.
+                                       </li>
+                                       <li class="mb-8">
+                                          <strong>File Security:</strong> Your design files are securely stored and will only be used for your order.
+                                       </li>
+                                       <li class="mb-8">
+                                          <strong>Quality Standards:</strong> We ensure your design meets printing quality standards.
+                                       </li>
+                                       <li>
+                                          <strong>No Refund After Approval:</strong> Once approved and paid, custom designs cannot be refunded unless defective.
+                                       </li>
+                                    </ul>
+                                 </div>
+                              </div>
+
+                              <!-- Error Messages -->
+                              @if($errors->any())
+                                 <div class="col-md-12 mb-30">
+                                    <div class="alert alert-danger alert-custom mb-0">
+                                       <h5 class="mb-15"><strong>Please fix the following errors:</strong></h5>
+                                       <ul class="list-unstyled">
+                                          @foreach($errors->all() as $error)
+                                             <li><i class="fal fa-times-circle"></i> {{ $error }}</li>
+                                          @endforeach
+                                       </ul>
+                                    </div>
+                                 </div>
+                              @endif
+
+                              <!-- Form Buttons -->
+                              <div class="col-md-12">
+                                 <div class="custom-design-buttons" style="display: flex; gap: 15px;">
+                                    <button type="submit" class="fill-btn">
+                                       <i class="fal fa-cloud-upload-alt"></i> Submit for Review
+                                    </button>
+                                    <a href="{{ route('home') }}" class="border-btn">
+                                       Cancel
+                                    </a>
+                                 </div>
+                              </div>
+                           </div>
+                        </form>
+                     </div>
+                  </div>
+               </div>
+
+               <!-- Sidebar with Guidelines -->
+               <div class="col-lg-4">
+                  <div class="sidebar-widget-wrapper mb-60">
+                     <!-- Design Guidelines -->
+                     <div class="sidebar-widget">
+                        <h4 class="sidebar-widget-title">
+                           <i class="fal fa-lightbulb"></i> Design Guidelines
+                        </h4>
+                        <div class="sidebar-widget-content">
+                           <div class="guideline-list">
+                              <div class="guideline-item mb-20">
+                                 <h6 class="mb-10">File Formats</h6>
+                                 <p>We accept PNG, JPG, and PDF files. PNG is preferred with transparent backgrounds.</p>
+                              </div>
+                              <div class="guideline-item mb-20">
+                                 <h6 class="mb-10">File Size</h6>
+                                 <p>Maximum file size is 10MB. Smaller files upload faster.</p>
+                              </div>
+                              <div class="guideline-item mb-20">
+                                 <h6 class="mb-10">Resolution</h6>
+                                 <p>For best quality, use images with 300 DPI or higher.</p>
+                              </div>
+                              <div class="guideline-item mb-20">
+                                 <h6 class="mb-10">Design Placement</h6>
+                                 <p>Leave at least 0.5 inch margins from the edges of the T-shirt.</p>
+                              </div>
+                              <div class="guideline-item">
+                                 <h6 class="mb-10">Color Accuracy</h6>
+                                 <p>Colors may appear slightly different on the actual T-shirt depending on fabric and printing method.</p>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+
+                     <!-- Pricing Info -->
+                     <div class="sidebar-widget mt-40">
+                        <h4 class="sidebar-widget-title">
+                           <i class="fal fa-tag"></i> Pricing
+                        </h4>
+                        <div class="sidebar-widget-content">
+                           <div class="pricing-info">
+                              <p>Custom design pricing starts at <strong>₹499.00</strong> for a single shirt depending on:</p>
+                              <ul class="list-unstyled mt-15">
+                                 <li class="mb-8"><i class="fal fa-check text-success"></i> T-shirt size & fabric quality</li>
+                                 <li class="mb-8"><i class="fal fa-check text-success"></i> Design complexity</li>
+                                 <li class="mb-8"><i class="fal fa-check text-success"></i> Number of colors</li>
+                                 <li><i class="fal fa-check text-success"></i> Quantity of shirts</li>
+                              </ul>
+                              <p class="mt-15"><small class="text-muted">Final price will be confirmed after design approval.</small></p>
+                           </div>
+                        </div>
+                     </div>
+
+                     <!-- FAQ -->
+                     <div class="sidebar-widget mt-40">
+                        <h4 class="sidebar-widget-title">
+                           <i class="fal fa-question-circle"></i> FAQ
+                        </h4>
+                        <div class="sidebar-widget-content">
+                           <div class="faq-list">
+                              <div class="faq-item mb-15">
+                                 <h6 class="mb-8"><strong>Q: How long does approval take?</strong></h6>
+                                 <p class="mb-0"><small>A: Usually 24-48 hours. You'll be notified via email.</small></p>
+                              </div>
+                              <div class="faq-item mb-15">
+                                 <h6 class="mb-8"><strong>Q: Can I modify my design?</strong></h6>
+                                 <p class="mb-0"><small>A: Yes, if requested in our feedback, you can resubmit.</small></p>
+                              </div>
+                              <div class="faq-item">
+                                 <h6 class="mb-8"><strong>Q: What's the minimum order?</strong></h6>
+                                 <p class="mb-0"><small>A: You can order as little as 1 shirt from your design.</small></p>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         @else
+            <!-- Not Logged In Message -->
+            <div class="row">
+               <div class="col-lg-8 mx-auto">
+                  <div class="login-required-card">
+                     <div class="text-center mb-40">
+                        <i class="fal fa-lock" style="font-size: 60px; color: #f4b400;"></i>
+                        <h2 class="mt-30 mb-20">Sign In Required</h2>
+                        <p class="text-muted">You must be logged in to submit a custom design. Please sign in to your account or create a new account to get started.</p>
+                     </div>
+                     <div style="display: flex; gap: 15px; justify-content: center;">
+                        <a href="{{ route('login') }}" class="fill-btn">
+                           <i class="fal fa-sign-in-alt"></i> Sign In
+                        </a>
+                        <a href="{{ route('register') }}" class="border-btn">
+                           <i class="fal fa-user-plus"></i> Create Account
+                        </a>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         @endauth
+      </div>
+   </section>
+   <!-- custom design form area end -->
+
+</main>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+   // File upload validation
+   const frontDesignInput = document.querySelector('input[name="front_design_file"]');
+   const backDesignInput = document.querySelector('input[name="back_design_file"]');
+
+   [frontDesignInput, backDesignInput].forEach(input => {
+      if (input) {
+         input.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+               const validFormats = ['image/png', 'image/jpeg', 'application/pdf'];
+               const maxSize = 10 * 1024 * 1024; // 10MB
+
+               if (!validFormats.includes(file.type)) {
+                  alert('Please upload PNG, JPG, or PDF files only');
+                  this.value = '';
+                  return;
+               }
+               if (file.size > maxSize) {
+                  alert('File size should not exceed 10MB');
+                  this.value = '';
+                  return;
+               }
+            }
+         });
+      }
+   });
+});
+</script>
+@endpush

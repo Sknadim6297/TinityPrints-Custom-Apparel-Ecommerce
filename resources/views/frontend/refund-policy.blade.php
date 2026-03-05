@@ -2,9 +2,10 @@
 
 @section('title', 'Refund Policy')
 @section('content')
+@php($frontendAsset = asset('frontend/assets'))
 
 <!-- page title area start  -->
-<section class="page-title-area" data-background="assets/img/bg/page-title-bg.html">
+<section class="page-title-area" data-background="{{ $frontendAsset }}/img/banner/banner-1-1.jpg">
    <div class="container">
       <div class="row">
          <div class="col-lg-12">
