@@ -16,6 +16,18 @@ Route::get('/shop', [HomeController::class, 'shop'])->name('shop');
 Route::get('/shop/{category}', [HomeController::class, 'shop'])->name('shop.category');
 Route::get('/product/{id}', [HomeController::class, 'productDetails'])->name('product.details');
 Route::get('/custom-design', [CustomDesignController::class, 'create'])->name('custom-design');
+Route::middleware('auth')->group(function () {
+    Route::post('/custom-design', [CustomDesignController::class, 'store'])->name('custom-design.store');
+    Route::get('/custom-design/{design}', [CustomDesignController::class, 'show'])->name('custom-design.show');
+    Route::post('/custom-design/{design}', [CustomDesignController::class, 'update'])->name('custom-design.update');
+    Route::get('/custom-design/{design}/download/{fileType}', [CustomDesignController::class, 'download'])
+        ->whereIn('fileType', ['front', 'back'])
+        ->name('custom-design.download');
+    Route::get('/custom-design/{design}/checkout', [CustomDesignController::class, 'checkout'])
+        ->name('custom-design.checkout');
+    Route::post('/custom-design/{design}/payment', [CustomDesignController::class, 'processPayment'])
+        ->name('custom-design.payment.process');
+});
 Route::get('/limited-edition', [HomeController::class, 'limitedEdition'])->name('limited-edition');
 Route::get('/about', [HomeController::class, 'about'])->name('about');
 Route::get('/refund-policy', [HomeController::class, 'refundPolicy'])->name('refund-policy');

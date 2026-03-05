@@ -11,11 +11,33 @@ class OrderController extends Controller
 {
     public function index()
     {
-        $orders = Order::with(['product', 'designRequest', 'items.product', 'user'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(12);
+        $search = request('search');
 
-        return view('admin.orders.index', compact('orders'));
+        $orders = Order::with(['product', 'designRequest', 'items.product', 'user']);
+
+        if ($search) {
+            $orders->where(function ($query) use ($search) {
+                $query->where('order_number', 'like', "%{$search}%")
+                    ->orWhere('customer_name', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('order_status', 'like', "%{$search}%")
+                    ->orWhere('payment_status', 'like', "%{$search}%");
+            });
+        }
+
+        $orders = $orders->orderBy('created_at', 'desc')
+            ->paginate(12)
+            ->withQueryString();
+
+        return view('admin.orders.index', compact('orders', 'search'));
+    }
+
+    public function show(Order $order)
+    {
+        $order->load(['product', 'designRequest', 'items.product', 'user']);
+        
+        return view('admin.orders.show', compact('order'));
     }
 
     public function update(Request $request, Order $order)

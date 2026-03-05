@@ -1,6 +1,6 @@
-@extends('admin.layouts.admin-app')
 
-@section('content')
+
+<?php $__env->startSection('content'); ?>
 <div class="py-6 md:py-12">
     <div class="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8">
         <div class="mb-6 md:mb-8">
@@ -10,20 +10,21 @@
             </p>
         </div>
 
-        @if(session('success'))
+        <?php if(session('success')): ?>
             <div class="mb-6 p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-300">
-                {{ session('success') }}
+                <?php echo e(session('success')); ?>
+
             </div>
-        @endif
+        <?php endif; ?>
 
         <div class="mb-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 border border-gray-100 dark:border-gray-700">
-            <form action="{{ route('admin.design-approvals.index') }}" method="GET" class="flex flex-col sm:flex-row gap-3">
+            <form action="<?php echo e(route('admin.design-approvals.index')); ?>" method="GET" class="flex flex-col sm:flex-row gap-3">
                 <div class="flex-1">
                     <input
                         type="text"
                         name="search"
                         placeholder="Search by customer, phone, email, status, size..."
-                        value="{{ $search ?? '' }}"
+                        value="<?php echo e($search ?? ''); ?>"
                         class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 text-sm"
                     >
                 </div>
@@ -31,20 +32,20 @@
                     <button type="submit" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors text-sm font-medium">
                         Search
                     </button>
-                    @if($search)
-                        <a href="{{ route('admin.design-approvals.index') }}" class="px-4 py-2 bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-lg transition-colors text-sm font-medium">
+                    <?php if($search): ?>
+                        <a href="<?php echo e(route('admin.design-approvals.index')); ?>" class="px-4 py-2 bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-lg transition-colors text-sm font-medium">
                             Clear
                         </a>
-                    @endif
+                    <?php endif; ?>
                 </div>
             </form>
         </div>
 
-        @if($designRequests->count() === 0)
+        <?php if($designRequests->count() === 0): ?>
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-300">
                 No design requests yet.
             </div>
-        @else
+        <?php else: ?>
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full">
@@ -60,8 +61,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($designRequests as $request)
-                                @php
+                            <?php $__currentLoopData = $designRequests; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $request): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <?php
                                     $statusColors = [
                                         'approved' => 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
                                         'pending' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
@@ -76,47 +77,49 @@
                                     $backExt = $backPath ? strtolower(pathinfo($backPath, PATHINFO_EXTENSION)) : null;
                                     $frontIsImage = in_array($frontExt, ['png', 'jpg', 'jpeg', 'webp']);
                                     $backIsImage = in_array($backExt, ['png', 'jpg', 'jpeg', 'webp']);
-                                @endphp
+                                ?>
                                 <tr class="border-b border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                                     <td class="px-4 sm:px-6 py-3 whitespace-nowrap align-middle text-sm font-semibold text-gray-900 dark:text-gray-100">
-                                        <div class="text-sm font-semibold text-gray-900 dark:text-gray-100">#{{ $request->id }}</div>
+                                        <div class="text-sm font-semibold text-gray-900 dark:text-gray-100">#<?php echo e($request->id); ?></div>
                                     </td>
                                     <td class="px-4 sm:px-6 py-3 align-middle">
-                                        <div class="text-sm font-medium text-gray-900 dark:text-gray-100 leading-tight">{{ $request->customer_name }}</div>
-                                        <div class="text-xs text-gray-500 dark:text-gray-400 leading-tight mt-0.5">{{ $request->phone }}</div>
+                                        <div class="text-sm font-medium text-gray-900 dark:text-gray-100 leading-tight"><?php echo e($request->customer_name); ?></div>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400 leading-tight mt-0.5"><?php echo e($request->phone); ?></div>
                                     </td>
                                     <td class="px-4 sm:px-6 py-3 whitespace-nowrap align-middle">
-                                        <div class="text-sm text-gray-900 dark:text-gray-100">{{ $request->selected_size }}</div>
+                                        <div class="text-sm text-gray-900 dark:text-gray-100"><?php echo e($request->selected_size); ?></div>
                                     </td>
                                     <td class="px-4 sm:px-6 py-3 align-middle">
                                         <div class="flex items-center gap-3">
-                                            @if($frontPath && $frontIsImage)
+                                            <?php if($frontPath && $frontIsImage): ?>
                                                 <div class="flex flex-col items-center gap-0.5">
-                                                    <img src="{{ Storage::url($frontPath) }}" alt="Front" class="w-8 h-8 object-cover bg-gray-100 dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600 hover:shadow-md transition-shadow cursor-pointer" title="Front Design">
+                                                    <img src="<?php echo e(Storage::url($frontPath)); ?>" alt="Front" class="w-8 h-8 object-cover bg-gray-100 dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600 hover:shadow-md transition-shadow cursor-pointer" title="Front Design">
                                                     <span class="text-xs font-medium text-gray-600 dark:text-gray-400">F</span>
                                                 </div>
-                                            @endif
-                                            @if($backPath && $backIsImage)
+                                            <?php endif; ?>
+                                            <?php if($backPath && $backIsImage): ?>
                                                 <div class="flex flex-col items-center gap-0.5">
-                                                    <img src="{{ Storage::url($backPath) }}" alt="Back" class="w-8 h-8 object-cover bg-gray-100 dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600 hover:shadow-md transition-shadow cursor-pointer" title="Back Design">
+                                                    <img src="<?php echo e(Storage::url($backPath)); ?>" alt="Back" class="w-8 h-8 object-cover bg-gray-100 dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600 hover:shadow-md transition-shadow cursor-pointer" title="Back Design">
                                                     <span class="text-xs font-medium text-gray-600 dark:text-gray-400">B</span>
                                                 </div>
-                                            @endif
-                                            @if(!$frontPath && !$backPath)
+                                            <?php endif; ?>
+                                            <?php if(!$frontPath && !$backPath): ?>
                                                 <span class="text-xs text-gray-400 italic">—</span>
-                                            @endif
+                                            <?php endif; ?>
                                         </div>
                                     </td>
                                     <td class="px-4 sm:px-6 py-3 whitespace-nowrap align-middle">
-                                        <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusColor }}">
-                                            {{ ucwords(str_replace('_', ' ', $request->status)) }}
+                                        <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full <?php echo e($statusColor); ?>">
+                                            <?php echo e(ucwords(str_replace('_', ' ', $request->status))); ?>
+
                                         </span>
                                     </td>
                                     <td class="px-4 sm:px-6 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 align-middle">
-                                        {{ $request->created_at->format('M d, Y') }}
+                                        <?php echo e($request->created_at->format('M d, Y')); ?>
+
                                     </td>
                                     <td class="px-4 sm:px-6 py-3 whitespace-nowrap text-center align-middle">
-                                        <a href="{{ route('admin.design-approvals.show', $request) }}" 
+                                        <a href="<?php echo e(route('admin.design-approvals.show', $request)); ?>" 
                                            class="inline-flex items-center px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-md hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors text-xs font-medium" 
                                            title="View Details">
                                             <i class="fa fa-eye text-base"></i>
@@ -124,16 +127,19 @@
                                         </a>
                                     </td>
                                 </tr>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </tbody>
                     </table>
                 </div>
             </div>
 
             <div class="mt-6">
-                {{ $designRequests->links() }}
+                <?php echo e($designRequests->links()); ?>
+
             </div>
-        @endif
+        <?php endif; ?>
     </div>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('admin.layouts.admin-app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\Tinnity_ecom\resources\views/admin/design-approvals/index.blade.php ENDPATH**/ ?>

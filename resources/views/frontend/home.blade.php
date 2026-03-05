@@ -106,7 +106,7 @@
       <!-- product area start  -->
       <section class="product-area pt-90 pb-120">
          <div class="container">
-            <div class="row justify-content-center">
+            <div class="row justify-content-center mb-50">
                <div class="col-xl-8">
                   <div class="section-title text-center">
                      <h2 class="section-main-title mb-35">Featured T-Shirts</h2>
@@ -114,54 +114,60 @@
                   </div>
                </div>
             </div>
-            <div class="products-wrapper">
+            
+            <div class="row g-4">
                @forelse($bestSellerProducts as $product)
                @php($productImage = optional($product->images->first())->image_path)
                @php($productColors = $product->colors ?? collect())
-               <div class="single-product">
-                  <div class="product-image pos-rel" style="aspect-ratio: 1 / 1;">
-                     <a href="{{ route('product.details', $product->id) }}" class="" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
-                        <img src="{{ $productImage ? Storage::url($productImage) : asset('frontend/assets/img/product/product-img1.jpg') }}" alt="{{ $product->name }}" style="width: 100%; height: 100%; object-fit: cover;">
-                     </a>
-                     <div class="product-action">
-                        <a href="{{ route('product.details', $product->id) }}" class="quick-view-btn"><i class="fal fa-eye"></i></a>
-                        <button type="button" class="wishlist-btn add-to-wishlist-btn" data-product-id="{{ $product->id }}"><i class="fal fa-heart"></i></button>
+               <div class="col-lg-3 col-md-4 col-sm-6 col-12">
+                  <div class="single-product h-100">
+                     <div class="product-image pos-rel" style="aspect-ratio: 1 / 1; overflow: hidden; border-radius: 8px;">
+                        <a href="{{ route('product.details', $product->id) }}" class="product-link" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                           <img src="{{ $productImage ? Storage::url($productImage) : asset('frontend/assets/img/product/product-img1.jpg') }}" alt="{{ $product->name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                        </a>
+                        <div class="product-action">
+                           <a href="{{ route('product.details', $product->id) }}" class="quick-view-btn" title="Quick View"><i class="fal fa-eye"></i></a>
+                           <button type="button" class="wishlist-btn add-to-wishlist-btn" data-product-id="{{ $product->id }}" title="Add to Wishlist"><i class="fal fa-heart"></i></button>
+                        </div>
+                        <div class="product-action-bottom">
+                           <button type="button" class="add-cart-btn add-to-cart-btn" data-product-id="{{ $product->id }}"><i class="fal fa-shopping-bag"></i> Add to Cart</button>
+                        </div>
+                        @if($product->created_at >= now()->subDays(30))
+                        <div class="product-sticker-wrapper">
+                           <span class="product-sticker new">New</span>
+                        </div>
+                        @endif
                      </div>
-                     <div class="product-action-bottom">
-                        <button type="button" class="add-cart-btn add-to-cart-btn" data-product-id="{{ $product->id }}"><i class="fal fa-shopping-bag"></i>Add to Cart</button>
+                     <div class="product-desc pt-3">
+                        <div class="product-name mb-2">
+                           <a href="{{ route('product.details', $product->id) }}" class="text-decoration-none">{{ $product->name }}</a>
+                        </div>
+                        <div class="product-price mb-2">
+                           <span class="price-now fw-bold">INR {{ number_format($product->price, 2) }}</span>
+                        </div>
+                        @if($productColors->count() > 0)
+                        <div class="product-color-nav" style="display: flex; gap: 8px; flex-wrap: wrap;">
+                           @foreach($productColors as $color)
+                           <div class="color-circle" style="width: 24px; height: 24px; border-radius: 50%; background-color: {{ $color->hex_code }}; border: 2px solid #ddd; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" title="{{ $color->color_name }}"></div>
+                           @endforeach
+                        </div>
+                        @endif
                      </div>
-                     @if($product->created_at >= now()->subDays(30))
-                     <div class="product-sticker-wrapper">
-                        <span class="product-sticker new">New</span>
-                     </div>
-                     @endif
-                  </div>
-                  <div class="product-desc">
-                     <div class="product-name"><a href="{{ route('product.details', $product->id) }}">{{ $product->name }}</a></div>
-                     <div class="product-price">
-                        <span class="price-now">INR {{ number_format($product->price, 2) }}</span>
-                     </div>
-                     @if($productColors->count() > 0)
-                     <div class="product-color-nav" style="display: flex; gap: 8px; margin-top: 10px;">
-                        @foreach($productColors as $color)
-                        <div class="color-circle" style="width: 24px; height: 24px; border-radius: 50%; background-color: {{ $color->hex_code }}; border: 2px solid #ddd; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" title="{{ $color->color_name }}"></div>
-                        @endforeach
-                     </div>
-                     @endif
                   </div>
                </div>
                @empty
                <div class="col-12">
-                  <div class="text-center">
-                     <h3>No products found</h3>
-                     <p>Please check back later for new products.</p>
+                  <div class="text-center py-5">
+                     <h3 class="mb-3">No products found</h3>
+                     <p class="text-muted">Please check back later for new products.</p>
                   </div>
                </div>
                @endforelse
             </div>
-            <div class="row">
+            
+            <div class="row mt-50">
                <div class="col-lg-12">
-                  <div class="product-area-btn mt-10 text-center">
+                  <div class="product-area-btn text-center">
                      <a href="{{ route('shop.category', 't-shirt') }}" class="border-btn">View All T-Shirts</a>
                   </div>
                </div>

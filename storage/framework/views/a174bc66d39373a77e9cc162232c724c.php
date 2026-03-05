@@ -1,15 +1,14 @@
-@extends('admin.layouts.admin-app')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="py-6 md:py-12">
     <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <!-- Page Header -->
         <div class="mb-6 md:mb-8">
             <h2 class="font-semibold text-2xl sm:text-3xl text-gray-800 dark:text-gray-200 leading-tight">
-                {{ __('Admin Dashboard') }}
+                <?php echo e(__('Admin Dashboard')); ?>
+
             </h2>
             <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-2">
-                Welcome back, <span class="font-semibold text-gray-800 dark:text-gray-200">{{ auth()->guard('admin')->user()->name }}</span>
+                Welcome back, <span class="font-semibold text-gray-800 dark:text-gray-200"><?php echo e(auth()->guard('admin')->user()->name); ?></span>
             </p>
         </div>
 
@@ -20,7 +19,7 @@
                 <div class="flex items-center justify-between">
                     <div class="flex-1">
                         <p class="text-yellow-100 text-xs sm:text-sm font-medium mb-1">Total Orders</p>
-                        <p class="text-2xl sm:text-4xl font-bold">{{ number_format($stats['total_orders']) }}</p>
+                        <p class="text-2xl sm:text-4xl font-bold"><?php echo e(number_format($stats['total_orders'])); ?></p>
                     </div>
                     <div class="bg-yellow-500 bg-opacity-30 rounded-full p-2 sm:p-4 flex-shrink-0">
                         <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -35,7 +34,7 @@
                 <div class="flex items-center justify-between">
                     <div class="flex-1">
                         <p class="text-red-100 text-xs sm:text-sm font-medium mb-1">Pending Approvals</p>
-                        <p class="text-2xl sm:text-4xl font-bold">{{ number_format($stats['pending_design_approvals']) }}</p>
+                        <p class="text-2xl sm:text-4xl font-bold"><?php echo e(number_format($stats['pending_design_approvals'])); ?></p>
                     </div>
                     <div class="bg-red-500 bg-opacity-30 rounded-full p-2 sm:p-4 flex-shrink-0">
                         <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -50,7 +49,7 @@
                 <div class="flex items-center justify-between">
                     <div class="flex-1">
                         <p class="text-orange-100 text-xs sm:text-sm font-medium mb-1">Pending Payments</p>
-                        <p class="text-2xl sm:text-4xl font-bold">{{ number_format($stats['pending_payments']) }}</p>
+                        <p class="text-2xl sm:text-4xl font-bold"><?php echo e(number_format($stats['pending_payments'])); ?></p>
                     </div>
                     <div class="bg-orange-500 bg-opacity-30 rounded-full p-2 sm:p-4 flex-shrink-0">
                         <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -65,7 +64,7 @@
                 <div class="flex items-center justify-between">
                     <div class="flex-1">
                         <p class="text-purple-100 text-xs sm:text-sm font-medium mb-1">In Printing</p>
-                        <p class="text-2xl sm:text-4xl font-bold">{{ number_format($stats['orders_in_printing']) }}</p>
+                        <p class="text-2xl sm:text-4xl font-bold"><?php echo e(number_format($stats['orders_in_printing'])); ?></p>
                     </div>
                     <div class="bg-purple-500 bg-opacity-30 rounded-full p-2 sm:p-4 flex-shrink-0">
                         <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -80,7 +79,7 @@
                 <div class="flex items-center justify-between">
                     <div class="flex-1">
                         <p class="text-green-100 text-xs sm:text-sm font-medium mb-1">Shipped Orders</p>
-                        <p class="text-2xl sm:text-4xl font-bold">{{ number_format($stats['shipped_orders']) }}</p>
+                        <p class="text-2xl sm:text-4xl font-bold"><?php echo e(number_format($stats['shipped_orders'])); ?></p>
                     </div>
                     <div class="bg-green-500 bg-opacity-30 rounded-full p-2 sm:p-4 flex-shrink-0">
                         <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -95,7 +94,7 @@
                 <div class="flex items-center justify-between">
                     <div class="flex-1">
                         <p class="text-pink-100 text-xs sm:text-sm font-medium mb-1">Refund Requests</p>
-                        <p class="text-2xl sm:text-4xl font-bold">{{ number_format($stats['refund_requests']) }}</p>
+                        <p class="text-2xl sm:text-4xl font-bold"><?php echo e(number_format($stats['refund_requests'])); ?></p>
                     </div>
                     <div class="bg-pink-500 bg-opacity-30 rounded-full p-2 sm:p-4 flex-shrink-0">
                         <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -110,7 +109,7 @@
                 <div class="flex items-center justify-between">
                     <div class="flex-1">
                         <p class="text-blue-100 text-xs sm:text-sm font-medium mb-1">Monthly Sales</p>
-                        <p class="text-2xl sm:text-4xl font-bold">₹{{ number_format($stats['monthly_sales'], 0) }}</p>
+                        <p class="text-2xl sm:text-4xl font-bold">₹<?php echo e(number_format($stats['monthly_sales'], 0)); ?></p>
                     </div>
                     <div class="bg-blue-500 bg-opacity-30 rounded-full p-2 sm:p-4 flex-shrink-0">
                         <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -125,7 +124,7 @@
                 <div class="flex items-center justify-between">
                     <div class="flex-1">
                         <p class="text-indigo-100 text-xs sm:text-sm font-medium mb-1">Limited Editions</p>
-                        <p class="text-2xl sm:text-4xl font-bold">{{ number_format($stats['active_limited_editions']) }}</p>
+                        <p class="text-2xl sm:text-4xl font-bold"><?php echo e(number_format($stats['active_limited_editions'])); ?></p>
                     </div>
                     <div class="bg-indigo-500 bg-opacity-30 rounded-full p-2 sm:p-4 flex-shrink-0">
                         <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -150,35 +149,35 @@
             <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 border border-gray-100 dark:border-gray-700">
                 <h3 class="text-lg sm:text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">Quick Actions</h3>
                 <div class="space-y-2 sm:space-y-3">
-                    <a href="{{ route('admin.customers.index') }}" class="block w-full bg-gradient-to-r from-cyan-400 to-cyan-600 text-white rounded-lg px-3 sm:px-4 py-2 sm:py-3 font-semibold text-sm sm:text-base hover:from-cyan-500 hover:to-cyan-700 transition-all duration-300 text-center shadow-md hover:shadow-lg">
+                    <a href="<?php echo e(route('admin.customers.index')); ?>" class="block w-full bg-gradient-to-r from-cyan-400 to-cyan-600 text-white rounded-lg px-3 sm:px-4 py-2 sm:py-3 font-semibold text-sm sm:text-base hover:from-cyan-500 hover:to-cyan-700 transition-all duration-300 text-center shadow-md hover:shadow-lg">
                         Manage Customers
                     </a>
 
-                    <a href="{{ route('admin.login-history.index') }}" class="block w-full bg-gradient-to-r from-slate-400 to-slate-600 text-white rounded-lg px-3 sm:px-4 py-2 sm:py-3 font-semibold text-sm sm:text-base hover:from-slate-500 hover:to-slate-700 transition-all duration-300 text-center shadow-md hover:shadow-lg">
+                    <a href="<?php echo e(route('admin.login-history.index')); ?>" class="block w-full bg-gradient-to-r from-slate-400 to-slate-600 text-white rounded-lg px-3 sm:px-4 py-2 sm:py-3 font-semibold text-sm sm:text-base hover:from-slate-500 hover:to-slate-700 transition-all duration-300 text-center shadow-md hover:shadow-lg">
                         Admin Login History
                     </a>
                     
-                    @if(auth()->guard('admin')->user()->isOrderManager())
-                        <a href="{{ route('admin.orders.index') }}" class="block w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-white rounded-lg px-3 sm:px-4 py-2 sm:py-3 font-semibold text-sm sm:text-base hover:from-yellow-500 hover:to-yellow-700 transition-all duration-300 text-center shadow-md hover:shadow-lg">
+                    <?php if(auth()->guard('admin')->user()->isOrderManager()): ?>
+                        <a href="<?php echo e(route('admin.orders.index')); ?>" class="block w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-white rounded-lg px-3 sm:px-4 py-2 sm:py-3 font-semibold text-sm sm:text-base hover:from-yellow-500 hover:to-yellow-700 transition-all duration-300 text-center shadow-md hover:shadow-lg">
                             View Orders
                         </a>
-                    @endif
+                    <?php endif; ?>
                     
-                    @if(auth()->guard('admin')->user()->isDesignApprover())
-                        <a href="{{ route('admin.design-approvals.index') }}" class="block w-full bg-gradient-to-r from-red-400 to-red-600 text-white rounded-lg px-3 sm:px-4 py-2 sm:py-3 font-semibold text-sm sm:text-base hover:from-red-500 hover:to-red-700 transition-all duration-300 text-center shadow-md hover:shadow-lg">
+                    <?php if(auth()->guard('admin')->user()->isDesignApprover()): ?>
+                        <a href="<?php echo e(route('admin.design-approvals.index')); ?>" class="block w-full bg-gradient-to-r from-red-400 to-red-600 text-white rounded-lg px-3 sm:px-4 py-2 sm:py-3 font-semibold text-sm sm:text-base hover:from-red-500 hover:to-red-700 transition-all duration-300 text-center shadow-md hover:shadow-lg">
                             Review Designs
                         </a>
-                    @endif
+                    <?php endif; ?>
                     
-                    <a href="{{ route('admin.refunds.index') }}" class="block w-full bg-gradient-to-r from-orange-400 to-orange-600 text-white rounded-lg px-3 sm:px-4 py-2 sm:py-3 font-semibold text-sm sm:text-base hover:from-orange-500 hover:to-orange-700 transition-all duration-300 text-center shadow-md hover:shadow-lg">
+                    <a href="<?php echo e(route('admin.refunds.index')); ?>" class="block w-full bg-gradient-to-r from-orange-400 to-orange-600 text-white rounded-lg px-3 sm:px-4 py-2 sm:py-3 font-semibold text-sm sm:text-base hover:from-orange-500 hover:to-orange-700 transition-all duration-300 text-center shadow-md hover:shadow-lg">
                         Process Refunds
                     </a>
                     
-                    @if(auth()->guard('admin')->user()->isSuperAdmin())
-                        <a href="{{ route('admin.customers.index') }}" class="block w-full bg-gradient-to-r from-purple-400 to-purple-600 text-white rounded-lg px-3 sm:px-4 py-2 sm:py-3 font-semibold text-sm sm:text-base hover:from-purple-500 hover:to-purple-700 transition-all duration-300 text-center shadow-md hover:shadow-lg">
+                    <?php if(auth()->guard('admin')->user()->isSuperAdmin()): ?>
+                        <a href="<?php echo e(route('admin.customers.index')); ?>" class="block w-full bg-gradient-to-r from-purple-400 to-purple-600 text-white rounded-lg px-3 sm:px-4 py-2 sm:py-3 font-semibold text-sm sm:text-base hover:from-purple-500 hover:to-purple-700 transition-all duration-300 text-center shadow-md hover:shadow-lg">
                             Manage Admins
                         </a>
-                    @endif
+                    <?php endif; ?>
                 </div>
 
                 <!-- Admin Info -->
@@ -187,16 +186,17 @@
                     <div class="space-y-2 text-xs sm:text-sm">
                         <div class="flex justify-between">
                             <span class="text-gray-600 dark:text-gray-400">Role:</span>
-                            <span class="font-semibold text-gray-800 dark:text-gray-200">{{ ucfirst(str_replace('_', ' ', auth()->guard('admin')->user()->role)) }}</span>
+                            <span class="font-semibold text-gray-800 dark:text-gray-200"><?php echo e(ucfirst(str_replace('_', ' ', auth()->guard('admin')->user()->role))); ?></span>
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-gray-600 dark:text-gray-400">Email:</span>
-                            <span class="font-semibold text-gray-800 dark:text-gray-200 text-xs truncate ml-2">{{ auth()->guard('admin')->user()->email }}</span>
+                            <span class="font-semibold text-gray-800 dark:text-gray-200 text-xs truncate ml-2"><?php echo e(auth()->guard('admin')->user()->email); ?></span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-gray-600 dark:text-gray-400">Status:</span>
-                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold {{ auth()->guard('admin')->user()->is_active ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200' }}">
-                                {{ auth()->guard('admin')->user()->is_active ? 'Active' : 'Inactive' }}
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold <?php echo e(auth()->guard('admin')->user()->is_active ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200'); ?>">
+                                <?php echo e(auth()->guard('admin')->user()->is_active ? 'Active' : 'Inactive'); ?>
+
                             </span>
                         </div>
                     </div>
@@ -206,7 +206,7 @@
     </div>
 </div>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -215,10 +215,10 @@
             const salesChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: @json($stats['monthly_chart_data']['labels']),
+                    labels: <?php echo json_encode($stats['monthly_chart_data']['labels'], 15, 512) ?>,
                     datasets: [{
                         label: 'Sales (₹)',
-                        data: @json($stats['monthly_chart_data']['data']),
+                        data: <?php echo json_encode($stats['monthly_chart_data']['data'], 15, 512) ?>,
                         borderColor: 'rgb(239, 68, 68)',
                         backgroundColor: 'rgba(239, 68, 68, 0.1)',
                         borderWidth: 2,
@@ -270,5 +270,7 @@
         }
     });
 </script>
-@endpush
-@endsection
+<?php $__env->stopPush(); ?>
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('admin.layouts.admin-app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\Tinnity_ecom\resources\views/admin/admin-dashboard.blade.php ENDPATH**/ ?>

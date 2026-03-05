@@ -17,6 +17,17 @@ class ProductController extends Controller
     {
         $query = Product::with(['colors.images', 'sizes', 'admin']);
 
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+
+            $query->where(function ($subQuery) use ($search) {
+                $subQuery->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('drop_name', 'like', "%{$search}%")
+                    ->orWhere('brand', 'like', "%{$search}%");
+            });
+        }
+
         // Apply filters
         if ($request->filled('category')) {
             $query->where('category', $request->category);
@@ -46,6 +57,20 @@ class ProductController extends Controller
             $query->whereNotNull('drop_story')->where('drop_story', '!=', '');
         }
 
+        if ($request->filled('stock_status')) {
+            if ($request->stock_status === 'in_stock') {
+                $query->whereHas('sizes', function ($subQuery) {
+                    $subQuery->where('stock_quantity', '>', 0);
+                });
+            }
+
+            if ($request->stock_status === 'out_of_stock') {
+                $query->whereDoesntHave('sizes', function ($subQuery) {
+                    $subQuery->where('stock_quantity', '>', 0);
+                });
+            }
+        }
+
         // Get segment counts
         $tshirtCount = Product::where('category', 't-shirt')->count();
         $accessoriesCount = Product::where('category', 'accessories')->count();
@@ -54,7 +79,7 @@ class ProductController extends Controller
         $availableSizes = ProductSize::distinct()->pluck('size')->sort();
         $availableColors = ProductColor::distinct()->pluck('color_name')->sort();
 
-        $products = $query->orderBy('created_at', 'desc')->paginate(12);
+        $products = $query->orderBy('created_at', 'desc')->paginate(12)->withQueryString();
 
         return view('admin.products.index', compact(
             'products', 

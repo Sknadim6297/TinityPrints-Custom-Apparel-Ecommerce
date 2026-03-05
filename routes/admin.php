@@ -84,6 +84,8 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
     Route::middleware('admin.role:order_manager,super_admin')->group(function () {
         Route::get('orders', [OrderController::class, 'index'])
             ->name('orders.index');
+        Route::get('orders/{order}', [OrderController::class, 'show'])
+            ->name('orders.show');
         Route::patch('orders/{order}', [OrderController::class, 'update'])
             ->name('orders.update');
         Route::get('refunds', [RefundController::class, 'index'])
@@ -110,6 +112,8 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
     Route::middleware('admin.role:design_approver,super_admin')->group(function () {
         Route::get('design-approvals', [DesignApprovalController::class, 'index'])
             ->name('design-approvals.index');
+        Route::get('design-approvals/{designRequest}', [DesignApprovalController::class, 'show'])
+            ->name('design-approvals.show');
         Route::get('design-approvals/{designRequest}/download/{fileType}', [DesignApprovalController::class, 'download'])
             ->name('design-approvals.download')
             ->where('fileType', 'front|back');
