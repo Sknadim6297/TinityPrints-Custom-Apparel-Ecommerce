@@ -119,7 +119,7 @@
                                              border-radius: 50%; 
                                              margin-right: 3px;
                                              border: 1px solid #ddd;"
-                                      title="{{ $color->name }}"></span>
+                                      title="{{ $color->color_name }}"></span>
                                 @endforeach
                                 @if($productColors->count() > 5)
                                 <small class="text-muted">+{{ $productColors->count() - 5 }}</small>
@@ -216,69 +216,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const actionUrl = `/wishlist/${wishlistId}`;
             removeForm.setAttribute('action', actionUrl);
             removeModal.show();
-        });
-    });
-
-    // Add to cart functionality (AJAX)
-    const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
-    
-    addToCartButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            const productId = this.dataset.productId;
-            const btn = this;
-            const originalText = btn.innerHTML;
-
-            // Disable button and show loading
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
-
-            // AJAX request to add to cart
-            fetch('/cart/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({
-                    product_id: productId,
-                    quantity: 1
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Show success message
-                    btn.innerHTML = '<i class="fas fa-check"></i> Added!';
-                    btn.style.backgroundColor = '#28a745';
-                    
-                    // Update cart count if exists
-                    const cartCount = document.querySelector('.action-item-number');
-                    if (cartCount && data.cart_count) {
-                        cartCount.textContent = data.cart_count;
-                    }
-
-                    // Reset button after 2 seconds
-                    setTimeout(() => {
-                        btn.innerHTML = originalText;
-                        btn.style.backgroundColor = '';
-                        btn.disabled = false;
-                    }, 2000);
-                } else {
-                    throw new Error(data.message || 'Failed to add to cart');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                btn.innerHTML = '<i class="fas fa-exclamation-circle"></i> Error';
-                btn.style.backgroundColor = '#dc3545';
-                
-                setTimeout(() => {
-                    btn.innerHTML = originalText;
-                    btn.style.backgroundColor = '';
-                    btn.disabled = false;
-                }, 2000);
-            });
         });
     });
 

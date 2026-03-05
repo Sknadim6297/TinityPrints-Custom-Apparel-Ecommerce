@@ -9,6 +9,8 @@ use App\Http\Controllers\Admin\DesignApprovalController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\RefundController;
+use App\Http\Controllers\Admin\ContactController;
+use App\Http\Controllers\Admin\AboutSectionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -40,6 +42,10 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
         Route::get('customers/{customer}/history', [CustomerController::class, 'history'])
             ->name('customers.history');
     });
+
+    // Contacts
+    Route::resource('contacts', ContactController::class)
+    ->only(['index', 'show', 'destroy']);
     
     // Logout
     Route::post('logout', [AdminAuthenticatedSessionController::class, 'destroy'])
@@ -117,4 +123,10 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
         Route::post('design-approvals/{designRequest}/lock', [DesignApprovalController::class, 'toggleLock'])
             ->name('design-approvals.toggle-lock');
     });
+
+    Route::get('about-section', [AboutSectionController::class, 'edit'])
+    ->name('about.edit');
+
+    Route::post('about-section', [AboutSectionController::class, 'update'])
+    ->name('about.update');
 });

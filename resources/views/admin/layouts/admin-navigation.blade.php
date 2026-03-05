@@ -1,4 +1,4 @@
-<nav x-data="{ open: false, profileOpen: false }" class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-md">
+<nav x-data="{ open: false, profileOpen: false }" class="sticky top-0 z-40 bg-white/90 dark:bg-gray-900/90 backdrop-blur border-b border-gray-200 dark:border-gray-700 shadow-sm">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
@@ -11,8 +11,13 @@
                 </div>
 
                 <!-- Navigation Links -->
-                <div class="hidden md:flex md:space-x-8 md:ms-10">
-                    <a href="{{ route('admin.dashboard') }}" class="text-gray-900 dark:text-gray-100 px-3 py-2 rounded-md text-sm font-medium hover:text-red-600 dark:hover:text-red-400 transition-colors">
+                <div class="hidden md:flex md:space-x-1 lg:space-x-2 md:ms-10">
+                    <a href="{{ route('admin.dashboard') }}" class="px-3 py-2 rounded-md text-sm font-medium transition-all duration-150
+                        @if(request()->routeIs('admin.dashboard*'))
+                            bg-gray-100 dark:bg-gray-700 text-red-600 dark:text-red-400 shadow-sm
+                        @else
+                            text-gray-900 dark:text-gray-100 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-800
+                        @endif">
                         Dashboard
                     </a>
 
@@ -22,35 +27,73 @@
                             : 0;
                     @endphp
                     
-                    <a href="{{ route('admin.products.index') }}" class="text-gray-900 dark:text-gray-100 px-3 py-2 rounded-md text-sm font-medium hover:text-red-600 dark:hover:text-red-400 transition-colors">
+                    <a href="{{ route('admin.products.index') }}" class="px-3 py-2 rounded-md text-sm font-medium transition-all duration-150
+                        @if(request()->routeIs('admin.products.*'))
+                            bg-gray-100 dark:bg-gray-700 text-red-600 dark:text-red-400 shadow-sm
+                        @else
+                            text-gray-900 dark:text-gray-100 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-800
+                        @endif">
                         Products
                     </a>
                     
-                    <a href="{{ route('admin.design-approvals.index') }}" class="text-gray-900 dark:text-gray-100 px-3 py-2 rounded-md text-sm font-medium hover:text-red-600 dark:hover:text-red-400 transition-colors">
+                    <a href="{{ route('admin.design-approvals.index') }}" class="px-3 py-2 rounded-md text-sm font-medium transition-all duration-150
+                        @if(request()->routeIs('admin.design-approvals.*'))
+                            bg-gray-100 dark:bg-gray-700 text-red-600 dark:text-red-400 shadow-sm
+                        @else
+                            text-gray-900 dark:text-gray-100 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-800
+                        @endif">
                         Designs
                     </a>
                     
-                    <a href="{{ route('admin.customers.index') }}" class="text-gray-900 dark:text-gray-100 px-3 py-2 rounded-md text-sm font-medium hover:text-red-600 dark:hover:text-red-400 transition-colors">
+                    <a href="{{ route('admin.customers.index') }}" class="px-3 py-2 rounded-md text-sm font-medium transition-all duration-150
+                        @if(request()->routeIs('admin.customers.*'))
+                            bg-gray-100 dark:bg-gray-700 text-red-600 dark:text-red-400 shadow-sm
+                        @else
+                            text-gray-900 dark:text-gray-100 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-800
+                        @endif">
                         Customers
                     </a>
                     
                     @if(auth()->guard('admin')->user()->isOrderManager())
-                        <a href="{{ route('admin.orders.index') }}" class="text-gray-900 dark:text-gray-100 px-3 py-2 rounded-md text-sm font-medium hover:text-red-600 dark:hover:text-red-400 transition-colors">
+                        <a href="{{ route('admin.orders.index') }}" class="px-3 py-2 rounded-md text-sm font-medium transition-all duration-150
+                            @if(request()->routeIs('admin.orders.*'))
+                                bg-gray-100 dark:bg-gray-700 text-red-600 dark:text-red-400 shadow-sm
+                            @else
+                                text-gray-900 dark:text-gray-100 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-800
+                            @endif">
                             Orders
                         </a>
-                        <a href="{{ route('admin.refunds.index') }}" class="text-gray-900 dark:text-gray-100 px-3 py-2 rounded-md text-sm font-medium hover:text-red-600 dark:hover:text-red-400 transition-colors">
+                        <a href="{{ route('admin.refunds.index') }}" class="px-3 py-2 rounded-md text-sm font-medium transition-all duration-150
+                            @if(request()->routeIs('admin.refunds.*'))
+                                bg-gray-100 dark:bg-gray-700 text-red-600 dark:text-red-400 shadow-sm
+                            @else
+                                text-gray-900 dark:text-gray-100 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-800
+                            @endif">
                             Refunds
                         </a>
                     @endif
                     
                     @if(auth()->guard('admin')->user()->isSuperAdmin())
-                        <a href="{{ route('admin.coupons.index') }}" class="text-gray-900 dark:text-gray-100 px-3 py-2 rounded-md text-sm font-medium hover:text-red-600 dark:hover:text-red-400 transition-colors">
+                        <a href="{{ route('admin.coupons.index') }}" class="px-3 py-2 rounded-md text-sm font-medium transition-all duration-150
+                            @if(request()->routeIs('admin.coupons.*'))
+                                bg-gray-100 dark:bg-gray-700 text-red-600 dark:text-red-400 shadow-sm
+                            @else
+                                text-gray-900 dark:text-gray-100 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-800
+                            @endif">
                             Coupons
                         </a>
-                        <a href="#" class="text-gray-900 dark:text-gray-100 px-3 py-2 rounded-md text-sm font-medium hover:text-red-600 dark:hover:text-red-400 transition-colors">
+                        <a href="#" class="px-3 py-2 rounded-md text-sm font-medium transition-all duration-150 text-gray-900 dark:text-gray-100 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-800">
                             Settings
                         </a>
                     @endif
+
+                    <a href="{{ route('admin.contacts.index') }}" class="px-3 py-2 rounded-md text-sm font-medium transition-all duration-150
+                        @if(request()->routeIs('admin.contacts.*'))bg-gray-100 dark:bg-gray-700 text-red-600 dark:text-red-400 shadow-sm
+                            @else
+                                text-gray-900 dark:text-gray-100 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-800
+                        @endif">
+                        Contacts
+                    </a>
                 </div>
             </div>
 
@@ -166,6 +209,10 @@
                     Settings
                 </a>
             @endif
+
+            <a href="{{ route('admin.contacts.index') }}" class="text-gray-900 dark:text-gray-100 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                Contacts
+            </a>
         </div>
     </div>
 </nav>

@@ -2,13 +2,33 @@
 @section('title', 'Home')
 @section('content')
 @php($frontendAsset = asset('frontend/assets'))
+<style>
+   .product-img-wrapper {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 5;   /* Perfect square */
+    overflow: hidden;
+    background: #f5f5f5;
+}
+
+.uniform-product-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;     /* Keeps image ratio & fills container */
+    transition: transform 0.4s ease;
+}
+
+.product-img-wrapper:hover .uniform-product-img {
+    transform: scale(1.05);
+}
+</style>
       <!-- banner area start  -->
       <div class="banner-area banner-area2 pos-rel">
          <div class="swiper-container slider__active">
             <div class="swiper-wrapper">
                <div class="swiper-slide">
                   <div class="single-banner single-banner-2 banner-800 d-flex align-items-center pos-rel">
-                     <div class="banner-bg banner-bg2 banner-bg2-1" data-background="{{ $frontendAsset }}/img/banner/banner-2-2.jpg">
+                     <div class="banner-bg banner-bg2 banner-bg2-1" data-background="{{ $frontendAsset }}/img/banner/banner-2-2.jpeg">
                      </div>
                      <div class="container pos-rel">
                         <div class="row align-items-center">
@@ -34,7 +54,7 @@
                </div>
                <div class="swiper-slide">
                   <div class="single-banner single-banner-2 banner-800 d-flex align-items-center pos-rel">
-                     <div class="banner-bg banner-bg2 banner-bg2-1" data-background="{{ $frontendAsset }}/img/banner/banner-2-2.jpg">
+                     <div class="banner-bg banner-bg2 banner-bg2-1" data-background="{{ $frontendAsset }}/img/banner/banner-2-2.jpeg">
                      </div>
                      <div class="container pos-rel">
                         <div class="row align-items-center">
@@ -59,7 +79,7 @@
                </div>
                <div class="swiper-slide">
                   <div class="single-banner single-banner-2 banner-800 d-flex align-items-center pos-rel">
-                     <div class="banner-bg banner-bg2 banner-bg2-1" data-background="{{ $frontendAsset }}/img/banner/banner-2-3.jpg">
+                     <div class="banner-bg banner-bg2 banner-bg2-1" data-background="{{ $frontendAsset }}/img/banner/banner-2-3.jpeg">
                      </div>
                      <div class="container pos-rel">
 
@@ -120,36 +140,48 @@
                @php($productColors = $product->colors ?? collect())
                <div class="single-product">
                   <div class="product-image pos-rel">
-                     <a href="{{ route('product.details', $product->id) }}" class="">
-                        <img src="{{ $productImage ? Storage::url($productImage) : asset('frontend/assets/img/product/product-img1.jpg') }}" alt="{{ $product->name }}">
-                     </a>
-                     <div class="product-action">
-                        <a href="{{ route('product.details', $product->id) }}" class="quick-view-btn"><i class="fal fa-eye"></i></a>
-                        <button type="button" class="wishlist-btn add-to-wishlist-btn" data-product-id="{{ $product->id }}"><i class="fal fa-heart"></i></button>
-                     </div>
-                     <div class="product-action-bottom">
-                        <button type="button" class="add-cart-btn add-to-cart-btn" data-product-id="{{ $product->id }}"><i class="fal fa-shopping-bag"></i>Add to Cart</button>
-                     </div>
-                     @if($product->created_at >= now()->subDays(30))
-                     <div class="product-sticker-wrapper">
-                        <span class="product-sticker new">New</span>
-                     </div>
-                     @endif
-                  </div>
+
+    <a href="{{ route('product.details', $product->id) }}" class="product-img-wrapper">
+        <img 
+            src="{{ $productImage ? Storage::url($productImage) : asset('frontend/assets/img/product/product-img1.jpg') }}" 
+            alt="{{ $product->name }}"
+            class="uniform-product-img"
+        >
+    </a>
+
+    <div class="product-action">
+        <a href="{{ route('product.details', $product->id) }}" class="quick-view-btn">
+            <i class="fal fa-eye"></i>
+        </a>
+        <button type="button" class="wishlist-btn add-to-wishlist-btn" data-product-id="{{ $product->id }}">
+            <i class="fal fa-heart"></i>
+        </button>
+    </div>
+
+    <div class="product-action-bottom">
+        <button type="button" class="add-cart-btn add-to-cart-btn" data-product-id="{{ $product->id }}">
+            <i class="fal fa-shopping-bag"></i> Add to Cart
+        </button>
+    </div>
+
+    @if($product->created_at >= now()->subDays(30))
+        <div class="product-sticker-wrapper">
+            <span class="product-sticker new">New</span>
+        </div>
+    @endif
+
+</div>
                   <div class="product-desc">
                      <div class="product-name"><a href="{{ route('product.details', $product->id) }}">{{ $product->name }}</a></div>
                      <div class="product-price">
                         <span class="price-now">INR {{ number_format($product->price, 2) }}</span>
                      </div>
                      @if($productColors->count() > 0)
-                     <ul class="product-color-nav">
+                     <div class="product-color-nav" style="display: flex; gap: 8px; margin-top: 10px;">
                         @foreach($productColors as $color)
-                        @php($colorImage = optional($color->images->first())->image_path)
-                        <li class="cl-{{ \Illuminate\Support\Str::slug($color->name ?? 'color') }} {{ $loop->first ? 'active' : '' }}">
-                           <img src="{{ $colorImage ? Storage::url($colorImage) : asset('frontend/assets/img/product/product-img1.jpg') }}" alt="img">
-                        </li>
+                        <div class="color-circle" style="width: 24px; height: 24px; border-radius: 50%; background-color: {{ $color->hex_code }}; border: 2px solid #ddd; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" title="{{ $color->color_name }}"></div>
                         @endforeach
-                     </ul>
+                     </div>
                      @endif
                   </div>
                </div>
@@ -182,10 +214,10 @@
                      <span class="limited-badge">
                         <i class="fas fa-fire"></i> LIMITED EDITION DROP
                      </span>
-                     <h2 class="section-main-title limited-title mb-20">This Month's Exclusive Collection</h2>
-                     <p class="limited-desc mb-30">Unique cartoon-style story designs. Once they're gone, they're gone forever!</p>
+                     <h2 class="section-main-title limited-title mb-25 mt-4">This Month's Exclusive Collection</h2>
+                     <p class="limited-desc mb-40">Unique cartoon-style story designs. Once they're gone, they're gone forever!</p>
                      
-                     <div class="countdown-timer mb-30">
+                     <div class="countdown-timer mb-40">
                         <div class="countdown-item">
                            <div class="countdown-number">15</div>
                            <div class="countdown-label">Days</div>
@@ -204,19 +236,21 @@
                         </div>
                      </div>
 
-                     <div class="stock-info mb-30">
+                     <div class="stock-info mb-40">
                         <i class="fas fa-bolt"></i> Only 47 pieces left in stock!
                      </div>
 
-                     <div>
+                     <div class="limited-btn-wrapper">
                         <a href="{{ route('limited-edition') }}" class="border-btn limited-btn">View Limited Edition</a>
                      </div>
                   </div>
                </div>
                <div class="col-lg-6">
+                  <div class="limited-drop-image-wrapper">
                   <div class="limited-drop-image">
-                     <img src="{{ asset('frontend/assets/img/product_category/product-cat-6.jpg') }}" alt="Limited Edition">
+                        <img src="{{ asset('frontend/assets/img/product_category/product-cat-6.jpeg') }}" alt="Limited Edition" class="img-fluid">
                      <div class="limited-badge-corner">LIMITED</div>
+                     </div>
                   </div>
                </div>
             </div>
@@ -335,37 +369,37 @@
             <div class="row">
                <div class="col-lg-12">
                   <div class="process-steps">
-                     <div class="row">
-                        <div class="col-md-2 text-center mb-4">
-                           <div class="process-step-item">
+                     <div class="row justify-content-center">
+                        <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+                           <div class="process-step-item h-100">
                               <div class="step-number-circle">1</div>
                               <h5 class="step-title-sm">Choose Product</h5>
                               <p class="step-text-sm">Select t-shirt or upload custom design</p>
                            </div>
                         </div>
-                        <div class="col-md-2 text-center mb-4">
-                           <div class="process-step-item">
+                        <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+                           <div class="process-step-item h-100">
                               <div class="step-number-circle">2</div>
                               <h5 class="step-title-sm">Admin Approval</h5>
                               <p class="step-text-sm">Design reviewed & approved by team</p>
                            </div>
                         </div>
-                        <div class="col-md-2 text-center mb-4">
-                           <div class="process-step-item">
+                        <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+                           <div class="process-step-item h-100">
                               <div class="step-number-circle">3</div>
                               <h5 class="step-title-sm">Payment</h5>
                               <p class="step-text-sm">Secure payment gateway</p>
                            </div>
                         </div>
-                        <div class="col-md-2 text-center mb-4">
-                           <div class="process-step-item">
+                        <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+                           <div class="process-step-item h-100">
                               <div class="step-number-circle">4</div>
                               <h5 class="step-title-sm">Printing</h5>
                               <p class="step-text-sm">HD quality printing on premium fabric</p>
                            </div>
                         </div>
-                        <div class="col-md-2 text-center mb-4">
-                           <div class="process-step-item">
+                        <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+                           <div class="process-step-item h-100">
                               <div class="step-number-circle">5</div>
                               <h5 class="step-title-sm">Delivery</h5>
                               <p class="step-text-sm">Fast shipping to your door</p>

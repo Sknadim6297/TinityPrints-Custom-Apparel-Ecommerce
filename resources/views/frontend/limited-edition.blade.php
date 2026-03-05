@@ -25,12 +25,12 @@
 <!-- page title area end  -->
 
 <!-- limited edition hero section -->
-<section class="limited-edition-hero pt-80 pb-60">
+<section class="limited-edition-hero pt-100 pb-80">
    <div class="container">
       <div class="row align-items-center">
-         <div class="col-lg-6">
+         <div class="col-lg-6 mb-lg-0 mb-50">
             <div class="limited-edition-content">
-               <span class="badge mb-20" style="background:#ff6b6b;color:#fff;">
+               <span class="limited-hero-badge">
                   <i class="fas fa-fire"></i> EXCLUSIVE COLLECTION
                </span>
                <h2 class="hero-title mb-30">Limited Edition Drops</h2>
@@ -39,23 +39,32 @@
                </p>
                <div class="hero-features">
                   <div class="feature-badge">
-                     <i class="fas fa-gem"></i>
-                     <span>Premium Quality</span>
+                     <div class="feature-icon">
+                        <i class="fas fa-gem"></i>
+                     </div>
+                     <span class="feature-text">Premium Quality</span>
                   </div>
                   <div class="feature-badge">
-                     <i class="fas fa-clock"></i>
-                     <span>Limited Time Only</span>
+                     <div class="feature-icon">
+                        <i class="fas fa-clock"></i>
+                     </div>
+                     <span class="feature-text">Limited Time Only</span>
                   </div>
                   <div class="feature-badge">
-                     <i class="fas fa-certificate"></i>
-                     <span>Exclusive Designs</span>
+                     <div class="feature-icon">
+                        <i class="fas fa-certificate"></i>
+                     </div>
+                     <span class="feature-text">Exclusive Designs</span>
                   </div>
                </div>
             </div>
          </div>
          <div class="col-lg-6">
-            <div class="limited-edition-image text-center">
-               <img src="{{ asset('frontend/assets/img/limited-edition-hero.jpg') }}" alt="Limited Edition" class="img-fluid rounded">
+            <div class="limited-edition-image-wrapper">
+               <div class="limited-edition-image">
+                  <img src="{{ asset('frontend/assets/img/limited-edition-hero.jpg') }}" alt="Limited Edition" class="img-fluid">
+                  <div class="image-overlay"></div>
+               </div>
             </div>
          </div>
       </div>
@@ -112,22 +121,22 @@
                </p>
                @endif
                @if($productColors->count() > 0)
-               <ul class="product-color-nav">
+               <div class="product-color-nav" style="display: flex; gap: 8px; margin-top: 10px;">
                   @foreach($productColors as $color)
-                  @php($colorImage = optional($color->images->first())->image_path)
-                  <li class="cl-{{ \Illuminate\Support\Str::slug($color->color_name ?? 'color') }} {{ $loop->first ? 'active' : '' }}">
-                     <img src="{{ $colorImage ? Storage::url($colorImage) : asset('frontend/assets/img/product/product-img1.jpg') }}" alt="img">
-                  </li>
+                  <div class="color-circle" style="width: 24px; height: 24px; border-radius: 50%; background-color: {{ $color->hex_code }}; border: 2px solid #ddd; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" title="{{ $color->color_name }}"></div>
                   @endforeach
-               </ul>
+               </div>
                @endif
             </div>
          </div>
          @empty
          <div class="col-12">
-            <div class="text-center">
-               <h3>No Limited Edition Items Available</h3>
-               <p>Please check back soon for new exclusive drops.</p>
+            <div class="empty-state text-center">
+               <div class="empty-state-icon">
+                  <i class="fas fa-box-open"></i>
+               </div>
+               <h3 class="empty-state-title">No Limited Edition Items Available</h3>
+               <p class="empty-state-text">Please check back soon for new exclusive drops.</p>
             </div>
          </div>
          @endforelse
@@ -142,7 +151,7 @@
       @if($limitedProducts->hasPages())
       <div class="row">
          <div class="col-lg-12">
-            <div class="pagination-wrapper text-center">
+            <div class="pagination-wrapper text-center mt-50">
                {{ $limitedProducts->links() }}
             </div>
          </div>

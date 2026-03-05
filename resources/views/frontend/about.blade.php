@@ -91,39 +91,56 @@
       <!-- about-heading area end  -->
 
       <!-- about-area start  -->
-      <section class="about-area pb-90">
-         <div class="container container-small">
-            <div class="row align-items-center">
-               <div class="col-lg-6">
-                  <div class="about-thumb pos-rel mb-30">
-                     <img class="about-thumb-main" src="assets/img/about/about-thumb.html" alt="img">
-                     <img class="est-time-img" src="assets/img/about/1990.html" alt="img">
-                  </div>
-               </div>
-               <div class="col-lg-6">
-                  <div class="about-content mb-30 align-pb-35">
-                     <div class="section-title">
-                        <h2 class="section-main-title mb-30">The fashion everything that
-                           you want in your life.</h2>
-                     </div>
-                     <p class="mb-40">We get it. Getting dressed can be hard and we’re here to help with that. Whether
-                        you’re more of
-                        a casual girl I feel
-                        you, give me joggers all day every day or are looking to spice things up for your next date
-                        night, you’ve come to the
-                        right place. Dig through our piles of posts. Booties, booties, booties rockin’ everywhere! When
-                        it comes to Fall and
-                        Winter fashion, boots are my weakness. As part of our growth, Roman has launched a new range of
-                        shoes and handbags.</p>
-                     <div class="about-btn">
-                        <a href="shop.html" class="fill-btn">Explore Products</a>
-                     </div>
-                  </div>
-               </div>
-            </div>
-         </div>
+@php
+$about = \App\Models\AboutSection::first();
+@endphp
 
-      </section>
+@if($about)
+<section class="about-area pb-90">
+    <div class="container container-small">
+        <div class="row align-items-center">
+            
+            <div class="col-lg-6">
+                <div class="about-thumb pos-rel mb-30">
+                    <img class="about-thumb-main" 
+                         src="{{ $about->main_image ? Storage::url($about->main_image) : asset('assets/img/default.jpg') }}" 
+                         alt="img">
+
+                    @if($about->secondary_image)
+                    <img class="est-time-img" 
+                         src="{{ Storage::url($about->secondary_image) }}" 
+                         alt="img">
+                    @endif
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="about-content mb-30 align-pb-35">
+                    <div class="section-title">
+                        <h2 class="section-main-title mb-30">
+                            {{ $about->title }}
+                        </h2>
+                    </div>
+
+                    <p class="mb-40">
+                        {{ $about->description }}
+                    </p>
+
+                    @if($about->button_text)
+                    <div class="about-btn">
+                        <a href="{{ $about->button_link }}" class="fill-btn">
+                            {{ $about->button_text }}
+                        </a>
+                    </div>
+                    @endif
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+@endif
       <!-- about-area end  -->
 
       <!-- features area start  -->

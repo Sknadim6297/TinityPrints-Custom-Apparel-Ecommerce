@@ -8,10 +8,7 @@
                      <div class="footer-widget-logo mb-20">
                         <a href="{{ route('home') }}"><img src="{{ asset('frontend/assets/img/logo/logo.png') }}" alt="img" width="100px"></a>
                      </div>
-                     <p class="mb-20">Ecomart is a fashion theme for presents a complete wardrobe of uniquely crafted
-                        Ethnic
-                        Wear, Casuals, Edgy Denims, &
-                        Accessories inspired from the most contemporary</p>
+                     <p class="mb-20">Tinnity is a fashion brand that presents a complete wardrobe of uniquely crafted T-Shirts, Casual Wear, Trendy Streetwear, and Accessories, inspired by the most contemporary styles and designed for everyday comfort and confidence.</p>
                      <div class="social__links social-border">
                         <ul>
                            <li><a href="#" target="_blank"><i class="fab fa-facebook-f"></i></a></li>
@@ -41,12 +38,10 @@
                         <h4>Category</h4>
                      </div>
                      <ul>
-                        <li><a href="#">Handbags & Wallets</a></li>
-                        <li><a href="#">Women's Clothing</a></li>
-                        <li><a href="#">Plus Sizes</a></li>
-                        <li><a href="#">Complete Your Look</a></li>
-                        <li><a href="#">Baby Corner</a></li>
-                        <li><a href="#">Man & Woman Shoe</a></li>
+                        <li><a href="{{ route('custom-design') }}">Custom Design</a></li>
+                        <li><a href="{{ route('limited-edition') }}">Limited Edition</a></li>
+                        <li><a href="{{ route('shop.category', 't-shirt') }}">T-shirt</a></li>
+                        <li><a href="{{ route('shop.category', 'accessories') }}">Accessories</a></li>
                      </ul>
                   </div>
                </div>
@@ -56,12 +51,10 @@
                         <h4>Information</h4>
                      </div>
                      <ul>
-                        <li><a href="#">About Company</a></li>
-                        <li><a href="#">Payment Type</a></li>
-                        <li><a href="#">Awards Winning</a></li>
-                        <li><a href="#">World Media Partner</a></li>
-                        <li><a href="#">Become an Agent</a></li>
-                        <li><a href="#">Refund Policy</a></li>
+                        <li><a href="{{ route('home') }}">Home</a></li>
+                        <li><a href="{{ route('about') }}">About Company</a></li>
+                        <li><a href="{{ route('refund-policy') }}">Refund Policy</a></li>
+                        <li><a href="{{ route('contact') }}">Contact Us</a></li>
                      </ul>
                   </div>
                </div>
@@ -71,12 +64,12 @@
                         <h4>Help & Support</h4>
                      </div>
                      <ul>
-                        <li><a href="#">Dealers & Agents</a></li>
-                        <li><a href="#">FAQ Information</a></li>
-                        <li><a href="#">Return Policy</a></li>
+                        
+                        <li><a href="{{ route('faq') }}">FAQ Information</a></li>
+                        <li><a href="{{ route('return.policy') }}">Return Policy</a></li>
+                        <li><a href="{{ route('terms') }}">Terms & Conditions</a></li>
                         <li><a href="#">Shipping & Delivery</a></li>
-                        <li><a href="#">Order Tranking</a></li>
-                        <li><a href="#">List of Shops</a></li>
+                        
                      </ul>
                   </div>
                </div>
@@ -87,12 +80,12 @@
          <div class="container">
             <div class="copyright2-inner">
                <div class="copyright-text copyright2-text">
-                  Copyright by <a href="https://themeforest.net/user/bdevs/portfolio">BDevs</a>. All Rights Reserved
+                  Copyright by <a href="https://themeforest.net/user/bdevs/portfolio">Konnectix Technology</a>. All Rights Reserved
                </div>
                <div class="copyright-link">
-                  <a href="#" class="text-btn">Privacy Policy</a>
-                  <a href="#" class="text-btn">Terms & Conditions</a>
-                  <a href="#" class="text-btn">Sitemap</a>
+                  <a href="{{ route('privacy') }}" class="text-btn">Privacy Policy</a>
+                  <a href="{{ route('terms') }}" class="text-btn">Terms & Conditions</a>
+                  {{-- <a href="#" class="text-btn">Sitemap</a> --}}
                </div>
                <div class="cards-wrapper">
                   <p>We Support</p>

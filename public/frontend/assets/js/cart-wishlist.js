@@ -34,7 +34,7 @@
             data: {
                 product_id: productId,
                 quantity: quantity,
-                product_color_id: selectedColor,
+                color_id: selectedColor,
                 size: selectedSize,
                 _token: $('meta[name="csrf-token"]').attr('content')
             },

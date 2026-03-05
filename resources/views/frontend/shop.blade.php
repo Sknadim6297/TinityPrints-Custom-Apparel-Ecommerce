@@ -2,6 +2,35 @@
 
 @section('title', 'Shop')
 @section('content')
+<style>
+ /* FIX PRODUCT IMAGE SIZE */
+
+.single-product .product-image{
+    width:100%;
+    height:320px;
+    overflow:hidden;
+    position:relative;
+}
+
+/* IMAGE */
+.single-product .product-image img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+}
+
+/* PRODUCT CARD */
+.single-product{
+    width:100%;
+}
+
+/* PRODUCT DESCRIPTION */
+.product-desc{
+    padding:15px;
+    text-align:center;
+}
+</style>
 <!-- page title area start  -->
       <section class="page-title-area" data-background="assets/img/bg/page-title-bg.html">
          <div class="container">
@@ -29,6 +58,12 @@
                               @else
                                  <li class="trail-item trail-end"><span>Shop</span></li>
                               @endif
+                           </ul>
+                        </nav>
+                     </div>
+                  </div>
+               </div>
+            </div>
          </div>
       </section>
       <!-- page title area end  -->
@@ -128,14 +163,11 @@
                                  <span class="price-now">INR {{ number_format($product->price, 2) }}</span>
                               </div>
                               @if($productColors->count() > 0)
-                              <ul class="product-color-nav">
+                              <div class="product-color-nav" style="display: flex; gap: 8px; margin-top: 10px;">
                                  @foreach($productColors as $color)
-                                 @php($colorImage = optional($color->images->first())->image_path)
-                                 <li class="cl-{{ \Illuminate\Support\Str::slug($color->name ?? 'color') }} {{ $loop->first ? 'active' : '' }}">
-                                    <img src="{{ $colorImage ? Storage::url($colorImage) : asset('frontend/assets/img/product/product-img1.jpg') }}" alt="img">
-                                 </li>
+                                 <div class="color-circle" style="width: 24px; height: 24px; border-radius: 50%; background-color: {{ $color->hex_code }}; border: 2px solid #ddd; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" title="{{ $color->color_name }}"></div>
                                  @endforeach
-                              </ul>
+                              </div>
                               @endif
                            </div>
                         </div>
@@ -208,9 +240,7 @@
                                  <div class="category-sizes">
                                     @foreach(['XS' => 'Extra Small', 'S' => 'Small', 'M' => 'Medium', 'L' => 'Large', 'XL' => 'Extra Large', 'XXL' => 'Double XL'] as $sizeKey => $sizeName)
                                     <div class="category-size">
-                                       <input class="check-box" type="checkbox" name="size[]" value="{{ $sizeKey }}" 
-                                              id="size-{{ $sizeKey }}" {{ in_array($sizeKey, (array)request('size', [])) ? 'checked' : '' }}
-                                              onchange="document.getElementById('filter-form').submit()">
+                                       <input class="check-box" type="checkbox" name="size[]" value="{{ $sizeKey }}" id="size-{{ $sizeKey }}" {{ in_array($sizeKey, (array)request('size', [])) ? 'checked' : '' }} onchange="document.getElementById('filter-form').submit()">
                                        <label class="check-label" for="size-{{ $sizeKey }}">{{ $sizeName }}</label>
                                     </div>
                                     @endforeach
@@ -225,10 +255,7 @@
                                  <div class="category-sizes">
                                     @foreach($availableSleeveTypes as $sleeveType)
                                     <div class="category-size">
-                                       <input class="radio-box" type="radio" name="sleeve_type" value="{{ $sleeveType }}" 
-                                              id="sleeve-{{ strtolower(str_replace(' ', '-', $sleeveType)) }}" 
-                                              {{ request('sleeve_type') == $sleeveType ? 'checked' : '' }}
-                                              onchange="document.getElementById('filter-form').submit()">
+                                       <input class="radio-box" type="radio" name="sleeve_type" value="{{ $sleeveType }}" id="sleeve-{{ strtolower(str_replace(' ', '-', $sleeveType)) }}" {{ request('sleeve_type') == $sleeveType ? 'checked' : '' }} onchange="document.getElementById('filter-form').submit()">
                                        <label class="check-label" for="sleeve-{{ strtolower(str_replace(' ', '-', $sleeveType)) }}">{{ ucfirst($sleeveType) }}</label>
                                     </div>
                                     @endforeach
@@ -241,22 +268,31 @@
                               <h4 class="filter-widget-title drop-btn">Colour</h4>
                               <div class="filter-widget-content">
                                  <div class="category-colours">
-                                    @if(isset($availableColors) && count($availableColors) > 0)
-                                    <div class="color-grid d-flex flex-wrap">
-                                       @foreach($availableColors as $color)
-                                       <label class="color-option {{ in_array($color, (array)request('color', [])) ? 'active-color' : '' }}" 
-                                              style="background-color: {{ strtolower($color) }}; display: inline-block; width: 35px; height: 35px; margin: 5px; cursor: pointer; border-radius: 50%; border: 3px solid {{ in_array($color, (array)request('color', [])) ? 'var(--clr-common-heading)' : '#ddd' }}; position: relative;"
-                                              title="{{ ucfirst($color) }}">
-                                          <input type="checkbox" name="color[]" value="{{ $color }}" 
-                                                 {{ in_array($color, (array)request('color', [])) ? 'checked' : '' }}
-                                                 onchange="document.getElementById('filter-form').submit()" style="display: none;">
-                                          @if(in_array($color, (array)request('color', [])))
-                                          <i class="fas fa-check" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: {{ in_array(strtolower($color), ['white', 'yellow', 'lightgray', 'lightblue']) ? '#000' : '#fff' }};"></i>
+                                    <?php
+                                       $colorsForFilter = isset($availableColors) ? $availableColors : [];
+                                    ?>
+                                    <div class="color-grid d-flex flex-wrap" style="gap: 10px;">
+                                       @foreach($colorsForFilter as $color)
+                                       <?php
+                                           $colorName = is_array($color) ? ($color['name'] ?? $color) : $color;
+                                           $colorHex = is_array($color) ? ($color['hex'] ?? '#cccccc') : '#cccccc';
+                                           $isChecked = in_array($colorName, (array)request('color', []));
+                                           $lightColors = ['#ffffff', '#ffff00', '#f0e68c', '#add8e6', '#90ee90', '#ffd700', '#fffacd'];
+                                           $textColor = in_array(strtolower($colorHex), $lightColors) ? '#000' : '#fff';
+                                           $borderColor = $isChecked ? 'var(--clr-common-heading)' : '#ddd';
+                                           $labelClass = 'color-option' . ($isChecked ? ' active-color' : '');
+                                       ?>
+                                       <label class="{{ $labelClass }}" 
+                                              style="background-color: {{ $colorHex }}; display: inline-block; width: 40px; height: 40px; margin: 0; cursor: pointer; border-radius: 50%; border: 3px solid {{ $borderColor }}; position: relative; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
+                                              title="{{ ucfirst($colorName) }}">
+                                          <input type="checkbox" name="color[]" value="{{ $colorName }}" {{ $isChecked ? 'checked' : '' }} onchange="document.getElementById('filter-form').submit()" style="display: none;">
+                                          @if($isChecked)
+                                          <i class="fas fa-check" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: {{ $textColor }}; font-weight: bold;"></i>
                                           @endif
                                        </label>
                                        @endforeach
                                     </div>
-                                    @else
+                                    @if(count($colorsForFilter) === 0)
                                     <p class="text-muted small">No colors available</p>
                                     @endif
                                  </div>
@@ -455,3 +491,4 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 @endsection
+

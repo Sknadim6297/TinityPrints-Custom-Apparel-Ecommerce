@@ -4,6 +4,7 @@ use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\CartController;
 use App\Http\Controllers\Frontend\WishlistController;
 use App\Http\Controllers\Frontend\ReviewController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -18,6 +19,7 @@ Route::get('/about', [HomeController::class, 'about'])->name('about');
 Route::get('/refund-policy', [HomeController::class, 'refundPolicy'])->name('refund-policy');
 Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
 Route::post('/contact', [HomeController::class, 'contactSubmit'])->name('contact.submit');
+Route::post('/contact-store', [ContactController::class, 'store'])->name('contact.store');
 
 // Cart Routes
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
@@ -72,3 +74,18 @@ Route::get('/storage-link', function () {
     return 'Storage link created successfully';
 });
 
+Route::get('/faq', function () {
+    return view('frontend.faq');
+})->name('faq');
+
+Route::get('/return-policy', function () {
+    return view('frontend.return-policy');
+})->name('return.policy');
+
+Route::get('/terms-and-conditions', function () {
+    return view('frontend.terms-and-conditions');
+})->name('terms');
+
+Route::get('/privacy-policy', function () {
+    return view('frontend.privacy-policy');
+})->name('privacy');

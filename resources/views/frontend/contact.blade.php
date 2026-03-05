@@ -85,34 +85,35 @@
                             <h2 class="section-main-title mb-40">Get in Touch</h2>
                         </div>
                         <div class="contact-main-form">
-                            <form action="#">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="single-form-input">
-                                        <input type="text" placeholder="Name">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="single-form-input">
-                                        <input type="text" placeholder="Phone">
-                                    </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="single-form-input">
-                                        <input type="text" placeholder="Email">
-                                    </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="single-form-input">
-                                        <textarea name="message" id="message" placeholder="Messages"></textarea>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="contact-btn">
-                                <a href="#" class="fill-btn">Submit Now</a>
-                            </div>
+<form action="{{ route('contact.store') }}" method="POST">
+    @csrf
+    <div class="row">
+        <div class="col-md-6">
+            <div class="single-form-input">
+                <input type="text" name="name" placeholder="Name" required>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="single-form-input">
+                <input type="text" name="phone" placeholder="Phone" required>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="single-form-input">
+                <input type="email" name="email" placeholder="Email" required>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="single-form-input">
+                <textarea name="message" placeholder="Messages" required></textarea>
+            </div>
+        </div>
+    </div>
 
-                            </form>
+    <div class="contact-btn">
+        <button type="submit" class="fill-btn">Submit Now</button>
+    </div>
+</form>
                         </div>
                     </div>
                 </div>

@@ -137,9 +137,9 @@
                               <li><a href="{{ route('limited-edition') }}">Limited Edition</a></li>
                               <li><a href="{{ route('shop.category', 't-shirt') }}">T-Shirts</a></li>
                               <li><a href="{{ route('shop.category', 'accessories') }}">Accessories</a></li>
-                              <li><a href="{{ route('about') }}">About Us</a></li>
-                              <li><a href="{{ route('refund-policy') }}">Refund Policy</a></li>
-                              <li><a href="{{ route('contact') }}">Contact</a></li>
+                              {{-- <li><a href="{{ route('about') }}">About Us</a></li> --}}
+                              {{-- <li><a href="{{ route('refund-policy') }}">Refund Policy</a></li> --}}
+                              {{-- <li><a href="{{ route('contact') }}">Contact</a></li> --}}
                            </ul>
                         </nav>
                      </div>
