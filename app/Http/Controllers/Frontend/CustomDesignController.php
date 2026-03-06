@@ -19,7 +19,6 @@ class CustomDesignController extends Controller
         if (Auth::check()) {
             $userDesigns = DesignRequest::where('user_id', Auth::id())
                 ->latest()
-                ->limit(5)
                 ->get();
         }
 
@@ -75,19 +74,10 @@ class CustomDesignController extends Controller
                 'payment_status' => 'unpaid',
                 'payment_unlocked' => false,
             ]);
-
-            // Log activity
-            \Log::info('Custom design submitted', [
-                'design_id' => $design->id,
-                'user_id' => Auth::id(),
-            ]);
-
             return redirect()->route('custom-design.show', $design)
                 ->with('success', 'Your design has been submitted for review! Our team will review it within 24-48 hours.');
 
         } catch (\Exception $e) {
-            \Log::error('Error storing custom design: ' . $e->getMessage());
-            
             return back()->with('error', 'Error uploading design. Please try again.')
                 ->withInput();
         }
@@ -164,7 +154,6 @@ class CustomDesignController extends Controller
             return back()->with('success', 'Your revised design has been resubmitted for review!');
 
         } catch (\Exception $e) {
-            \Log::error('Error updating design: ' . $e->getMessage());
             return back()->with('error', 'Error uploading files. Please try again.');
         }
     }
@@ -312,7 +301,6 @@ class CustomDesignController extends Controller
                 ->with('success', 'Your order has been placed successfully!');
 
         } catch (\Exception $e) {
-            \Log::error('Error processing custom design payment: ' . $e->getMessage());
             return back()->with('error', 'Error processing payment. Please try again.');
         }
     }

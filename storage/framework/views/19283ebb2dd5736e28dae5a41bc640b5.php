@@ -1,8 +1,8 @@
-@extends('frontend.layout.app')
 
-@section('title', 'Order Placed Successfully')
 
-@section('content')
+<?php $__env->startSection('title', 'Order Placed Successfully'); ?>
+
+<?php $__env->startSection('content'); ?>
 <style>
 .order-success-area {
     background: linear-gradient(180deg, #fffdf8 0%, #ffffff 50%, #fff7ee 100%);
@@ -393,7 +393,7 @@
 </style>
 
 <main>
-    <section class="page-title-area" data-background="{{ asset('frontend/assets/img/banner/banner-1-1.jpg') }}">
+    <section class="page-title-area" data-background="<?php echo e(asset('frontend/assets/img/banner/banner-1-1.jpg')); ?>">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
@@ -402,7 +402,7 @@
                         <div class="breadcrumb-menu">
                             <nav aria-label="Breadcrumbs" class="breadcrumb-trail breadcrumbs">
                                 <ul class="trail-items">
-                                    <li class="trail-item trail-begin"><a href="{{ route('home') }}"><span>Home</span></a></li>
+                                    <li class="trail-item trail-begin"><a href="<?php echo e(route('home')); ?>"><span>Home</span></a></li>
                                     <li class="trail-item trail-end"><span>Order Success</span></li>
                                 </ul>
                             </nav>
@@ -431,16 +431,16 @@
                             <div class="hero-stats">
                                 <div class="hero-stat">
                                     <div class="hero-stat-label">Order Number</div>
-                                    <div class="hero-stat-value">{{ $order->order_number }}</div>
+                                    <div class="hero-stat-value"><?php echo e($order->order_number); ?></div>
                                 </div>
                                 <div class="hero-stat">
                                     <div class="hero-stat-label">Total Amount</div>
-                                    <div class="hero-stat-value">INR {{ number_format($order->total_amount, 2) }}</div>
+                                    <div class="hero-stat-value">INR <?php echo e(number_format($order->total_amount, 2)); ?></div>
                                 </div>
                                 <div class="hero-stat">
                                     <div class="hero-stat-label">Payment Method</div>
                                     <div class="hero-stat-value">
-                                        <span class="payment-chip">{{ strtoupper(str_replace('_', ' ', $order->payment_method)) }}</span>
+                                        <span class="payment-chip"><?php echo e(strtoupper(str_replace('_', ' ', $order->payment_method))); ?></span>
                                     </div>
                                 </div>
                             </div>
@@ -458,18 +458,18 @@
                                                 <div class="info-card">
                                                     <div class="info-label">Shipping Address</div>
                                                     <div class="info-value">
-                                                        <div class="detail-line">{{ $order->customer_name }}</div>
-                                                        <div class="detail-line">{{ $order->shipping_address }}</div>
-                                                        <div class="detail-line">{{ $order->shipping_city }}, {{ $order->shipping_state }} {{ $order->shipping_postal_code }}</div>
-                                                        <div class="detail-line">{{ $order->shipping_country }}</div>
+                                                        <div class="detail-line"><?php echo e($order->customer_name); ?></div>
+                                                        <div class="detail-line"><?php echo e($order->shipping_address); ?></div>
+                                                        <div class="detail-line"><?php echo e($order->shipping_city); ?>, <?php echo e($order->shipping_state); ?> <?php echo e($order->shipping_postal_code); ?></div>
+                                                        <div class="detail-line"><?php echo e($order->shipping_country); ?></div>
                                                     </div>
                                                 </div>
 
                                                 <div class="info-card">
                                                     <div class="info-label">Contact Information</div>
                                                     <div class="info-value">
-                                                        <div class="detail-line"><strong>Phone:</strong> {{ $order->phone }}</div>
-                                                        <div class="detail-line"><strong>Email:</strong> {{ $order->email }}</div>
+                                                        <div class="detail-line"><strong>Phone:</strong> <?php echo e($order->phone); ?></div>
+                                                        <div class="detail-line"><strong>Email:</strong> <?php echo e($order->email); ?></div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -493,48 +493,48 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        @foreach($order->items as $item)
+                                                        <?php $__currentLoopData = $order->items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                             <tr>
                                                                 <td>
                                                                     <div class="product-cell">
-                                                                        @if($order->design_request_id && $order->designRequest && $order->designRequest->front_design_file)
-                                                                            <img src="{{ \Illuminate\Support\Facades\Storage::url($order->designRequest->front_design_file) }}" alt="{{ $item->product_name }}" style="object-fit: contain;">
-                                                                        @elseif($item->product && $item->product->images && $item->product->images->first())
-                                                                            <img src="{{ \Illuminate\Support\Facades\Storage::url($item->product->images->first()->image_path) }}" alt="{{ $item->product_name }}">
-                                                                        @else
-                                                                            <img src="{{ asset('frontend/assets/img/product/product-img1.jpg') }}" alt="{{ $item->product_name }}">
-                                                                        @endif
-                                                                        <span class="product-name">{{ $item->product_name }}</span>
+                                                                        <?php if($order->design_request_id && $order->designRequest && $order->designRequest->front_design_file): ?>
+                                                                            <img src="<?php echo e(\Illuminate\Support\Facades\Storage::url($order->designRequest->front_design_file)); ?>" alt="<?php echo e($item->product_name); ?>" style="object-fit: contain;">
+                                                                        <?php elseif($item->product && $item->product->images && $item->product->images->first()): ?>
+                                                                            <img src="<?php echo e(\Illuminate\Support\Facades\Storage::url($item->product->images->first()->image_path)); ?>" alt="<?php echo e($item->product_name); ?>">
+                                                                        <?php else: ?>
+                                                                            <img src="<?php echo e(asset('frontend/assets/img/product/product-img1.jpg')); ?>" alt="<?php echo e($item->product_name); ?>">
+                                                                        <?php endif; ?>
+                                                                        <span class="product-name"><?php echo e($item->product_name); ?></span>
                                                                     </div>
                                                                 </td>
                                                                 <td>
-                                                                    @if($item->color_name)
-                                                                        <span class="meta-badge">{{ $item->color_name }}</span>
-                                                                    @endif
-                                                                    @if($item->size)
-                                                                        <span class="meta-badge">{{ $item->size }}</span>
-                                                                    @endif
+                                                                    <?php if($item->color_name): ?>
+                                                                        <span class="meta-badge"><?php echo e($item->color_name); ?></span>
+                                                                    <?php endif; ?>
+                                                                    <?php if($item->size): ?>
+                                                                        <span class="meta-badge"><?php echo e($item->size); ?></span>
+                                                                    <?php endif; ?>
                                                                 </td>
-                                                                <td>INR {{ number_format($item->price, 2) }}</td>
-                                                                <td>{{ $item->quantity }}</td>
-                                                                <td><strong>INR {{ number_format($item->total, 2) }}</strong></td>
+                                                                <td>INR <?php echo e(number_format($item->price, 2)); ?></td>
+                                                                <td><?php echo e($item->quantity); ?></td>
+                                                                <td><strong>INR <?php echo e(number_format($item->total, 2)); ?></strong></td>
                                                             </tr>
-                                                        @endforeach
+                                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                     </tbody>
                                                     <tfoot>
                                                         <tr>
                                                             <td colspan="4">Subtotal:</td>
-                                                            <td><strong>INR {{ number_format($order->subtotal, 2) }}</strong></td>
+                                                            <td><strong>INR <?php echo e(number_format($order->subtotal, 2)); ?></strong></td>
                                                         </tr>
-                                                        @if($order->discount_amount > 0)
+                                                        <?php if($order->discount_amount > 0): ?>
                                                             <tr>
                                                                 <td colspan="4">Discount:</td>
-                                                                <td><strong>-INR {{ number_format($order->discount_amount, 2) }}</strong></td>
+                                                                <td><strong>-INR <?php echo e(number_format($order->discount_amount, 2)); ?></strong></td>
                                                             </tr>
-                                                        @endif
+                                                        <?php endif; ?>
                                                         <tr>
                                                             <td colspan="4">Total:</td>
-                                                            <td><strong>INR {{ number_format($order->total_amount, 2) }}</strong></td>
+                                                            <td><strong>INR <?php echo e(number_format($order->total_amount, 2)); ?></strong></td>
                                                         </tr>
                                                     </tfoot>
                                                 </table>
@@ -543,15 +543,15 @@
                                     </div>
 
                                     <div class="notice-card">
-                                        You will receive an email confirmation at <strong>{{ $order->email }}</strong> shortly. You can track your order status in your profile.
+                                        You will receive an email confirmation at <strong><?php echo e($order->email); ?></strong> shortly. You can track your order status in your profile.
                                     </div>
 
                                     <div class="actions-row">
-                                        <a href="{{ route('orders') }}" class="action-btn action-btn-primary">
+                                        <a href="<?php echo e(route('orders')); ?>" class="action-btn action-btn-primary">
                                             <i class="fal fa-list"></i>
                                             View My Orders
                                         </a>
-                                        <a href="{{ route('shop') }}" class="action-btn action-btn-secondary">
+                                        <a href="<?php echo e(route('shop')); ?>" class="action-btn action-btn-secondary">
                                             <i class="fal fa-shopping-bag"></i>
                                             Continue Shopping
                                         </a>
@@ -571,8 +571,8 @@
                                     <div class="sidebar-card">
                                         <h5 class="sidebar-title">Need Help</h5>
                                         <ul class="sidebar-list">
-                                            <li>Support email: {{ $order->email }}</li>
-                                            <li>Keep your order number ready: {{ $order->order_number }}</li>
+                                            <li>Support email: <?php echo e($order->email); ?></li>
+                                            <li>Keep your order number ready: <?php echo e($order->order_number); ?></li>
                                             <li>For design orders, approval and fulfillment updates appear in your account.</li>
                                         </ul>
                                     </div>
@@ -585,4 +585,6 @@
         </div>
     </section>
 </main>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('frontend.layout.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\Tinnity_ecom\resources\views/frontend/order-success.blade.php ENDPATH**/ ?>

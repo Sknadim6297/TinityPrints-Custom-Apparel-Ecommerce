@@ -20,7 +20,7 @@ Route::get('/custom-design', [CustomDesignController::class, 'create'])->name('c
 Route::middleware('auth')->group(function () {
     Route::post('/custom-design', [CustomDesignController::class, 'store'])->name('custom-design.store');
     Route::get('/custom-design/{design}', [CustomDesignController::class, 'show'])->name('custom-design.show');
-    Route::post('/custom-design/{design}', [CustomDesignController::class, 'update'])->name('custom-design.update');
+    Route::match(['post', 'put'], '/custom-design/{design}', [CustomDesignController::class, 'update'])->name('custom-design.update');
     Route::get('/custom-design/{design}/download/{fileType}', [CustomDesignController::class, 'download'])
         ->whereIn('fileType', ['front', 'back'])
         ->name('custom-design.download');
