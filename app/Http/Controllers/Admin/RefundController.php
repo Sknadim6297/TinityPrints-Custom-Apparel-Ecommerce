@@ -11,13 +11,56 @@ use Illuminate\Validation\ValidationException;
 
 class RefundController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $refunds = RefundRequest::with(['order.items.product', 'order.user'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(12);
+        $search = trim((string) $request->input('search', ''));
+        $status = $request->input('status');
+        $dateFrom = $request->input('date_from');
+        $dateTo = $request->input('date_to');
+        $statusOptions = RefundRequest::statusOptions();
 
-        return view('admin.refunds.index', compact('refunds'));
+        $refunds = RefundRequest::query()
+            ->with(['order.items.product', 'order.user'])
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($innerQuery) use ($search) {
+                    $innerQuery->where('ticket_id', 'like', "%{$search}%")
+                        ->orWhere('reason', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%")
+                        ->orWhereHas('order', function ($orderQuery) use ($search) {
+                            $orderQuery->where('order_number', 'like', "%{$search}%")
+                                ->orWhere('customer_name', 'like', "%{$search}%")
+                                ->orWhere('email', 'like', "%{$search}%")
+                                ->orWhere('phone', 'like', "%{$search}%");
+                        });
+                });
+            })
+            ->when(in_array($status, $statusOptions, true), function ($query) use ($status) {
+                $query->where('status', $status);
+            })
+            ->when(!empty($dateFrom), function ($query) use ($dateFrom) {
+                $query->whereDate('created_at', '>=', $dateFrom);
+            })
+            ->when(!empty($dateTo), function ($query) use ($dateTo) {
+                $query->whereDate('created_at', '<=', $dateTo);
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(12)
+            ->withQueryString();
+
+        return view('admin.refunds.index', compact(
+            'refunds',
+            'search',
+            'status',
+            'dateFrom',
+            'dateTo',
+            'statusOptions'
+        ));
+    }
+
+    public function show(RefundRequest $refund)
+    {
+        $refund->load(['order.items.product', 'order.user']);
+        return view('admin.refunds.show', compact('refund'));
     }
 
     public function approve(Request $request, RefundRequest $refund)
@@ -32,7 +75,7 @@ class RefundController extends Controller
         $this->syncOrderStatus($refund);
         $this->notifyCustomer($refund);
 
-        return redirect()->route('admin.refunds.index')
+        return redirect()->route('admin.refunds.show', $refund)
             ->with('success', 'Refund approved successfully.');
     }
 
@@ -52,7 +95,7 @@ class RefundController extends Controller
         $this->syncOrderStatus($refund);
         $this->notifyCustomer($refund);
 
-        return redirect()->route('admin.refunds.index')
+        return redirect()->route('admin.refunds.show', $refund)
             ->with('success', 'Refund rejected successfully.');
     }
 
@@ -69,7 +112,7 @@ class RefundController extends Controller
         $this->syncOrderStatus($refund);
         $this->notifyCustomer($refund);
 
-        return redirect()->route('admin.refunds.index')
+        return redirect()->route('admin.refunds.show', $refund)
             ->with('success', 'Refund status updated successfully.');
     }
 
@@ -93,7 +136,7 @@ class RefundController extends Controller
         $this->syncOrderStatus($refund);
         $this->notifyCustomer($refund);
 
-        return redirect()->route('admin.refunds.index')
+        return redirect()->route('admin.refunds.show', $refund)
             ->with('success', 'Refund payment processed successfully.');
     }
 
@@ -114,7 +157,7 @@ class RefundController extends Controller
         $this->syncOrderStatus($refund);
         $this->notifyCustomer($refund);
 
-        return redirect()->route('admin.refunds.index')
+        return redirect()->route('admin.refunds.show', $refund)
             ->with('success', 'Return handling has been started.');
     }
 
@@ -133,7 +176,7 @@ class RefundController extends Controller
         $this->syncOrderStatus($refund);
         $this->notifyCustomer($refund);
 
-        return redirect()->route('admin.refunds.index')
+        return redirect()->route('admin.refunds.show', $refund)
             ->with('success', 'Product marked as received.');
     }
 
@@ -157,7 +200,7 @@ class RefundController extends Controller
         $this->syncOrderStatus($refund);
         $this->notifyCustomer($refund);
 
-        return redirect()->route('admin.refunds.index')
+        return redirect()->route('admin.refunds.show', $refund)
             ->with('success', 'Refund completed successfully.');
     }
 
@@ -179,7 +222,7 @@ class RefundController extends Controller
             ['refund_id' => $refund->id, 'order_number' => $orderNumber]
         );
 
-        return redirect()->route('admin.refunds.index')
+        return redirect()->route('admin.refunds.show', $refund)
             ->with('success', 'Refund notification sent.');
     }
 

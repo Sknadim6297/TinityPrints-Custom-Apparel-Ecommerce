@@ -1,6 +1,4 @@
-@extends('admin.layouts.admin-app')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="py-6 md:py-12">
     <div class="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8">
         <div class="mb-6 md:mb-8">
@@ -10,20 +8,22 @@
             </p>
         </div>
 
-        @if(session('success'))
+        <?php if(session('success')): ?>
             <div class="mb-6 p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-300">
-                {{ session('success') }}
-            </div>
-        @endif
+                <?php echo e(session('success')); ?>
 
-        @if($errors->any())
-            <div class="mb-6 p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300">
-                {{ $errors->first() }}
             </div>
-        @endif
+        <?php endif; ?>
+
+        <?php if($errors->any()): ?>
+            <div class="mb-6 p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300">
+                <?php echo e($errors->first()); ?>
+
+            </div>
+        <?php endif; ?>
 
         <div class="mb-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
-            <form action="{{ route('admin.refunds.index') }}" method="GET" class="space-y-4">
+            <form action="<?php echo e(route('admin.refunds.index')); ?>" method="GET" class="space-y-4">
                 <!-- Search Row -->
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Search Refunds</label>
@@ -31,7 +31,7 @@
                         type="text"
                         name="search"
                         placeholder="Search by ticket ID, order number, customer name, email, phone, or reason..."
-                        value="{{ $search ?? '' }}"
+                        value="<?php echo e($search ?? ''); ?>"
                         class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 text-sm"
                     >
                 </div>
@@ -42,11 +42,12 @@
                         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Refund Status</label>
                         <select name="status" class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm">
                             <option value="">All Statuses</option>
-                            @foreach(($statusOptions ?? []) as $statusOption)
-                                <option value="{{ $statusOption }}" {{ ($status ?? '') === $statusOption ? 'selected' : '' }}>
-                                    {{ ucwords(str_replace('_', ' ', $statusOption)) }}
+                            <?php $__currentLoopData = ($statusOptions ?? []); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $statusOption): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($statusOption); ?>" <?php echo e(($status ?? '') === $statusOption ? 'selected' : ''); ?>>
+                                    <?php echo e(ucwords(str_replace('_', ' ', $statusOption))); ?>
+
                                 </option>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </select>
                     </div>
 
@@ -55,7 +56,7 @@
                         <input
                             type="date"
                             name="date_from"
-                            value="{{ $dateFrom ?? '' }}"
+                            value="<?php echo e($dateFrom ?? ''); ?>"
                             class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm"
                         >
                     </div>
@@ -65,7 +66,7 @@
                         <input
                             type="date"
                             name="date_to"
-                            value="{{ $dateTo ?? '' }}"
+                            value="<?php echo e($dateTo ?? ''); ?>"
                             class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm"
                         >
                     </div>
@@ -77,21 +78,21 @@
                         <i class="fa fa-search mr-2"></i>
                         Apply Filters
                     </button>
-                    @if(($search ?? '') !== '' || ($status ?? '') !== '' || ($dateFrom ?? '') !== '' || ($dateTo ?? '') !== '')
-                        <a href="{{ route('admin.refunds.index') }}" class="inline-flex items-center px-6 py-2.5 bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-lg transition-colors text-sm font-semibold">
+                    <?php if(($search ?? '') !== '' || ($status ?? '') !== '' || ($dateFrom ?? '') !== '' || ($dateTo ?? '') !== ''): ?>
+                        <a href="<?php echo e(route('admin.refunds.index')); ?>" class="inline-flex items-center px-6 py-2.5 bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-lg transition-colors text-sm font-semibold">
                             <i class="fa fa-times mr-2"></i>
                             Clear Filters
                         </a>
-                    @endif
+                    <?php endif; ?>
                 </div>
             </form>
         </div>
 
-        @if($refunds->count() === 0)
+        <?php if($refunds->count() === 0): ?>
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-300">
                 No refund requests found.
             </div>
-        @else
+        <?php else: ?>
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full">
@@ -107,8 +108,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($refunds as $refund)
-                                @php
+                            <?php $__currentLoopData = $refunds; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $refund): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <?php
                                     $statusColors = [
                                         'refund_requested' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
                                         'under_review' => 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
@@ -120,31 +121,33 @@
                                         'refund_completed' => 'bg-green-200 text-green-900 dark:bg-green-900/40 dark:text-green-300',
                                     ];
                                     $statusColor = $statusColors[$refund->status] ?? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
-                                @endphp
+                                ?>
                                 <tr class="border-b border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                                     <td class="px-4 sm:px-6 py-3 whitespace-nowrap align-middle text-sm font-semibold text-gray-900 dark:text-gray-100">
-                                        <div class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ $refund->ticket_id ?? ('RFD-#' . $refund->id) }}</div>
+                                        <div class="text-sm font-semibold text-gray-900 dark:text-gray-100"><?php echo e($refund->ticket_id ?? ('RFD-#' . $refund->id)); ?></div>
                                     </td>
                                     <td class="px-4 sm:px-6 py-3 align-middle">
-                                        <div class="text-sm font-medium text-gray-900 dark:text-gray-100 leading-tight">{{ $refund->order?->order_number ?? 'N/A' }}</div>
+                                        <div class="text-sm font-medium text-gray-900 dark:text-gray-100 leading-tight"><?php echo e($refund->order?->order_number ?? 'N/A'); ?></div>
                                     </td>
                                     <td class="px-4 sm:px-6 py-3 align-middle">
-                                        <div class="text-sm font-medium text-gray-900 dark:text-gray-100 leading-tight">{{ $refund->order?->customer_name ?? 'N/A' }}</div>
-                                        <div class="text-xs text-gray-500 dark:text-gray-400 leading-tight mt-0.5">{{ $refund->order?->email ?? '' }}</div>
+                                        <div class="text-sm font-medium text-gray-900 dark:text-gray-100 leading-tight"><?php echo e($refund->order?->customer_name ?? 'N/A'); ?></div>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400 leading-tight mt-0.5"><?php echo e($refund->order?->email ?? ''); ?></div>
                                     </td>
                                     <td class="px-4 sm:px-6 py-3 align-middle">
-                                        <div class="text-sm text-gray-900 dark:text-gray-100">{{ Str::limit($refund->reason, 30) }}</div>
+                                        <div class="text-sm text-gray-900 dark:text-gray-100"><?php echo e(Str::limit($refund->reason, 30)); ?></div>
                                     </td>
                                     <td class="px-4 sm:px-6 py-3 whitespace-nowrap align-middle">
-                                        <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusColor }}">
-                                            {{ ucwords(str_replace('_', ' ', $refund->status)) }}
+                                        <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full <?php echo e($statusColor); ?>">
+                                            <?php echo e(ucwords(str_replace('_', ' ', $refund->status))); ?>
+
                                         </span>
                                     </td>
                                     <td class="px-4 sm:px-6 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 align-middle">
-                                        {{ $refund->created_at->format('M d, Y') }}
+                                        <?php echo e($refund->created_at->format('M d, Y')); ?>
+
                                     </td>
                                     <td class="px-4 sm:px-6 py-3 whitespace-nowrap text-center align-middle">
-                                        <a href="{{ route('admin.refunds.show', $refund) }}" 
+                                        <a href="<?php echo e(route('admin.refunds.show', $refund)); ?>" 
                                            class="inline-flex items-center px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-md hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors text-xs font-medium" 
                                            title="View Details">
                                             <i class="fa fa-eye text-base"></i>
@@ -152,16 +155,19 @@
                                         </a>
                                     </td>
                                 </tr>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </tbody>
                     </table>
                 </div>
             </div>
 
             <div class="mt-6">
-                {{ $refunds->links() }}
+                <?php echo e($refunds->links()); ?>
+
             </div>
-        @endif
+        <?php endif; ?>
     </div>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('admin.layouts.admin-app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\Tinnity_ecom\resources\views/admin/refunds/index.blade.php ENDPATH**/ ?>
