@@ -107,12 +107,16 @@
                            </div>
                         </div>
                         <div class="sing-buttom mb-20">
+                           <!-- Store redirect URL if provided in query string -->
+                           @if(request('redirect_to'))
+                              <input type="hidden" name="redirect_to" value="{{ request('redirect_to') }}">
+                           @endif
                            <button type="submit" class="sing-btn">Login</button>
                         </div>
                      </form>
                      <div class="registered wrapper">
                         <div class="not-register">
-                           <span>Not registered?</span><span><a href="/register">Sign up</a></span>
+                           <span>Not registered?</span><span><a href="{{ route('register', request('redirect_to') ? ['redirect_to' => request('redirect_to')] : []) }}">Sign up</a></span>
                         </div>
                         <div class="forget-password">
                            <a href="/forgot-password">Forgot password?</a>

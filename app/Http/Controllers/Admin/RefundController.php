@@ -106,11 +106,24 @@ class RefundController extends Controller
             'admin_note' => 'nullable|string|max:1000',
         ]);
 
-        $updates = $this->buildStatusUpdatePayload($refund, $validated['status'], $validated['admin_note'] ?? null);
+        // Check if status actually changed
+        $oldStatus = $refund->status;
+        $newStatus = $validated['status'];
+        
+        if ($oldStatus === $newStatus && empty($validated['admin_note'])) {
+            return redirect()->route('admin.refunds.show', $refund)
+                ->with('success', 'No changes were made.');
+        }
+
+        $updates = $this->buildStatusUpdatePayload($refund, $newStatus, $validated['admin_note'] ?? null);
 
         $refund->update($updates);
-        $this->syncOrderStatus($refund);
-        $this->notifyCustomer($refund);
+        
+        // Only sync order status if status actually changed
+        if ($oldStatus !== $newStatus) {
+            $this->syncOrderStatus($refund);
+            $this->notifyCustomer($refund);
+        }
 
         return redirect()->route('admin.refunds.show', $refund)
             ->with('success', 'Refund status updated successfully.');

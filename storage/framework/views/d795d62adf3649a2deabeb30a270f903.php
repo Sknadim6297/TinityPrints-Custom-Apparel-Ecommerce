@@ -3,7 +3,9 @@
 <?php $__env->startSection('title', 'Custom Design - Tinnity'); ?>
 
 <?php $__env->startSection('content'); ?>
-<?php ($frontendAsset = asset('frontend/assets')); ?>
+<?php
+    $frontendAsset = asset('frontend/assets');
+?>
 
 <style>
 .custom-design-area {
@@ -378,6 +380,44 @@
     color: #9f6300;
 }
 
+.status-badge.payment_pending {
+    background: #fff4dd;
+    color: #9f6300;
+}
+
+.status-badge.paid {
+    background: #e9f7ef;
+    color: #18834f;
+}
+
+.status-badge.printing,
+.status-badge.packed {
+    background: #ece9ff;
+    color: #4b3db4;
+}
+
+.status-badge.shipped {
+    background: #e8f3ff;
+    color: #1f6fc7;
+}
+
+.status-badge.delivered {
+    background: #e7faef;
+    color: #0d8a44;
+}
+
+.status-badge.refund_requested,
+.status-badge.under_review,
+.status-badge.refund_approved,
+.status-badge.refund_rejected,
+.status-badge.return_in_process,
+.status-badge.product_received,
+.status-badge.refund_completed,
+.status-badge.refunded {
+    background: #fff0f0;
+    color: #b73a3a;
+}
+
 .table-view-link {
     color: var(--clr-common-heading);
     font-weight: 700;
@@ -689,27 +729,51 @@ unset($__errorArgs, $__bag); ?>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php $__currentLoopData = $userDesigns; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $design): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <?php $__empty_1 = true; $__currentLoopData = $userDesigns; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $design): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                        <?php
+                                            $frontPath = $design->front_design_file ?: $design->design_file_path;
+                                            $frontExt = $frontPath ? strtolower(pathinfo($frontPath, PATHINFO_EXTENSION)) : null;
+                                            $frontIsImage = in_array($frontExt, ['png', 'jpg', 'jpeg', 'webp'], true);
+
+                                            $backPath = $design->back_design_file;
+                                            $backExt = $backPath ? strtolower(pathinfo($backPath, PATHINFO_EXTENSION)) : null;
+                                            $backIsImage = in_array($backExt, ['png', 'jpg', 'jpeg', 'webp'], true);
+
+                                            $displayStatus = $design->order ? $design->order->order_status : $design->status;
+                                        ?>
                                         <tr>
                                             <td>#<?php echo e($design->id); ?></td>
                                             <td><?php echo e(strtoupper($design->selected_size)); ?></td>
                                             <td>
-                                                <span>Front: <?php echo e($design->front_label ?: 'F'); ?></span>
-                                                <?php if($design->back_design_file): ?>
-                                                    <span class="d-block">Back: <?php echo e($design->back_label ?: 'B'); ?></span>
-                                                <?php else: ?>
-                                                    <span class="d-block text-muted">Back: Not uploaded</span>
+                                                <?php if($frontPath && $frontIsImage): ?>
+                                                    <a href="<?php echo e(\Illuminate\Support\Facades\Storage::url($frontPath)); ?>" target="_blank" class="d-inline-block me-2" title="Front Design">
+                                                        <img src="<?php echo e(\Illuminate\Support\Facades\Storage::url($frontPath)); ?>" alt="Front Design" style="width: 38px; height: 38px; object-fit: cover; border-radius: 6px; border: 1px solid #ddd;">
+                                                    </a>
+                                                <?php elseif($frontPath): ?>
+                                                    <a href="<?php echo e(\Illuminate\Support\Facades\Storage::url($frontPath)); ?>" target="_blank" class="d-inline-block me-2 text-muted" title="Front Design File">Front File</a>
+                                                <?php endif; ?>
+
+                                                <?php if($backPath && $backIsImage): ?>
+                                                    <a href="<?php echo e(\Illuminate\Support\Facades\Storage::url($backPath)); ?>" target="_blank" class="d-inline-block" title="Back Design">
+                                                        <img src="<?php echo e(\Illuminate\Support\Facades\Storage::url($backPath)); ?>" alt="Back Design" style="width: 38px; height: 38px; object-fit: cover; border-radius: 6px; border: 1px solid #ddd;">
+                                                    </a>
+                                                <?php elseif($backPath): ?>
+                                                    <a href="<?php echo e(\Illuminate\Support\Facades\Storage::url($backPath)); ?>" target="_blank" class="d-inline-block text-muted" title="Back Design File">Back File</a>
+                                                <?php endif; ?>
+
+                                                <?php if(!$frontPath && !$backPath): ?>
+                                                    <span class="text-muted">No file</span>
                                                 <?php endif; ?>
                                             </td>
-                                            <td>
-                                                <span class="status-badge <?php echo e($design->status); ?>"><?php echo e(str_replace('_', ' ', $design->status)); ?></span>
-                                            </td>
+                                            <td><span class="status-badge <?php echo e($displayStatus); ?>"><?php echo e(ucwords(str_replace('_', ' ', $displayStatus))); ?></span></td>
                                             <td><?php echo e($design->created_at->format('M d, Y')); ?></td>
-                                            <td>
-                                                <a class="table-view-link" href="<?php echo e(route('custom-design.show', $design)); ?>">View</a>
-                                            </td>
+                                            <td><a class="table-view-link" href="<?php echo e(route('custom-design.show', $design)); ?>">View</a></td>
                                         </tr>
-                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                        <tr>
+                                            <td colspan="6" class="text-center text-muted">No design requests found.</td>
+                                        </tr>
+                                    <?php endif; ?>
                                 </tbody>
                             </table>
                         </div>
@@ -723,8 +787,8 @@ unset($__errorArgs, $__bag); ?>
                             <h2 class="mt-25 mb-15">Sign In Required</h2>
                             <p class="mb-30">You must be logged in to submit a custom design. Sign in to continue or create a new account.</p>
                             <div class="form-actions justify-content-center">
-                                <a href="<?php echo e(route('login')); ?>" class="custom-btn custom-btn-primary"><i class="fal fa-sign-in-alt"></i> Sign In</a>
-                                <a href="<?php echo e(route('register')); ?>" class="custom-btn custom-btn-outline"><i class="fal fa-user-plus"></i> Create Account</a>
+                                <a href="<?php echo e(route('login', ['redirect_to' => request()->fullUrl()])); ?>" class="custom-btn custom-btn-primary"><i class="fal fa-sign-in-alt"></i> Sign In</a>
+                                <a href="<?php echo e(route('register', ['redirect_to' => request()->fullUrl()])); ?>" class="custom-btn custom-btn-outline"><i class="fal fa-user-plus"></i> Create Account</a>
                             </div>
                         </div>
                     </div>

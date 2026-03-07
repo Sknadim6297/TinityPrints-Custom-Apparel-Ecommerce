@@ -31,7 +31,8 @@
                                $('body').find('a[href*="logout"]').length > 0;
         
         if (!isAuthenticated) {
-            window.location.href = '/login';
+            // Store the intended URL and redirect through auth
+            window.location.href = '/login?redirect_to=' + encodeURIComponent(window.location.href);
             return false;
         }
 
@@ -99,7 +100,8 @@
                                $('body').find('a[href*="logout"]').length > 0;
         
         if (!isAuthenticated) {
-            window.location.href = '/login';
+            // Store the intended URL and redirect through auth
+            window.location.href = '/login?redirect_to=' + encodeURIComponent(window.location.href);
             return false;
         }
 

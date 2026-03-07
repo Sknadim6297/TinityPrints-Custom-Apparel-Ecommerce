@@ -35,7 +35,7 @@ class OrderController extends Controller
 
     public function show(Order $order)
     {
-        $order->load(['product', 'designRequest', 'items.product', 'user']);
+        $order->load(['product', 'designRequest', 'items.product.images', 'user']);
         
         return view('admin.orders.show', compact('order'));
     }
@@ -73,7 +73,10 @@ class OrderController extends Controller
         }
 
         if ($order->order_status === 'delivered') {
-            $order->update(['delivery_status' => 'delivered']);
+            $order->update([
+                'delivery_status' => 'delivered',
+                'delivered_date' => $order->delivered_date ?? now(),
+            ]);
         }
 
         if ($previousPaymentStatus !== 'paid' && $order->payment_status === 'paid') {

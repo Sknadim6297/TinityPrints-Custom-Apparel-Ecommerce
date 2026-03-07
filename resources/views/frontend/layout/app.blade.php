@@ -11,8 +11,8 @@
    <meta name="csrf-token" content="{{ csrf_token() }}">
    <meta name="user-auth" content="{{ Auth::check() ? 'true' : 'false' }}">
    
-   <!-- Place favicon.ico in the root directory -->
-   <link rel="shortcut icon" type="image/x-icon" href="{{ asset('frontend/assets/img/favicon.png') }}">
+   <link rel="icon" type="image/png" href="{{ asset('frontend/assets/img/logo/logo.png') }}">
+   <link rel="shortcut icon" type="image/png" href="{{ asset('frontend/assets/img/logo/logo.png') }}">
    
    <!-- CSS here -->
    <link rel="stylesheet" href="{{ asset('frontend/assets/css/bootstrap.min.css') }}">

@@ -55,7 +55,8 @@
                                 <th class="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">Amount</th>
                                 <th class="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">Status</th>
                                 <th class="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">Payment</th>
-                                <th class="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">Date</th>
+                                <th class="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">Order Date</th>
+                                <th class="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">Delivered Date</th>
                                 <th class="px-4 sm:px-6 py-3 text-center text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">Actions</th>
                             </tr>
                         </thead>
@@ -109,7 +110,16 @@
                                         </span>
                                     </td>
                                     <td class="px-4 sm:px-6 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 align-middle">
-                                        {{ $order->created_at->format('M d, Y') }}
+                                        <div class="text-sm text-gray-900 dark:text-gray-100">{{ $order->created_at->format('M d, Y') }}</div>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400">{{ $order->created_at->format('h:i A') }}</div>
+                                    </td>
+                                    <td class="px-4 sm:px-6 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 align-middle">
+                                        @if($order->delivered_date)
+                                            <div class="text-sm text-green-600 dark:text-green-400">{{ $order->delivered_date->format('M d, Y') }}</div>
+                                            <div class="text-xs text-gray-500 dark:text-gray-400">{{ $order->delivered_date->format('h:i A') }}</div>
+                                        @else
+                                            <span class="text-sm text-gray-400 dark:text-gray-600">Not delivered</span>
+                                        @endif
                                     </td>
                                     <td class="px-4 sm:px-6 py-3 whitespace-nowrap text-center align-middle">
                                         <a href="{{ route('admin.orders.show', $order) }}" 

@@ -1,7 +1,7 @@
 @extends('frontend.layout.app')
 
 @section('title', 'About Us')
-
+@php($frontendAsset = asset('frontend/assets'))
 @section('content')
 <main>
 
@@ -110,7 +110,9 @@
       <!-- side toggle end -->
 
       <!-- page title area start  -->
-      <section class="page-title-area" data-background="{{ asset('frontend/assets/img/banner/banner-1-1.jpg') }}">
+    
+<!-- page title area start  -->
+     <section class="page-title-area" data-background="{{ $frontendAsset }}/img/banner/banner-1-1.jpeg">
          <div class="container">
             <div class="row">
                <div class="col-lg-12">

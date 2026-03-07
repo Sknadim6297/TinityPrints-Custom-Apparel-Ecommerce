@@ -1,0 +1,1 @@
+<?php /**PATH C:\xampp\htdocs\Tinnity_ecom\resources\views\admin\settings\index.blade.php ENDPATH**/ ?>

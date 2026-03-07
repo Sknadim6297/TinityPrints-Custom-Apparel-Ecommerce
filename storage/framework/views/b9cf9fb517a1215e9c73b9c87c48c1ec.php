@@ -11,8 +11,8 @@
    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
    <meta name="user-auth" content="<?php echo e(Auth::check() ? 'true' : 'false'); ?>">
    
-   <!-- Place favicon.ico in the root directory -->
-   <link rel="shortcut icon" type="image/x-icon" href="<?php echo e(asset('frontend/assets/img/favicon.png')); ?>">
+   <link rel="icon" type="image/png" href="<?php echo e(asset('frontend/assets/img/logo/logo.png')); ?>">
+   <link rel="shortcut icon" type="image/png" href="<?php echo e(asset('frontend/assets/img/logo/logo.png')); ?>">
    
    <!-- CSS here -->
    <link rel="stylesheet" href="<?php echo e(asset('frontend/assets/css/bootstrap.min.css')); ?>">

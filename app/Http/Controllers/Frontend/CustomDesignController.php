@@ -18,6 +18,7 @@ class CustomDesignController extends Controller
         $userDesigns = null;
         if (Auth::check()) {
             $userDesigns = DesignRequest::where('user_id', Auth::id())
+                ->with('order')
                 ->latest()
                 ->get();
         }

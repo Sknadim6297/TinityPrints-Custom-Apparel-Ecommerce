@@ -68,13 +68,22 @@
                     @if($order->items && $order->items->count() > 0)
                         <div class="space-y-3">
                             @foreach($order->items as $item)
+                                @php
+                                    $productImage = optional(optional($item->product)->images)->first();
+                                    $itemImageUrl = $productImage
+                                        ? \Illuminate\Support\Facades\Storage::url($productImage->image_path)
+                                        : asset('frontend/assets/img/product/default.jpg');
+                                @endphp
                                 <div class="flex justify-between items-start p-3 bg-gray-50 dark:bg-gray-700/40 rounded-lg border border-gray-200 dark:border-gray-600">
-                                    <div class="flex-1">
-                                        <p class="font-semibold text-gray-900 dark:text-gray-100">{{ $item->product_name }}</p>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                            @if($item->size) Size: {{ $item->size }} @endif
-                                            @if($item->color_name) • Color: {{ $item->color_name }} @endif
-                                        </p>
+                                    <div class="flex items-start space-x-3 flex-1">
+                                        <img src="{{ $itemImageUrl }}" alt="{{ $item->product_name }}" class="w-16 h-16 object-cover rounded-lg border border-gray-200 dark:border-gray-600">
+                                        <div class="flex-1">
+                                            <p class="font-semibold text-gray-900 dark:text-gray-100">{{ $item->product_name }}</p>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                                @if($item->size) Size: {{ $item->size }} @endif
+                                                @if($item->color_name) • Color: {{ $item->color_name }} @endif
+                                            </p>
+                                        </div>
                                     </div>
                                     <div class="text-right ml-4">
                                         <p class="font-semibold text-gray-900 dark:text-gray-100">₹{{ number_format($item->price, 2) }} × {{ $item->quantity }}</p>

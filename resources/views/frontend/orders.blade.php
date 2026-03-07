@@ -73,7 +73,7 @@
                                           'delivered' => ['badge' => 'success', 'icon' => 'fa-check-circle', 'text' => 'Delivered'],
                                           'shipped' => ['badge' => 'info', 'icon' => 'fa-truck', 'text' => 'Shipped'],
                                           'packed' => ['badge' => 'primary', 'icon' => 'fa-box', 'text' => 'Packed'],
-                                          'printing' => ['badge' => 'primary', 'icon' => 'fa-cogs', 'text' => 'Processing'],
+                                          'printing' => ['badge' => 'primary', 'icon' => 'fa-cogs', 'text' => 'Printing'],
                                           'paid' => ['badge' => 'success', 'icon' => 'fa-check', 'text' => 'Confirmed'],
                                           'payment_pending' => ['badge' => 'warning', 'icon' => 'fa-clock', 'text' => 'Pending Payment'],
                                           'under_review' => ['badge' => 'primary', 'icon' => 'fa-search', 'text' => 'Under Review'],
@@ -148,9 +148,12 @@
                                     @foreach($order->items as $item)
                                        @php
                                           $productImage = optional(optional($item->product)->images)->first();
+                                          $designImagePath = optional($order->designRequest)->front_design_file;
                                           $itemImageUrl = $productImage
                                              ? \Illuminate\Support\Facades\Storage::url($productImage->image_path)
-                                             : asset('frontend/assets/img/product/default.jpg');
+                                             : ($designImagePath
+                                                ? \Illuminate\Support\Facades\Storage::url($designImagePath)
+                                                : asset('frontend/assets/img/product/default.jpg'));
                                        @endphp
                                        <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
                                           <img src="{{ $itemImageUrl }}" 

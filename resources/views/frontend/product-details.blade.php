@@ -654,6 +654,31 @@
    <!-- Product Details JavaScript -->
    <script>
       document.addEventListener('DOMContentLoaded', function() {
+         // Quantity button functionality
+         const quantityInput = document.getElementById('product-quantity');
+         const plusButton = document.querySelector('.cart-plus');
+         const minusButton = document.querySelector('.cart-minus');
+         
+         // Handle quantity increase
+         if (plusButton) {
+            plusButton.addEventListener('click', function(e) {
+               e.preventDefault();
+               let currentQty = parseInt(quantityInput.value) || 1;
+               quantityInput.value = currentQty + 1;
+            });
+         }
+         
+         // Handle quantity decrease
+         if (minusButton) {
+            minusButton.addEventListener('click', function(e) {
+               e.preventDefault();
+               let currentQty = parseInt(quantityInput.value) || 1;
+               if (currentQty > 1) {
+                  quantityInput.value = currentQty - 1;
+               }
+            });
+         }
+         
          // Size and Color Selection
          const sizeOptions = document.querySelectorAll('.size-option');
          const colorOptions = document.querySelectorAll('.color-option');

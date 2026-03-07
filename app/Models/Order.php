@@ -36,6 +36,7 @@ class Order extends Model
         'shipping_method',
         'tracking_number',
         'delivery_status',
+        'delivered_date',
     ];
 
     protected $casts = [
@@ -44,6 +45,7 @@ class Order extends Model
         'subtotal' => 'decimal:2',
         'discount_amount' => 'decimal:2',
         'total_amount' => 'decimal:2',
+        'delivered_date' => 'datetime',
     ];
 
     public function user()

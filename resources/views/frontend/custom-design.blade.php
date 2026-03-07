@@ -3,7 +3,9 @@
 @section('title', 'Custom Design - Tinnity')
 
 @section('content')
-@php($frontendAsset = asset('frontend/assets'))
+@php
+    $frontendAsset = asset('frontend/assets');
+@endphp
 
 <style>
 .custom-design-area {
@@ -378,6 +380,44 @@
     color: #9f6300;
 }
 
+.status-badge.payment_pending {
+    background: #fff4dd;
+    color: #9f6300;
+}
+
+.status-badge.paid {
+    background: #e9f7ef;
+    color: #18834f;
+}
+
+.status-badge.printing,
+.status-badge.packed {
+    background: #ece9ff;
+    color: #4b3db4;
+}
+
+.status-badge.shipped {
+    background: #e8f3ff;
+    color: #1f6fc7;
+}
+
+.status-badge.delivered {
+    background: #e7faef;
+    color: #0d8a44;
+}
+
+.status-badge.refund_requested,
+.status-badge.under_review,
+.status-badge.refund_approved,
+.status-badge.refund_rejected,
+.status-badge.return_in_process,
+.status-badge.product_received,
+.status-badge.refund_completed,
+.status-badge.refunded {
+    background: #fff0f0;
+    color: #b73a3a;
+}
+
 .table-view-link {
     color: var(--clr-common-heading);
     font-weight: 700;
@@ -626,27 +666,51 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($userDesigns as $design)
+                                    @forelse($userDesigns as $design)
+                                        @php
+                                            $frontPath = $design->front_design_file ?: $design->design_file_path;
+                                            $frontExt = $frontPath ? strtolower(pathinfo($frontPath, PATHINFO_EXTENSION)) : null;
+                                            $frontIsImage = in_array($frontExt, ['png', 'jpg', 'jpeg', 'webp'], true);
+
+                                            $backPath = $design->back_design_file;
+                                            $backExt = $backPath ? strtolower(pathinfo($backPath, PATHINFO_EXTENSION)) : null;
+                                            $backIsImage = in_array($backExt, ['png', 'jpg', 'jpeg', 'webp'], true);
+
+                                            $displayStatus = $design->order ? $design->order->order_status : $design->status;
+                                        @endphp
                                         <tr>
                                             <td>#{{ $design->id }}</td>
                                             <td>{{ strtoupper($design->selected_size) }}</td>
                                             <td>
-                                                <span>Front: {{ $design->front_label ?: 'F' }}</span>
-                                                @if($design->back_design_file)
-                                                    <span class="d-block">Back: {{ $design->back_label ?: 'B' }}</span>
-                                                @else
-                                                    <span class="d-block text-muted">Back: Not uploaded</span>
+                                                @if($frontPath && $frontIsImage)
+                                                    <a href="{{ \Illuminate\Support\Facades\Storage::url($frontPath) }}" target="_blank" class="d-inline-block me-2" title="Front Design">
+                                                        <img src="{{ \Illuminate\Support\Facades\Storage::url($frontPath) }}" alt="Front Design" style="width: 38px; height: 38px; object-fit: cover; border-radius: 6px; border: 1px solid #ddd;">
+                                                    </a>
+                                                @elseif($frontPath)
+                                                    <a href="{{ \Illuminate\Support\Facades\Storage::url($frontPath) }}" target="_blank" class="d-inline-block me-2 text-muted" title="Front Design File">Front File</a>
+                                                @endif
+
+                                                @if($backPath && $backIsImage)
+                                                    <a href="{{ \Illuminate\Support\Facades\Storage::url($backPath) }}" target="_blank" class="d-inline-block" title="Back Design">
+                                                        <img src="{{ \Illuminate\Support\Facades\Storage::url($backPath) }}" alt="Back Design" style="width: 38px; height: 38px; object-fit: cover; border-radius: 6px; border: 1px solid #ddd;">
+                                                    </a>
+                                                @elseif($backPath)
+                                                    <a href="{{ \Illuminate\Support\Facades\Storage::url($backPath) }}" target="_blank" class="d-inline-block text-muted" title="Back Design File">Back File</a>
+                                                @endif
+
+                                                @if(!$frontPath && !$backPath)
+                                                    <span class="text-muted">No file</span>
                                                 @endif
                                             </td>
-                                            <td>
-                                                <span class="status-badge {{ $design->status }}">{{ str_replace('_', ' ', $design->status) }}</span>
-                                            </td>
+                                            <td><span class="status-badge {{ $displayStatus }}">{{ ucwords(str_replace('_', ' ', $displayStatus)) }}</span></td>
                                             <td>{{ $design->created_at->format('M d, Y') }}</td>
-                                            <td>
-                                                <a class="table-view-link" href="{{ route('custom-design.show', $design) }}">View</a>
-                                            </td>
+                                            <td><a class="table-view-link" href="{{ route('custom-design.show', $design) }}">View</a></td>
                                         </tr>
-                                    @endforeach
+                                    @empty
+                                        <tr>
+                                            <td colspan="6" class="text-center text-muted">No design requests found.</td>
+                                        </tr>
+                                    @endforelse
                                 </tbody>
                             </table>
                         </div>
@@ -660,8 +724,8 @@
                             <h2 class="mt-25 mb-15">Sign In Required</h2>
                             <p class="mb-30">You must be logged in to submit a custom design. Sign in to continue or create a new account.</p>
                             <div class="form-actions justify-content-center">
-                                <a href="{{ route('login') }}" class="custom-btn custom-btn-primary"><i class="fal fa-sign-in-alt"></i> Sign In</a>
-                                <a href="{{ route('register') }}" class="custom-btn custom-btn-outline"><i class="fal fa-user-plus"></i> Create Account</a>
+                                <a href="{{ route('login', ['redirect_to' => request()->fullUrl()]) }}" class="custom-btn custom-btn-primary"><i class="fal fa-sign-in-alt"></i> Sign In</a>
+                                <a href="{{ route('register', ['redirect_to' => request()->fullUrl()]) }}" class="custom-btn custom-btn-outline"><i class="fal fa-user-plus"></i> Create Account</a>
                             </div>
                         </div>
                     </div>

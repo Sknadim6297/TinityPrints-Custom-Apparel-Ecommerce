@@ -36,22 +36,6 @@ Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
 Route::post('/contact', [HomeController::class, 'contactSubmit'])->name('contact.submit');
 Route::post('/contact-store', [ContactController::class, 'store'])->name('contact.store');
 
-// Cart Routes
-Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
-Route::patch('/cart/{id}', [CartController::class, 'update'])->name('cart.update');
-Route::delete('/cart/{id}', [CartController::class, 'destroy'])->name('cart.destroy');
-Route::get('/cart/sidebar-items', [CartController::class, 'getSidebarItems'])->name('cart.sidebar-items');
-Route::post('/cart/apply-coupon', [CartController::class, 'applyCoupon'])->name('cart.apply-coupon');
-Route::get('/cart/available-coupons', [CartController::class, 'getAvailableCoupons'])->name('cart.available-coupons');
-Route::post('/cart/remove-coupon', [CartController::class, 'removeCoupon'])->name('cart.remove-coupon');
-
-// Wishlist Routes
-Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
-Route::post('/wishlist', [WishlistController::class, 'store'])->name('wishlist.store');
-Route::get('/wishlist/sidebar-items', [WishlistController::class, 'getSidebarItems'])->name('wishlist.sidebar-items');
-Route::delete('/wishlist/{id}', [WishlistController::class, 'destroy'])->name('wishlist.destroy');
-
 // Cart Routes (Protected - requires authentication)
 Route::middleware('auth')->group(function () {
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
