@@ -404,57 +404,51 @@
             <div class="section-title mb-55">
                <h2>Related Products</h2>
             </div>
-            <!-- Slider main container -->
-            <div class="swiper-container r-product-active">
-               <!-- Additional required wrapper -->
-               <div class="swiper-wrapper">
-                  @forelse($relatedProducts as $relatedProduct)
-                     <div class="swiper-slide">
-                        <div class="single-product">
-                           <div class="product-image pos-rel">
-                              <a href="{{ route('product.details', $relatedProduct->id) }}" class="">
-                                 @if($relatedProduct->images->first())
-                                    <img src="{{ Storage::url($relatedProduct->images->first()->image_path) }}" alt="{{ $relatedProduct->name }}">
-                                 @else
-                                    <img src="{{ asset('frontend/assets/img/product_category/product-cat-1.jpg') }}" alt="{{ $relatedProduct->name }}">
-                                 @endif
-                              </a>
-                           <div class="product-action">
-                              <a href="{{ route('product.details', $relatedProduct->id) }}" class="quick-view-btn"><i class="fal fa-eye"></i></a>
-                              <button type="button" class="wishlist-btn add-to-wishlist-btn" data-product-id="{{ $relatedProduct->id }}"><i class="fal fa-heart"></i></button>
-                           </div>
-                           <div class="product-action-bottom">
-                              <button type="button" class="add-cart-btn add-to-cart-btn" data-product-id="{{ $relatedProduct->id }}"><i class="fal fa-shopping-bag"></i>Add to Cart</button>
-                           </div>
-                           @if($relatedProduct->is_limited_edition)
-                              <div class="product-sticker-wrapper">
-                                 <span class="product-sticker new">Limited</span>
-                              </div>
-                           @endif
+            <div class="products-wrapper">
+               @forelse($relatedProducts as $relatedProduct)
+                  @php($productImage = optional($relatedProduct->images->first())->image_path)
+                  @php($productColors = ($relatedProduct->colors ?? collect())->where('is_active', true))
+                  <div class="single-product">
+                     <div class="product-image pos-rel">
+                        <a href="{{ route('product.details', $relatedProduct->id) }}">
+                           <img src="{{ $productImage ? Storage::url($productImage) : asset('frontend/assets/img/product/product-img1.jpg') }}" alt="{{ $relatedProduct->name }}">
+                        </a>
+                        <div class="product-action">
+                           <a href="{{ route('product.details', $relatedProduct->id) }}" class="quick-view-btn"><i class="fal fa-eye"></i></a>
+                           <button type="button" class="wishlist-btn add-to-wishlist-btn" data-product-id="{{ $relatedProduct->id }}"><i class="fal fa-heart"></i></button>
                         </div>
-                        <div class="product-desc">
-                           <div class="product-name"><a href="{{ route('product.details', $relatedProduct->id) }}">{{ $relatedProduct->name }}</a></div>
-                           <div class="product-price">
-                              <span class="price-now">INR {{ number_format($relatedProduct->price, 2) }}</span>
-                           </div>
-                           @if($relatedProduct->colors->where('is_active', true)->count() > 0)
-                              <div class="product-color-nav" style="display: flex; gap: 8px; margin-top: 10px;">
-                                 @foreach($relatedProduct->colors->where('is_active', true)->take(4) as $color)
-                                    <div class="color-circle" style="width: 24px; height: 24px; border-radius: 50%; background-color: {{ $color->hex_code }}; border: 2px solid #ddd; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" title="{{ $color->color_name }}"></div>
-                                 @endforeach
-                              </div>
-                           @endif
+                        <div class="product-action-bottom">
+                           <button type="button" class="add-cart-btn add-to-cart-btn" data-product-id="{{ $relatedProduct->id }}"><i class="fal fa-shopping-bag"></i>Add to Cart</button>
                         </div>
+                        @if($relatedProduct->is_limited_edition)
+                           <div class="product-sticker-wrapper">
+                              <span class="product-sticker new">Limited</span>
+                           </div>
+                        @elseif($relatedProduct->created_at >= now()->subDays(30))
+                           <div class="product-sticker-wrapper">
+                              <span class="product-sticker new">New</span>
+                           </div>
+                        @endif
                      </div>
-                  @empty
-                     <div class="col-12 text-center py-50">
-                        <p>No related products found.</p>
+                     <div class="product-desc">
+                        <div class="product-name"><a href="{{ route('product.details', $relatedProduct->id) }}">{{ $relatedProduct->name }}</a></div>
+                        <div class="product-price">
+                           <span class="price-now">INR {{ number_format($relatedProduct->price, 2) }}</span>
+                        </div>
+                        @if($productColors->count() > 0)
+                           <div class="product-color-nav" style="display: flex; gap: 8px; margin-top: 10px;">
+                              @foreach($productColors->take(4) as $color)
+                                 <div class="color-circle" style="width: 24px; height: 24px; border-radius: 50%; background-color: {{ $color->hex_code }}; border: 2px solid #ddd; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" title="{{ $color->color_name }}"></div>
+                              @endforeach
+                           </div>
+                        @endif
                      </div>
-                  @endforelse
-               </div>
-               <!-- If we need pagination -->
-               <div class="testimonial-pagination text-center"></div>
-               <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span>
+                  </div>
+               @empty
+                  <div class="col-12 text-center py-50">
+                     <p>No related products found.</p>
+                  </div>
+               @endforelse
             </div>
          </div>
       </div>
@@ -530,6 +524,60 @@
 
    <!-- Reviews rating CSS -->
    <style>
+      /* Related Products Grid Layout */
+      .related_product .products-wrapper {
+         display: grid;
+         grid-template-columns: repeat(4, 1fr);
+         gap: 30px;
+         margin-bottom: 30px;
+      }
+
+      @media (max-width: 1199px) {
+         .related_product .products-wrapper {
+            grid-template-columns: repeat(3, 1fr);
+         }
+      }
+
+      @media (max-width: 767px) {
+         .related_product .products-wrapper {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+         }
+      }
+
+      @media (max-width: 480px) {
+         .related_product .products-wrapper {
+            grid-template-columns: 1fr;
+         }
+      }
+
+      /* FIX PRODUCT IMAGE SIZE */
+      .related_product .single-product .product-image {
+         width: 100%;
+         height: 320px;
+         overflow: hidden;
+         position: relative;
+      }
+
+      /* IMAGE */
+      .related_product .single-product .product-image img {
+         width: 100%;
+         height: 100%;
+         object-fit: cover;
+         display: block;
+      }
+
+      /* PRODUCT CARD */
+      .related_product .single-product {
+         width: 100%;
+      }
+
+      /* PRODUCT DESCRIPTION */
+      .related_product .product-desc {
+         padding: 15px;
+         text-align: center;
+      }
+
       /* Size Chart Modal Styles */
       .modal-content {
          border-radius: 8px;
