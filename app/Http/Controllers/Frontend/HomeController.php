@@ -188,10 +188,16 @@ class HomeController extends Controller
     public function productDetails($id)
     {
         $product = Product::with(['colors.images', 'sizes'])->findOrFail($id);
-        $relatedProducts = Product::where('id', '!=', $id)
+        $relatedProducts = Product::with(['images', 'colors'])
+            ->where('id', '!=', $id)
             ->where('is_active', true)
+            ->orderByDesc('id')
+            ->get()
+            ->unique(function ($relatedProduct) {
+                return strtolower(trim($relatedProduct->name));
+            })
             ->take(4)
-            ->get();
+            ->values();
 
         return view('frontend.product-details', compact('product', 'relatedProducts'));
     }

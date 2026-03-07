@@ -8,8 +8,10 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\UserAddress;
 use App\Support\AdminNotifier;
+use App\Support\InventoryManager;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class CheckoutController extends Controller
 {
@@ -129,6 +131,9 @@ class CheckoutController extends Controller
             // Generate unique order number
             $orderNumber = 'ORD-' . strtoupper(uniqid());
 
+            // Reserve stock only for the selected sizes in cart.
+            InventoryManager::decrementForCartItems($cartItems);
+
             // Create order
             $order = Order::create([
                 'user_id' => auth()->id(),
@@ -152,6 +157,7 @@ class CheckoutController extends Controller
                 'product_size' => 'Various', // For compatibility
                 'quantity' => $cartItems->sum('quantity'),
                 'custom_design_status' => 'not_required',
+                'placed_at' => now(),
             ]);
 
             // Create order items
@@ -166,6 +172,8 @@ class CheckoutController extends Controller
                     'price' => $cartItem->product->price,
                     'quantity' => $cartItem->quantity,
                     'total' => $cartItem->product->price * $cartItem->quantity,
+                    'stock_deducted' => !empty($cartItem->size),
+                    'stock_restored' => false,
                 ]);
             }
 
@@ -190,6 +198,13 @@ class CheckoutController extends Controller
             return redirect()->route('order.success', ['order' => $order->id])
                 ->with('success', 'Order placed successfully! Order Number: ' . $orderNumber);
 
+        } catch (ValidationException $e) {
+            DB::rollBack();
+
+            return redirect()->back()
+                ->withInput()
+                ->withErrors($e->errors())
+                ->with('error', 'Some items are out of stock for the selected size. Please update your cart and try again.');
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()

@@ -4,7 +4,7 @@
 @section('content')
 @php($frontendAsset = asset('frontend/assets'))
 <!-- page title area start  -->
-<section class="page-title-area" data-background="{{ $frontendAsset }}/img/banner/banner-1-1.jpg">
+<section class="page-title-area" data-background="{{ $frontendAsset }}/img/banner/banner-1-1.jpeg">
    <div class="container">
       <div class="row">
          <div class="col-lg-12">
@@ -61,9 +61,9 @@
             </div>
          </div>
          <div class="col-lg-6">
-            <div class="limited-edition-image-wrapper">
+            <div class="limited-edition-image-wrapper" style="background-color:transparent">
                <div class="limited-edition-image">
-                  <img src="{{ asset('frontend/assets/img/limited-edition-hero.jpg') }}" alt="Limited Edition" class="img-fluid">
+                  <img src="{{ asset('frontend/assets/img/logo/logo.png') }}" alt="Limited Edition" class="img-fluid">
                   <div class="image-overlay"></div>
                </div>
             </div>
@@ -95,9 +95,6 @@
                <div class="product-action">
                   <a href="{{ route('product.details', $product->id) }}" class="quick-view-btn"><i class="fal fa-eye"></i></a>
                   <button type="button" class="wishlist-btn add-to-wishlist-btn" data-product-id="{{ $product->id }}"><i class="fal fa-heart"></i></button>
-               </div>
-               <div class="product-action-bottom">
-                  <button type="button" class="add-cart-btn add-to-cart-btn" data-product-id="{{ $product->id }}"><i class="fal fa-shopping-bag"></i>Add to Cart</button>
                </div>
                <div class="product-sticker-wrapper">
                   <span class="product-sticker new">Limited</span>

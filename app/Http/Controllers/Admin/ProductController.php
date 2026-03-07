@@ -193,10 +193,6 @@ class ProductController extends Controller
             }
         }
 
-        if ($product->auto_hide_out_of_stock && $product->totalStock() === 0) {
-            $product->update(['is_active' => false]);
-        }
-
         return redirect()->route('admin.products.show', $product)
             ->with('success', 'Product created successfully!');
     }
@@ -359,10 +355,6 @@ class ProductController extends Controller
                     $request->file("new_colors.$index.back_image")
                 );
             }
-        }
-
-        if ($product->auto_hide_out_of_stock && $product->totalStock() === 0) {
-            $product->update(['is_active' => false]);
         }
 
         return redirect()->route('admin.products.show', $product)

@@ -45,7 +45,7 @@
                             </span>
                         @endif
                         <span class="px-4 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-400">
-                            <i class="fal fa-calendar mr-1"></i>{{ $designRequest->created_at->format('M d, Y \a\t h:i A') }}
+                            <i class="fal fa-calendar mr-1"></i>{{ $designRequest->created_at->format('M d, Y') }}
                         </span>
                     </div>
                 </div>

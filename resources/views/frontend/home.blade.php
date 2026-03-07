@@ -21,6 +21,54 @@
 .product-img-wrapper:hover .uniform-product-img {
     transform: scale(1.05);
 }
+/* Feature Section */
+.custom-design-features{
+    background: #f9f9f9;
+    padding: 40px 20px;
+    border-radius: 10px;
+}
+
+/* Feature Card */
+.custom-design-features .col-md-3{
+    transition: all 0.3s ease;
+}
+
+.custom-design-features .col-md-3:hover{
+    transform: translateY(-6px);
+}
+
+/* Icon Style */
+.feature-icon{
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #111;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 26px;
+    transition: 0.3s;
+}
+
+.col-md-3:hover .feature-icon{
+    background: #ff4d4d;
+}
+
+/* Heading */
+.custom-design-features h5{
+    font-weight: 600;
+    margin-bottom: 5px;
+    font-size: 18px;
+}
+
+/* Description */
+.feature-desc{
+    color: #666;
+    font-size: 14px;
+    margin: 0;
+}
 </style>
       <!-- banner area start  -->
       <div class="banner-area banner-area2 pos-rel">
@@ -158,12 +206,6 @@
         </button>
     </div>
 
-    <div class="product-action-bottom">
-        <button type="button" class="add-cart-btn add-to-cart-btn" data-product-id="{{ $product->id }}">
-            <i class="fal fa-shopping-bag"></i> Add to Cart
-        </button>
-    </div>
-
     @if($product->created_at >= now()->subDays(30))
         <div class="product-sticker-wrapper">
             <span class="product-sticker new">New</span>
@@ -275,7 +317,7 @@
             <div class="row align-items-center mb-60">
                <div class="col-lg-6">
                   <div class="custom-design-image">
-                     <img src="{{ asset('frontend/assets/img/product_category/product-cat-8.jpg') }}" alt="Custom Design" class="img-fluid custom-img">
+                     <img src="{{ asset('frontend/assets/img/product_category/img1.png') }}" alt="Custom Design" class="img-fluid custom-img">
                   </div>
                </div>
                <div class="col-lg-6">

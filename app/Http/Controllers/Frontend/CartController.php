@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Cart;
 use App\Models\Product;
 use App\Models\Coupon;
+use App\Models\ProductSize;
 use Illuminate\Http\Request;
 
 class CartController extends Controller
@@ -37,8 +38,34 @@ class CartController extends Controller
             'product_id' => 'required|exists:products,id',
             'quantity' => 'required|integer|min:1',
             'color_id' => 'nullable|exists:product_colors,id',
-            'size' => 'nullable|string',
+            'size' => 'nullable|string|in:xs,s,m,l,xl,xxl',
         ]);
+
+        $product = Product::with(['sizes', 'colors'])->findOrFail($validated['product_id']);
+
+        if ($validated['color_id'] ?? null) {
+            $validColor = $product->colors->contains('id', (int) $validated['color_id']);
+            if (!$validColor) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Selected color is not valid for this product.',
+                ], 422);
+            }
+        }
+
+        $sizeInventoryEnabled = $product->sizes->isNotEmpty();
+        $selectedSize = isset($validated['size']) ? strtolower((string) $validated['size']) : null;
+
+        if ($sizeInventoryEnabled && !$selectedSize) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please select a size before adding this product to cart.',
+            ], 422);
+        }
+
+        if ($selectedSize) {
+            $validated['size'] = $selectedSize;
+        }
 
         $cart = Cart::where('user_id', auth()->id())
             ->where('product_id', $validated['product_id'])
@@ -47,9 +74,51 @@ class CartController extends Controller
             ->first();
 
         if ($cart) {
-            $cart->quantity += $validated['quantity'];
+            $newQuantity = $cart->quantity + $validated['quantity'];
+
+            if ($sizeInventoryEnabled) {
+                $sizeRow = ProductSize::where('product_id', $product->id)
+                    ->where('size', $selectedSize)
+                    ->first();
+
+                if (!$sizeRow) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Selected size is not available for this product.',
+                    ], 422);
+                }
+
+                if ($newQuantity > (int) $sizeRow->stock_quantity) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Only ' . $sizeRow->stock_quantity . ' item(s) available for size ' . strtoupper($selectedSize) . '.',
+                    ], 422);
+                }
+            }
+
+            $cart->quantity = $newQuantity;
             $cart->save();
         } else {
+            if ($sizeInventoryEnabled) {
+                $sizeRow = ProductSize::where('product_id', $product->id)
+                    ->where('size', $selectedSize)
+                    ->first();
+
+                if (!$sizeRow) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Selected size is not available for this product.',
+                    ], 422);
+                }
+
+                if ($validated['quantity'] > (int) $sizeRow->stock_quantity) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Only ' . $sizeRow->stock_quantity . ' item(s) available for size ' . strtoupper($selectedSize) . '.',
+                    ], 422);
+                }
+            }
+
             Cart::create([
                 'user_id' => auth()->id(),
                 'product_id' => $validated['product_id'],
@@ -59,7 +128,7 @@ class CartController extends Controller
             ]);
         }
 
-        $cartCount = Cart::where('user_id', auth()->id())->sum('quantity');
+        $cartCount = Cart::where('user_id', auth()->id())->count();
         $cartItems = $this->getCartItemsData();
 
         return response()->json([
@@ -95,7 +164,7 @@ class CartController extends Controller
         return response()->json([
             'success' => true,
             'html' => $html,
-            'cart_count' => Cart::where('user_id', auth()->id())->sum('quantity'),
+            'cart_count' => Cart::where('user_id', auth()->id())->count(),
             'cart_total' => $sidebarCartTotal
         ]);
     }
@@ -139,6 +208,27 @@ class CartController extends Controller
         $cart = Cart::where('id', $id)
             ->where('user_id', auth()->id())
             ->firstOrFail();
+
+        $selectedSize = $cart->size ? strtolower((string) $cart->size) : null;
+        if ($selectedSize) {
+            $sizeRow = ProductSize::where('product_id', $cart->product_id)
+                ->where('size', $selectedSize)
+                ->first();
+
+            if (!$sizeRow) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Selected size is no longer available.',
+                ], 422);
+            }
+
+            if ($validated['quantity'] > (int) $sizeRow->stock_quantity) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Only ' . $sizeRow->stock_quantity . ' item(s) available for size ' . strtoupper($selectedSize) . '.',
+                ], 422);
+            }
+        }
 
         $cart->quantity = $validated['quantity'];
         $cart->save();

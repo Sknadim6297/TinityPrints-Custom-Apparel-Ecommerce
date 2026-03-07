@@ -264,7 +264,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Initialize all handlers
-    setupAddToCartButtons();
+    // NOTE: setupAddToCartButtons() is disabled - cart-wishlist.js handles add-to-cart with jQuery event delegation
+    // setupAddToCartButtons();
     setupAddToWishlistButtons();
     protectCartAccess();
     protectWishlistAccess();

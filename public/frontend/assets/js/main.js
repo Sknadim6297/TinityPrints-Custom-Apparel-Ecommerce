@@ -320,20 +320,8 @@
 
 	////////////////////////////////////////////////////
 	// Cart Quantity Js
-	$(".cart-minus").click(function () {
-		var $input = $(this).parent().find("input");
-		var count = parseInt($input.val()) - 1;
-		count = count < 1 ? 1 : count;
-		$input.val(count);
-		$input.change();
-		return false;
-	});
-	$(".cart-plus").click(function () {
-		var $input = $(this).parent().find("input");
-		$input.val(parseInt($input.val()) + 1);
-		$input.change();
-		return false;
-	});
+	// NOTE: Cart plus/minus handlers are now in cart.blade.php with AJAX functionality
+	// to avoid duplicate event triggering. Do not add handlers here.
 
 	////////////////////////////////////////////////////
 	// Show Login Toggle Js

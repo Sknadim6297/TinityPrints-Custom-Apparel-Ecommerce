@@ -32,7 +32,7 @@
 }
 </style>
 <!-- page title area start  -->
-      <section class="page-title-area" data-background="{{ asset('frontend/assets/img/banner/banner-1-1.jpg') }}">
+      <section class="page-title-area" data-background="{{ asset('frontend/assets/img/banner/banner-1-1.jpeg') }}">
          <div class="container">
             <div class="row">
                <div class="col-lg-12">
@@ -143,9 +143,6 @@
                               <div class="product-action">
                                  <a href="{{ route('product.details', $product->id) }}" class="quick-view-btn"><i class="fal fa-eye"></i></a>
                                  <button type="button" class="wishlist-btn add-to-wishlist-btn" data-product-id="{{ $product->id }}"><i class="fal fa-heart"></i></button>
-                              </div>
-                              <div class="product-action-bottom">
-                                 <button type="button" class="add-cart-btn add-to-cart-btn" data-product-id="{{ $product->id }}"><i class="fal fa-shopping-bag"></i>Add to Cart</button>
                               </div>
                               @if($product->is_limited_edition)
                               <div class="product-sticker-wrapper">

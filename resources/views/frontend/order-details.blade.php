@@ -33,8 +33,14 @@
                            <div>
                               <h4 class="mb-1">Order #{{ $order->order_number }}</h4>
                               <small class="text-muted">
-                                 Placed on {{ $order->created_at->format('M d, Y \a\t h:i A') }}
+                              <strong>Placed on:</strong> {{ $order->created_at->format('M d, Y') }}
                               </small>
+                              @if($order->delivered_date)
+                                 <br>
+                                 <small class="text-success">
+                                    <strong>Delivered on:</strong> {{ $order->delivered_date->format('M d, Y') }}
+                                 </small>
+                              @endif
                            </div>
                            <span class="badge 
                               @if($order->order_status == 'delivered') bg-success
@@ -52,9 +58,12 @@
                         @foreach($order->items as $item)
                            @php
                               $productImage = optional(optional($item->product)->images)->first();
+                              $designImagePath = optional($order->designRequest)->front_design_file;
                               $itemImageUrl = $productImage
                                  ? \Illuminate\Support\Facades\Storage::url($productImage->image_path)
-                                 : asset('frontend/assets/img/product/default.jpg');
+                                 : ($designImagePath
+                                    ? \Illuminate\Support\Facades\Storage::url($designImagePath)
+                                    : asset('frontend/assets/img/product/default.jpg'));
                            @endphp
                            <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
                               <img src="{{ $itemImageUrl }}" 
@@ -105,14 +114,19 @@
                      </div>
                      <div class="card-body">
                         @php
-                           $statusFlow = [
+                           // Order statuses for normal order tracking
+                           $orderStatusFlow = [
                               'payment_pending' => ['label' => 'Order Placed', 'icon' => 'fa-shopping-cart'],
                               'paid' => ['label' => 'Payment Confirmed', 'icon' => 'fa-check-circle'],
                               'printing' => ['label' => 'Processing', 'icon' => 'fa-cogs'],
                               'packed' => ['label' => 'Packed', 'icon' => 'fa-box'],
                               'shipped' => ['label' => 'Shipped', 'icon' => 'fa-truck'],
-                              'delivered' => ['label' => 'Delivered', 'icon' => 'fa-home'],
-                              'refund_requested' => ['label' => 'Refund Requested', 'icon' => 'fa-exclamation-circle'],
+                              'delivered' => ['label' => 'Delivered', 'icon' => 'fa-home']
+                           ];
+                           
+                           // Refund statuses for refund tracking  
+                           $refundStatusFlow = [
+                              'refund_requested' => ['label' => 'Refund Requested', 'icon' => 'fa-exclamation-circle'], 
                               'under_review' => ['label' => 'Under Review', 'icon' => 'fa-search'],
                               'refund_approved' => ['label' => 'Refund Approved', 'icon' => 'fa-thumbs-up'],
                               'refund_rejected' => ['label' => 'Refund Rejected', 'icon' => 'fa-times-circle'],
@@ -120,52 +134,106 @@
                               'product_received' => ['label' => 'Product Received', 'icon' => 'fa-inbox'],
                               'refund_completed' => ['label' => 'Refund Completed', 'icon' => 'fa-undo']
                            ];
-                           $currentStatus = $order->order_status;
-                           $statusKeys = array_keys($statusFlow);
-                           $currentIndex = array_search($currentStatus, $statusKeys);
+                           
+                           $currentOrderStatus = $order->order_status;
+                           $hasActiveRefund = $order->refundRequest && !in_array($order->refundRequest->status, ['refund_rejected', 'refund_completed']);
+                           
+                           // Determine which tracking flow to show
+                           if ($hasActiveRefund || in_array($currentOrderStatus, array_keys($refundStatusFlow))) {
+                              // Show refund tracking if there's an active refund
+                              $displayStatusFlow = $refundStatusFlow;
+                              $currentDisplayStatus = $order->refundRequest ? $order->refundRequest->status : $currentOrderStatus;
+                           } else {
+                              // Show normal order tracking
+                              $displayStatusFlow = $orderStatusFlow;
+                              $currentDisplayStatus = $currentOrderStatus;
+                           }
+                           
+                           $statusKeys = array_keys($displayStatusFlow);
+                           $currentIndex = array_search($currentDisplayStatus, $statusKeys);
                            if ($currentIndex === false) $currentIndex = -1;
                         @endphp
 
-                        <div class="order-tracking">
-                           @foreach($statusFlow as $status => $info)
-                              @php
-                                 $stepIndex = array_search($status, $statusKeys);
-                                 $isActive = $stepIndex <= $currentIndex;
-                                 $isCurrent = $status === $currentStatus;
-                              @endphp
-                              <div class="tracking-step {{ $isActive ? 'active' : '' }} {{ $isCurrent ? 'current' : '' }}">
-                                 <div class="tracking-icon">
-                                    <i class="fa {{ $info['icon'] }}"></i>
+                        <!-- Order Status Section -->
+                        @if(!$hasActiveRefund && !in_array($currentOrderStatus, array_keys($refundStatusFlow)))
+                           <div class="order-tracking">
+                              @foreach($displayStatusFlow as $status => $info)
+                                 @php
+                                    $stepIndex = array_search($status, $statusKeys);
+                                    $isActive = $stepIndex <= $currentIndex;
+                                    $isCurrent = $status === $currentDisplayStatus;
+                                    
+                                    // Map status to timestamp field
+                                    $timestampMap = [
+                                       'payment_pending' => $order->placed_at,
+                                       'paid' => $order->paid_at,
+                                       'printing' => $order->printing_at,
+                                       'packed' => $order->packed_at,
+                                       'shipped' => $order->shipped_at,
+                                       'delivered' => $order->delivered_at,
+                                    ];
+                                    $timestamp = $timestampMap[$status] ?? null;
+                                 @endphp
+                                 <div class="tracking-step {{ $isActive ? 'active' : '' }} {{ $isCurrent ? 'current' : '' }}">
+                                    <div class="tracking-icon">
+                                       <i class="fa {{ $info['icon'] }}"></i>
+                                    </div>
+                                    <div class="tracking-content">
+                                       <h6 class="mb-0">{{ $info['label'] }}</h6>
+                                       @if($timestamp)
+                                          <small class="text-muted d-block">{{ $timestamp->format('M d, Y') }}</small>
+                                          <small class="text-muted">{{ $timestamp->format('h:i A') }}</small>
+                                       @elseif($isCurrent)
+                                          <small class="text-muted">Current Status</small>
+                                       @elseif($isActive)
+                                          <small class="text-success">Completed</small>
+                                       @else
+                                          <small class="text-muted">Pending</small>
+                                       @endif
+                                    </div>
                                  </div>
-                                 <div class="tracking-content">
-                                    <h6 class="mb-0">{{ $info['label'] }}</h6>
-                                    @if($isCurrent)
-                                       <small class="text-muted">Current Status</small>
-                                    @elseif($isActive)
-                                       <small class="text-success">Completed</small>
-                                    @else
-                                       <small class="text-muted">Pending</small>
-                                    @endif
-                                 </div>
-                              </div>
-                           @endforeach
-                        </div>
+                              @endforeach
+                           </div>
+                        @endif
 
-                        @if(in_array($order->order_status, ['refund_completed', 'refunded']))
-                           <div class="alert alert-danger mt-3 mb-0">
-                              <i class="fa fa-exclamation-circle"></i> This order refund has been completed.
+                        <!-- Refund Status Section -->
+                        @if($hasActiveRefund || in_array($currentOrderStatus, array_keys($refundStatusFlow)))
+                           <div class="mb-3">
+                              <h6 class="text-warning"><i class="fa fa-exclamation-triangle"></i> Refund In Progress</h6>
                            </div>
-                        @elseif($order->order_status == 'refund_requested')
-                           <div class="alert alert-warning mt-3 mb-0">
-                              <i class="fa fa-clock"></i> Refund requested
-                           </div>
-                        @elseif($order->order_status == 'under_review')
-                           <div class="alert alert-primary mt-3 mb-0">
-                              <i class="fa fa-search"></i> Your refund request is under review.
-                           </div>
-                        @elseif($order->order_status == 'refund_rejected')
-                           <div class="alert alert-danger mt-3 mb-0">
-                              <i class="fa fa-times-circle"></i> Refund request was rejected.
+                           <div class="order-tracking">
+                              @foreach($displayStatusFlow as $status => $info)
+                                 @php
+                                    $stepIndex = array_search($status, $statusKeys);
+                                    $isActive = $stepIndex <= $currentIndex;
+                                    $isCurrent = $status === $currentDisplayStatus;
+                                    
+                                    // Map refund status to timestamp field
+                                    $timestampMap = [
+                                       'cancelled' => $order->cancelled_at,
+                                       'refunded' => $order->refunded_at,
+                                       'refund_completed' => $order->refunded_at,
+                                    ];
+                                    $timestamp = $timestampMap[$status] ?? null;
+                                 @endphp
+                                 <div class="tracking-step {{ $isActive ? 'active' : '' }} {{ $isCurrent ? 'current' : '' }}">
+                                    <div class="tracking-icon">
+                                       <i class="fa {{ $info['icon'] }}"></i>
+                                    </div>
+                                    <div class="tracking-content">
+                                       <h6 class="mb-0">{{ $info['label'] }}</h6>
+                                       @if($timestamp)
+                                          <small class="text-muted">{{ $timestamp->format('M d, Y') }}</small>
+                                       @elseif($isCurrent)
+                                          <small class="text-muted">Current Status</small>
+                                       @elseif($isActive)
+                                          <small class="text-success">Completed</small>
+                                       @else
+                                          <small class="text-muted">Pending</small>
+                                       @endif
+                                    </div>
+                                 </div>
+                              @endforeach
                            </div>
                         @endif
 

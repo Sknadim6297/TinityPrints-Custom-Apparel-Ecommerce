@@ -253,7 +253,6 @@
                      <div class="card-body">
                         <form action="{{ route('custom-design.update', $design) }}" method="POST" enctype="multipart/form-data">
                            @csrf
-                           @method('PUT')
 
                            <div class="mb-3">
                               <label class="form-label"><strong>Update Front Design (Optional)</strong></label>

@@ -91,6 +91,9 @@
                      @endif
                      <form method="POST" action="{{ route('register') }}">
                         @csrf
+                        @if(request('redirect_to'))
+                           <input type="hidden" name="redirect_to" value="{{ request('redirect_to') }}">
+                        @endif
                         <div class="row">
                            <div class="col-md-12">
                               <div class="signup-wrapper">
@@ -135,7 +138,7 @@
                            <button type="submit" class="sing-btn">Register now</button>
                         </div>
                         <div class="acount-login text-center">
-                           <span>Already have an account? <a href="{{ route('login') }}">Log in</a></span>
+                           <span>Already have an account? <a href="{{ route('login', request('redirect_to') ? ['redirect_to' => request('redirect_to')] : []) }}">Log in</a></span>
                         </div>
                      </form>
                      <div class="sign-social text-center">

@@ -55,7 +55,8 @@
                                 <th class="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">Amount</th>
                                 <th class="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">Status</th>
                                 <th class="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">Payment</th>
-                                <th class="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">Date</th>
+                                <th class="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">Order Date</th>
+                                <th class="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">Delivered Date</th>
                                 <th class="px-4 sm:px-6 py-3 text-center text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">Actions</th>
                             </tr>
                         </thead>
@@ -77,6 +78,7 @@
                                         'product_received' => 'bg-slate-100 text-slate-800 dark:bg-slate-900/30 dark:text-slate-300',
                                         'refund_completed' => 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
                                         'refunded' => 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
+                                        'cancelled' => 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200',
                                     ];
                                     $statusColor = $statusColors[$order->order_status] ?? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
                                     
@@ -109,7 +111,14 @@
                                         </span>
                                     </td>
                                     <td class="px-4 sm:px-6 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 align-middle">
-                                        {{ $order->created_at->format('M d, Y') }}
+                                        <div class="text-sm text-gray-900 dark:text-gray-100">{{ $order->created_at->format('M d, Y') }}</div>
+                                    </td>
+                                    <td class="px-4 sm:px-6 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 align-middle">
+                                        @if($order->delivered_date)
+                                            <div class="text-sm text-green-600 dark:text-green-400">{{ $order->delivered_date->format('M d, Y') }}</div>
+                                        @else
+                                            <span class="text-sm text-gray-400 dark:text-gray-600">Not delivered</span>
+                                        @endif
                                     </td>
                                     <td class="px-4 sm:px-6 py-3 whitespace-nowrap text-center align-middle">
                                         <a href="{{ route('admin.orders.show', $order) }}" 

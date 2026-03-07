@@ -43,6 +43,7 @@
                                 'product_received' => 'bg-slate-100 text-slate-800 dark:bg-slate-900/30 dark:text-slate-300',
                                 'refund_completed' => 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
                                 'refunded' => 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
+                                'cancelled' => 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200',
                             ];
                             $statusColor = $statusColors[$order->order_status] ?? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
                         @endphp
@@ -53,8 +54,130 @@
                             Payment: {{ ucwords($order->payment_status) }}
                         </span>
                         <span class="px-4 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-400">
-                            <i class="fal fa-calendar mr-1"></i>{{ $order->created_at->format('M d, Y \a\t h:i A') }}
+                                <i class="fal fa-calendar mr-1"></i>{{ $order->created_at->format('M d, Y') }}
                         </span>
+                    </div>
+                </div>
+
+                <!-- Order Timeline Card -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">
+                        <i class="fal fa-clock mr-2 text-blue-500"></i>Order Timeline
+                    </h3>
+                    <div class="space-y-3">
+                        @if($order->placed_at)
+                            <div class="flex items-start space-x-3 p-3 bg-gray-50 dark:bg-gray-700/40 rounded-lg">
+                                <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+                                    <i class="fal fa-shopping-cart text-blue-600 dark:text-blue-400 text-sm"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-semibold text-gray-900 dark:text-gray-100">Order Placed</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ $order->placed_at->format('M d, Y') }}</p>
+                                </div>
+                            </div>
+                        @endif
+                        
+                        @if($order->confirmed_at)
+                            <div class="flex items-start space-x-3 p-3 bg-gray-50 dark:bg-gray-700/40 rounded-lg">
+                                <div class="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0">
+                                    <i class="fal fa-check-circle text-green-600 dark:text-green-400 text-sm"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-semibold text-gray-900 dark:text-gray-100">Order Confirmed</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ $order->confirmed_at->format('M d, Y') }}</p>
+                                </div>
+                            </div>
+                        @endif
+                        
+                        @if($order->paid_at)
+                            <div class="flex items-start space-x-3 p-3 bg-gray-50 dark:bg-gray-700/40 rounded-lg">
+                                <div class="w-8 h-8 rounded-full bg-teal-100 dark:bg-teal-900/30 flex items-center justify-center flex-shrink-0">
+                                    <i class="fal fa-credit-card text-teal-600 dark:text-teal-400 text-sm"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-semibold text-gray-900 dark:text-gray-100">Payment Confirmed</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ $order->paid_at->format('M d, Y') }}</p>
+                                </div>
+                            </div>
+                        @endif
+                        
+                        @if($order->printing_at)
+                            <div class="flex items-start space-x-3 p-3 bg-gray-50 dark:bg-gray-700/40 rounded-lg">
+                                <div class="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center flex-shrink-0">
+                                    <i class="fal fa-print text-purple-600 dark:text-purple-400 text-sm"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-semibold text-gray-900 dark:text-gray-100">Printing Started</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ $order->printing_at->format('M d, Y') }}</p>
+                                </div>
+                            </div>
+                        @endif
+                        
+                        @if($order->packed_at)
+                            <div class="flex items-start space-x-3 p-3 bg-gray-50 dark:bg-gray-700/40 rounded-lg">
+                                <div class="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center flex-shrink-0">
+                                    <i class="fal fa-box text-indigo-600 dark:text-indigo-400 text-sm"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-semibold text-gray-900 dark:text-gray-100">Order Packed</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ $order->packed_at->format('M d, Y') }}</p>
+                                </div>
+                            </div>
+                        @endif
+                        
+                        @if($order->shipped_at)
+                            <div class="flex items-start space-x-3 p-3 bg-gray-50 dark:bg-gray-700/40 rounded-lg">
+                                <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+                                    <i class="fal fa-truck text-blue-600 dark:text-blue-400 text-sm"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-semibold text-gray-900 dark:text-gray-100">Order Shipped</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ $order->shipped_at->format('M d, Y') }}</p>
+                                </div>
+                            </div>
+                        @endif
+                        
+                        @if($order->delivered_at)
+                            <div class="flex items-start space-x-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border-2 border-green-200 dark:border-green-700">
+                                <div class="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0">
+                                    <i class="fal fa-check-double text-green-600 dark:text-green-400 text-sm"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-semibold text-gray-900 dark:text-gray-100">Delivered</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ $order->delivered_at->format('M d, Y') }}</p>
+                                </div>
+                            </div>
+                        @endif
+                        
+                        @if($order->cancelled_at)
+                            <div class="flex items-start space-x-3 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border-2 border-red-200 dark:border-red-700">
+                                <div class="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center flex-shrink-0">
+                                    <i class="fal fa-times-circle text-red-600 dark:text-red-400 text-sm"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-semibold text-gray-900 dark:text-gray-100">Order Cancelled</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ $order->cancelled_at->format('M d, Y') }}</p>
+                                </div>
+                            </div>
+                        @endif
+                        
+                        @if($order->refunded_at)
+                            <div class="flex items-start space-x-3 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border-2 border-red-200 dark:border-red-700">
+                                <div class="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center flex-shrink-0">
+                                    <i class="fal fa-undo text-red-600 dark:text-red-400 text-sm"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-semibold text-gray-900 dark:text-gray-100">Refund Processed</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ $order->refunded_at->format('M d, Y') }}</p>
+                                </div>
+                            </div>
+                        @endif
+                        
+                        @if(!$order->placed_at && !$order->confirmed_at && !$order->paid_at && !$order->printing_at && !$order->packed_at && !$order->shipped_at && !$order->delivered_at && !$order->cancelled_at && !$order->refunded_at)
+                            <div class="text-center py-4">
+                                <p class="text-gray-500 dark:text-gray-400 text-sm">No timeline data available yet</p>
+                            </div>
+                        @endif
                     </div>
                 </div>
 
@@ -68,13 +191,22 @@
                     @if($order->items && $order->items->count() > 0)
                         <div class="space-y-3">
                             @foreach($order->items as $item)
+                                @php
+                                    $productImage = optional(optional($item->product)->images)->first();
+                                    $itemImageUrl = $productImage
+                                        ? \Illuminate\Support\Facades\Storage::url($productImage->image_path)
+                                        : asset('frontend/assets/img/product/default.jpg');
+                                @endphp
                                 <div class="flex justify-between items-start p-3 bg-gray-50 dark:bg-gray-700/40 rounded-lg border border-gray-200 dark:border-gray-600">
-                                    <div class="flex-1">
-                                        <p class="font-semibold text-gray-900 dark:text-gray-100">{{ $item->product_name }}</p>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                            @if($item->size) Size: {{ $item->size }} @endif
-                                            @if($item->color_name) • Color: {{ $item->color_name }} @endif
-                                        </p>
+                                    <div class="flex items-start space-x-3 flex-1">
+                                        <img src="{{ $itemImageUrl }}" alt="{{ $item->product_name }}" class="w-16 h-16 object-cover rounded-lg border border-gray-200 dark:border-gray-600">
+                                        <div class="flex-1">
+                                            <p class="font-semibold text-gray-900 dark:text-gray-100">{{ $item->product_name }}</p>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                                @if($item->size) Size: {{ $item->size }} @endif
+                                                @if($item->color_name) • Color: {{ $item->color_name }} @endif
+                                            </p>
+                                        </div>
                                     </div>
                                     <div class="text-right ml-4">
                                         <p class="font-semibold text-gray-900 dark:text-gray-100">₹{{ number_format($item->price, 2) }} × {{ $item->quantity }}</p>
@@ -216,7 +348,7 @@
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Order Status</label>
                                 <select name="order_status" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                    @foreach(['design_pending','design_approved','payment_pending','paid','printing','packed','shipped','delivered','refund_requested','under_review','refund_approved','refund_rejected','return_in_process','product_received','refund_completed','refunded'] as $status)
+                                    @foreach(['design_pending','design_approved','payment_pending','paid','printing','packed','shipped','delivered','refund_requested','under_review','refund_approved','refund_rejected','return_in_process','product_received','refund_completed','refunded','cancelled'] as $status)
                                         <option value="{{ $status }}" {{ $order->order_status === $status ? 'selected' : '' }}>
                                             {{ ucwords(str_replace('_', ' ', $status)) }}
                                         </option>

@@ -9,6 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 
@@ -17,8 +18,10 @@ class RegisteredUserController extends Controller
     /**
      * Display the registration view.
      */
-    public function create(): View
+    public function create(Request $request): View
     {
+        $this->rememberIntendedUrl($request);
+
         return view('auth.register');
     }
 
@@ -48,7 +51,46 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect($this->redirectPath($user));
+        $redirectTo = $request->input('redirect_to');
+        if ($redirectTo && $this->isValidInternalUrl($redirectTo)) {
+            $request->session()->put('url.intended', $redirectTo);
+        }
+
+        return redirect()->intended($this->redirectPath($user));
+    }
+
+    private function rememberIntendedUrl(Request $request): void
+    {
+        $candidate = $request->query('redirect_to') ?: url()->previous();
+
+        if (! $this->isValidInternalUrl($candidate)) {
+            return;
+        }
+
+        $path = parse_url($candidate, PHP_URL_PATH) ?? '';
+        $blockedPaths = ['/login', '/register', '/forgot-password', '/logout'];
+
+        foreach ($blockedPaths as $blockedPath) {
+            if (Str::startsWith($path, $blockedPath)) {
+                return;
+            }
+        }
+
+        $request->session()->put('url.intended', $candidate);
+    }
+
+    private function isValidInternalUrl(?string $url): bool
+    {
+        if (!$url) {
+            return false;
+        }
+
+        $parsed = parse_url($url);
+        if (isset($parsed['host'])) {
+            return $parsed['host'] === request()->getHost();
+        }
+
+        return strpos($url, '/') === 0;
     }
 
     private function redirectPath(User $user): string

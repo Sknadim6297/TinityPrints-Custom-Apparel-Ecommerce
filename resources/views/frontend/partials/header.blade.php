@@ -85,14 +85,14 @@
                            </svg>
                            @auth
                               @php
-                                 $cartCount = \App\Models\Cart::where('user_id', auth()->id())->sum('quantity');
+                                 $cartCount = \App\Models\Cart::where('user_id', auth()->id())->count();
                               @endphp
                               <span class="action-item-number cart-count">{{ $cartCount }}</span>
                            @else
                               <span class="action-item-number cart-count">0</span>
                            @endauth
                         </a>
-                        <a href="#" class="action-btn-text">Cartlisht</a>
+                        <a href="#" class="action-btn-text">Cartlist</a>
                      </div>
                      <div class="action-item action-item-wishlist">
                         <a href="{{ route('wishlist.index') }}" class="view-wishlist-button">
@@ -228,7 +228,7 @@
                               <i class="fal fa-shopping-bag"></i>
                               @auth
                                  @php
-                                    $cartCount = \App\Models\Cart::where('user_id', auth()->id())->sum('quantity');
+                                    $cartCount = \App\Models\Cart::where('user_id', auth()->id())->count();
                                  @endphp
                                  <span class="action-item-number cart-count">{{ $cartCount }}</span>
                               @else

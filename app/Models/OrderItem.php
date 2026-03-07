@@ -16,11 +16,15 @@ class OrderItem extends Model
         'price',
         'quantity',
         'total',
+        'stock_deducted',
+        'stock_restored',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
         'total' => 'decimal:2',
+        'stock_deducted' => 'boolean',
+        'stock_restored' => 'boolean',
     ];
 
     public function order()

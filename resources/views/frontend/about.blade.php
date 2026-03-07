@@ -70,7 +70,7 @@
                               <i class="fal fa-shopping-bag"></i>
                               @auth
                                  @php
-                                    $cartCount = \App\Models\Cart::where('user_id', auth()->id())->sum('quantity');
+                                    $cartCount = \App\Models\Cart::where('user_id', auth()->id())->count();
                                  @endphp
                                  <span class="action-item-number cart-count">{{ $cartCount }}</span>
                               @else
@@ -110,7 +110,7 @@
       <!-- side toggle end -->
 
       <!-- page title area start  -->
-      <section class="page-title-area" data-background="{{ asset('frontend/assets/img/banner/banner-1-1.jpg') }}">
+      <section class="page-title-area" data-background="{{ asset('frontend/assets/img/banner/banner-1-1.jpeg') }}">
          <div class="container">
             <div class="row">
                <div class="col-lg-12">

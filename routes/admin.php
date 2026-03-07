@@ -96,6 +96,8 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
             ->name('orders.update');
         Route::get('refunds', [RefundController::class, 'index'])
             ->name('refunds.index');
+        Route::get('refunds/{refund}', [RefundController::class, 'show'])
+            ->name('refunds.show');
         Route::patch('refunds/{refund}/approve', [RefundController::class, 'approve'])
             ->name('refunds.approve');
         Route::patch('refunds/{refund}/reject', [RefundController::class, 'reject'])

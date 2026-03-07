@@ -9,6 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
@@ -16,8 +17,10 @@ class AuthenticatedSessionController extends Controller
     /**
      * Display the login view.
      */
-    public function create(): View
+    public function create(Request $request): View
     {
+        $this->rememberIntendedUrl($request);
+
         return view('auth.login');
     }
 
@@ -39,7 +42,59 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->put('login_history_id', $loginHistory->id);
 
+        // Explicit redirect from login form has priority if valid.
+        $redirectTo = $request->input('redirect_to');
+
+        if ($redirectTo && $this->isValidInternalUrl($redirectTo)) {
+            $request->session()->put('url.intended', $redirectTo);
+        }
+
         return redirect()->intended($this->redirectPath($request->user()));
+    }
+
+    /**
+     * Store intended URL when user opens login directly from a protected context.
+     */
+    private function rememberIntendedUrl(Request $request): void
+    {
+        $candidate = $request->query('redirect_to') ?: url()->previous();
+
+        if (! $this->isValidInternalUrl($candidate)) {
+            return;
+        }
+
+        $path = parse_url($candidate, PHP_URL_PATH) ?? '';
+
+        // Avoid loops back to auth endpoints.
+        $blockedPaths = ['/login', '/register', '/forgot-password', '/logout'];
+        foreach ($blockedPaths as $blockedPath) {
+            if (Str::startsWith($path, $blockedPath)) {
+                return;
+            }
+        }
+
+        $request->session()->put('url.intended', $candidate);
+    }
+
+    /**
+     * Validate that the redirect URL is internal (not an open redirect).
+     */
+    private function isValidInternalUrl(?string $url): bool
+    {
+        if (!$url) {
+            return false;
+        }
+
+        // Parse the URL
+        $parsed = parse_url($url);
+        
+        // Allow only relative URLs or URLs with the same host
+        if (isset($parsed['host'])) {
+            return $parsed['host'] === request()->getHost();
+        }
+
+        // Allow relative URLs starting with /
+        return strpos($url, '/') === 0;
     }
 
     /**

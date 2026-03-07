@@ -70,7 +70,7 @@
                               <i class="fal fa-shopping-bag"></i>
                               @auth
                                  @php
-                                    $cartCount = \App\Models\Cart::where('user_id', auth()->id())->sum('quantity');
+                                    $cartCount = \App\Models\Cart::where('user_id', auth()->id())->count();
                                  @endphp
                                  <span class="action-item-number cart-count">{{ $cartCount }}</span>
                               @else
@@ -110,16 +110,25 @@
       <!-- side toggle end -->
 
       <!-- page title area start  -->
-      <section class="page-title-area" data-background="{{ asset('frontend/assets/img/banner/banner-1-1.jpg') }}">
+      <section class="page-title-area" data-background="{{ asset('frontend/assets/img/banner/banner-1-1.jpeg') }}">
          <div class="container">
             <div class="row">
                <div class="col-lg-12">
                   <div class="page-title-wrapper text-center">
-                     <h1 class="page-title mb-10">{{ $product->name }}</h1>
+                     <h1 class="page-title mb-10">
+                        @if($product->category == 't-shirt')
+                           T-Shirts
+                        @elseif($product->category == 'accessories')
+                           Accessories
+                        @else
+                           {{ ucfirst($product->category) }}
+                        @endif
+                     </h1>
                      <div class="breadcrumb-menu">
                         <nav aria-label="Breadcrumbs" class="breadcrumb-trail breadcrumbs">
                            <ul class="trail-items">
                               <li class="trail-item trail-begin"><a href="{{ route('home') }}"><span>Home</span></a></li>
+                              <li class="trail-item"><a href="{{ route('shop', ['category' => $product->category]) }}"><span>{{ $product->category == 't-shirt' ? 'T-Shirts' : ucfirst($product->category) }}</span></a></li>
                               <li class="trail-item trail-end"><span>{{ $product->name }}</span></li>
                            </ul>
                         </nav>
@@ -195,7 +204,7 @@
 
                      <p class="mb-30">{{ $product->description ?: 'No description available for this product.' }}</p>
                      
-                     @if($product->sizes->where('is_available', true)->count() > 0)
+                     @if($product->sizes->count() > 0)
                         <div class="available-sizes mb-20">
                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                               <span style="font-weight: 600;">Select Size: <span class="text-danger">*</span></span>
@@ -204,15 +213,40 @@
                               </button>
                            </div>
                            <div class="product-available-sizes" style="display: flex; gap: 10px; flex-wrap: wrap;">
-                              @foreach($product->sizes->where('is_available', true) as $size)
-                                 <label class="size-option" style="cursor: pointer;">
-                                    <input type="radio" name="product_size" value="{{ $size->size }}" style="display: none;" required>
-                                    <span class="size-badge" style="display: inline-block; border: 2px solid #ddd; border-radius: 4px; font-weight: 600; transition: all 0.3s;">
-                                       {{ strtoupper($size->size) }}
-                                    </span>
-                                 </label>
+                              @foreach($product->sizes as $size)
+                                 @php
+                                    $isInStock = (int) $size->stock_quantity > 0;
+                                 @endphp
+                                 <div class="size-pill-wrapper" style="display: inline-flex; flex-direction: column; gap: 6px; align-items: flex-start;">
+                                    <label class="size-option {{ $isInStock ? '' : 'size-option-disabled' }}" style="cursor: {{ $isInStock ? 'pointer' : 'not-allowed' }};">
+                                       <input
+                                          type="radio"
+                                          name="product_size"
+                                          value="{{ $size->size }}"
+                                          data-stock="{{ (int) $size->stock_quantity }}"
+                                          style="display: none;"
+                                          {{ $isInStock ? '' : 'disabled' }}
+                                          required
+                                       >
+                                       <span class="size-badge" style="display: inline-block; border: 2px solid #ddd; border-radius: 4px; font-weight: 600; transition: all 0.3s;">
+                                          {{ strtoupper($size->size) }}
+                                       </span>
+                                    </label>
+
+                                    @if(!$isInStock)
+                                       <span class="text-danger" style="font-size: 12px; line-height: 1;">Out of stock</span>
+                                       @auth
+                                          <button type="button" class="btn-link notify-stock-btn" data-size="{{ $size->size }}" data-product-id="{{ $product->id }}" style="font-size: 12px; color: #171717; text-decoration: underline; padding: 0; border: none; cursor: pointer; background: none;">
+                                             Notify Admin
+                                          </button>
+                                       @else
+                                          <a href="{{ route('login') }}" style="font-size: 12px; color: #171717; text-decoration: underline;">Login to notify</a>
+                                       @endauth
+                                    @endif
+                                 </div>
                               @endforeach
                            </div>
+                           <div class="stock-alert-message" style="display:none; margin-top: 8px; font-size: 14px;"></div>
                         </div>
                      @endif
 
@@ -404,57 +438,48 @@
             <div class="section-title mb-55">
                <h2>Related Products</h2>
             </div>
-            <!-- Slider main container -->
-            <div class="swiper-container r-product-active">
-               <!-- Additional required wrapper -->
-               <div class="swiper-wrapper">
-                  @forelse($relatedProducts as $relatedProduct)
-                     <div class="swiper-slide">
-                        <div class="single-product">
-                           <div class="product-image pos-rel">
-                              <a href="{{ route('product.details', $relatedProduct->id) }}" class="">
-                                 @if($relatedProduct->images->first())
-                                    <img src="{{ Storage::url($relatedProduct->images->first()->image_path) }}" alt="{{ $relatedProduct->name }}">
-                                 @else
-                                    <img src="{{ asset('frontend/assets/img/product_category/product-cat-1.jpg') }}" alt="{{ $relatedProduct->name }}">
-                                 @endif
-                              </a>
-                           <div class="product-action">
-                              <a href="{{ route('product.details', $relatedProduct->id) }}" class="quick-view-btn"><i class="fal fa-eye"></i></a>
-                              <button type="button" class="wishlist-btn add-to-wishlist-btn" data-product-id="{{ $relatedProduct->id }}"><i class="fal fa-heart"></i></button>
-                           </div>
-                           <div class="product-action-bottom">
-                              <button type="button" class="add-cart-btn add-to-cart-btn" data-product-id="{{ $relatedProduct->id }}"><i class="fal fa-shopping-bag"></i>Add to Cart</button>
-                           </div>
-                           @if($relatedProduct->is_limited_edition)
-                              <div class="product-sticker-wrapper">
-                                 <span class="product-sticker new">Limited</span>
-                              </div>
-                           @endif
+            <div class="products-wrapper">
+               @forelse($relatedProducts as $relatedProduct)
+                  @php($productImage = optional($relatedProduct->images->first())->image_path)
+                  @php($productColors = ($relatedProduct->colors ?? collect())->where('is_active', true))
+                  <div class="single-product">
+                     <div class="product-image pos-rel">
+                        <a href="{{ route('product.details', $relatedProduct->id) }}">
+                           <img src="{{ $productImage ? Storage::url($productImage) : asset('frontend/assets/img/product/product-img1.jpg') }}" alt="{{ $relatedProduct->name }}">
+                        </a>
+                        <div class="product-action">
+                           <a href="{{ route('product.details', $relatedProduct->id) }}" class="quick-view-btn"><i class="fal fa-eye"></i></a>
+                           <button type="button" class="wishlist-btn add-to-wishlist-btn" data-product-id="{{ $relatedProduct->id }}"><i class="fal fa-heart"></i></button>
                         </div>
-                        <div class="product-desc">
-                           <div class="product-name"><a href="{{ route('product.details', $relatedProduct->id) }}">{{ $relatedProduct->name }}</a></div>
-                           <div class="product-price">
-                              <span class="price-now">INR {{ number_format($relatedProduct->price, 2) }}</span>
+                        @if($relatedProduct->is_limited_edition)
+                           <div class="product-sticker-wrapper">
+                              <span class="product-sticker new">Limited</span>
                            </div>
-                           @if($relatedProduct->colors->where('is_active', true)->count() > 0)
-                              <div class="product-color-nav" style="display: flex; gap: 8px; margin-top: 10px;">
-                                 @foreach($relatedProduct->colors->where('is_active', true)->take(4) as $color)
-                                    <div class="color-circle" style="width: 24px; height: 24px; border-radius: 50%; background-color: {{ $color->hex_code }}; border: 2px solid #ddd; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" title="{{ $color->color_name }}"></div>
-                                 @endforeach
-                              </div>
-                           @endif
+                        @elseif($relatedProduct->created_at >= now()->subDays(30))
+                           <div class="product-sticker-wrapper">
+                              <span class="product-sticker new">New</span>
+                           </div>
+                        @endif
+                     </div>
+                     <div class="product-desc">
+                        <div class="product-name"><a href="{{ route('product.details', $relatedProduct->id) }}">{{ $relatedProduct->name }}</a></div>
+                        <div class="product-price">
+                           <span class="price-now">INR {{ number_format($relatedProduct->price, 2) }}</span>
                         </div>
+                        @if($productColors->count() > 0)
+                           <div class="product-color-nav" style="display: flex; gap: 8px; margin-top: 10px;">
+                              @foreach($productColors->take(4) as $color)
+                                 <div class="color-circle" style="width: 24px; height: 24px; border-radius: 50%; background-color: {{ $color->hex_code }}; border: 2px solid #ddd; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" title="{{ $color->color_name }}"></div>
+                              @endforeach
+                           </div>
+                        @endif
                      </div>
-                  @empty
-                     <div class="col-12 text-center py-50">
-                        <p>No related products found.</p>
-                     </div>
-                  @endforelse
-               </div>
-               <!-- If we need pagination -->
-               <div class="testimonial-pagination text-center"></div>
-               <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span>
+                  </div>
+               @empty
+                  <div class="col-12 text-center py-50">
+                     <p>No related products found.</p>
+                  </div>
+               @endforelse
             </div>
          </div>
       </div>
@@ -530,6 +555,60 @@
 
    <!-- Reviews rating CSS -->
    <style>
+      /* Related Products Grid Layout */
+      .related_product .products-wrapper {
+         display: grid;
+         grid-template-columns: repeat(4, 1fr);
+         gap: 30px;
+         margin-bottom: 30px;
+      }
+
+      @media (max-width: 1199px) {
+         .related_product .products-wrapper {
+            grid-template-columns: repeat(3, 1fr);
+         }
+      }
+
+      @media (max-width: 767px) {
+         .related_product .products-wrapper {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+         }
+      }
+
+      @media (max-width: 480px) {
+         .related_product .products-wrapper {
+            grid-template-columns: 1fr;
+         }
+      }
+
+      /* FIX PRODUCT IMAGE SIZE */
+      .related_product .single-product .product-image {
+         width: 100%;
+         height: 320px;
+         overflow: hidden;
+         position: relative;
+      }
+
+      /* IMAGE */
+      .related_product .single-product .product-image img {
+         width: 100%;
+         height: 100%;
+         object-fit: cover;
+         display: block;
+      }
+
+      /* PRODUCT CARD */
+      .related_product .single-product {
+         width: 100%;
+      }
+
+      /* PRODUCT DESCRIPTION */
+      .related_product .product-desc {
+         padding: 15px;
+         text-align: center;
+      }
+
       /* Size Chart Modal Styles */
       .modal-content {
          border-radius: 8px;
@@ -632,8 +711,16 @@
          background-color: #171717;
          color: #fff;
       }
+      .size-option-disabled .size-badge {
+         color: #999;
+         border-style: dashed;
+         background: #f8f8f8;
+      }
       .size-option:hover .size-badge {
          border-color: #171717;
+      }
+      .size-option-disabled:hover .size-badge {
+         border-color: #ddd;
       }
       .color-option input[type="radio"]:checked + .color-badge {
          border-color: #171717 !important;
@@ -654,6 +741,62 @@
    <!-- Product Details JavaScript -->
    <script>
       document.addEventListener('DOMContentLoaded', function() {
+         // Quantity button functionality
+         const quantityInput = document.getElementById('product-quantity');
+         const plusButton = document.querySelector('.cart-plus');
+         const minusButton = document.querySelector('.cart-minus');
+
+         function getSelectedSizeStock() {
+            const selected = document.querySelector('input[name="product_size"]:checked');
+            if (!selected) {
+               return null;
+            }
+
+            const stock = parseInt(selected.dataset.stock || '0', 10);
+            return Number.isNaN(stock) ? null : stock;
+         }
+
+         function normalizeQuantityToStock() {
+            const stock = getSelectedSizeStock();
+            if (stock === null || !quantityInput) {
+               return;
+            }
+
+            const currentQty = parseInt(quantityInput.value || '1', 10);
+            if (stock <= 0) {
+               quantityInput.value = 1;
+               return;
+            }
+
+            if (currentQty > stock) {
+               quantityInput.value = stock;
+            }
+         }
+         
+         // Handle quantity increase
+         if (plusButton) {
+            plusButton.addEventListener('click', function(e) {
+               e.preventDefault();
+               let currentQty = parseInt(quantityInput.value) || 1;
+               const stock = getSelectedSizeStock();
+               if (stock !== null && currentQty >= stock) {
+                  return;
+               }
+               quantityInput.value = currentQty + 1;
+            });
+         }
+         
+         // Handle quantity decrease
+         if (minusButton) {
+            minusButton.addEventListener('click', function(e) {
+               e.preventDefault();
+               let currentQty = parseInt(quantityInput.value) || 1;
+               if (currentQty > 1) {
+                  quantityInput.value = currentQty - 1;
+               }
+            });
+         }
+         
          // Size and Color Selection
          const sizeOptions = document.querySelectorAll('.size-option');
          const colorOptions = document.querySelectorAll('.color-option');
@@ -662,8 +805,55 @@
          sizeOptions.forEach(option => {
             option.addEventListener('click', function() {
                const radio = this.querySelector('input[type="radio"]');
+               if (!radio || radio.disabled) {
+                  return;
+               }
                radio.checked = true;
                removeError('size');
+               normalizeQuantityToStock();
+            });
+         });
+
+         // Notify admin for out-of-stock sizes
+         document.querySelectorAll('.notify-stock-btn').forEach((button) => {
+            button.addEventListener('click', async function () {
+               const size = this.dataset.size;
+               const productId = this.dataset.productId;
+               const messageEl = document.querySelector('.stock-alert-message');
+
+               try {
+                  const response = await fetch(`/products/${productId}/stock-alert`, {
+                     method: 'POST',
+                     headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                        'Accept': 'application/json',
+                     },
+                     body: JSON.stringify({ size }),
+                  });
+
+                  const data = await response.json();
+                  if (!messageEl) {
+                     return;
+                  }
+
+                  messageEl.style.display = 'block';
+                  if (response.ok && data.success) {
+                     messageEl.style.color = '#15803d';
+                     messageEl.textContent = data.message || 'Request sent successfully.';
+                  } else {
+                     messageEl.style.color = '#b91c1c';
+                     messageEl.textContent = data.message || 'Unable to send request right now.';
+                  }
+               } catch (error) {
+                  if (!messageEl) {
+                     return;
+                  }
+
+                  messageEl.style.display = 'block';
+                  messageEl.style.color = '#b91c1c';
+                  messageEl.textContent = 'Unable to send request right now.';
+               }
             });
          });
          

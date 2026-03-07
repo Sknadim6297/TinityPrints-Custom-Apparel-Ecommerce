@@ -36,6 +36,16 @@ class Order extends Model
         'shipping_method',
         'tracking_number',
         'delivery_status',
+        'delivered_date',
+        'placed_at',
+        'confirmed_at',
+        'paid_at',
+        'printing_at',
+        'packed_at',
+        'shipped_at',
+        'delivered_at',
+        'cancelled_at',
+        'refunded_at',
     ];
 
     protected $casts = [
@@ -44,6 +54,16 @@ class Order extends Model
         'subtotal' => 'decimal:2',
         'discount_amount' => 'decimal:2',
         'total_amount' => 'decimal:2',
+        'delivered_date' => 'datetime',
+        'placed_at' => 'datetime',
+        'confirmed_at' => 'datetime',
+        'paid_at' => 'datetime',
+        'printing_at' => 'datetime',
+        'packed_at' => 'datetime',
+        'shipped_at' => 'datetime',
+        'delivered_at' => 'datetime',
+        'cancelled_at' => 'datetime',
+        'refunded_at' => 'datetime',
     ];
 
     public function user()

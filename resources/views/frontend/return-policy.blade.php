@@ -5,7 +5,7 @@
 
 <!-- page title area start -->
 
-<section class="page-title-area" data-background="{{ asset('frontend/assets/img/banner/banner-1-1.jpg') }}">
+<section class="page-title-area" data-background="{{ asset('frontend/assets/img/banner/banner-1-1.jpeg') }}">
    <div class="container">
       <div class="row">
          <div class="col-lg-12">

@@ -4,7 +4,7 @@
 
 @section('content')
 <!-- page title area start  -->
-<section class="page-title-area" data-background="{{ asset('frontend/assets/img/banner/banner-1-1.jpg') }}">
+<section class="page-title-area" data-background="{{ asset('frontend/assets/img/banner/banner-1-1.jpeg') }}">
     <div class="container">
         <div class="row">
             <div class="col-lg-12">
@@ -130,16 +130,6 @@
 
                         <div class="product-actions mt-3">
                             <button class="btn add-to-cart-btn w-100 mb-2" 
-                                    data-product-id="{{ $product->id }}"
-                                    style="background-color: var(--clr-common-heading); 
-                                           color: white; 
-                                           padding: 10px 15px; 
-                                           border: none; 
-                                           border-radius: 5px;
-                                           font-weight: 600;
-                                           transition: all 0.3s;">
-                                <i class="fal fa-shopping-bag"></i> Add to Cart
-                            </button>
                         </div>
                     </div>
                 </div>

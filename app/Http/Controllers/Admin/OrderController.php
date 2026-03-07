@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Support\AdminNotifier;
+use App\Support\InventoryManager;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -35,7 +37,7 @@ class OrderController extends Controller
 
     public function show(Order $order)
     {
-        $order->load(['product', 'designRequest', 'items.product', 'user']);
+        $order->load(['product', 'designRequest', 'items.product.images', 'user']);
         
         return view('admin.orders.show', compact('order'));
     }
@@ -46,7 +48,7 @@ class OrderController extends Controller
         $previousPaymentStatus = $order->payment_status;
 
         $validated = $request->validate([
-            'order_status' => 'required|in:design_pending,design_approved,payment_pending,paid,printing,packed,shipped,delivered,refund_requested,under_review,refund_approved,refund_rejected,return_in_process,product_received,refund_completed,refunded',
+            'order_status' => 'required|in:design_pending,design_approved,payment_pending,paid,printing,packed,shipped,delivered,refund_requested,under_review,refund_approved,refund_rejected,return_in_process,product_received,refund_completed,refunded,cancelled',
             'payment_status' => 'required|in:pending,paid,refunded',
             'delivery_status' => 'required|in:pending,in_transit,delivered,failed',
             'tracking_number' => 'nullable|string|max:255',
@@ -57,23 +59,61 @@ class OrderController extends Controller
 
         $shippingCost = $this->calculateShippingCost($validated['shipping_weight_grams'] ?? null);
 
-        $order->update([
-            'order_status' => $validated['order_status'],
-            'payment_status' => $validated['payment_status'],
-            'delivery_status' => $validated['delivery_status'],
-            'tracking_number' => $validated['tracking_number'] ?? null,
-            'shipping_method' => $validated['shipping_method'] ?? null,
-            'shipping_partner' => $validated['shipping_partner'] ?? null,
-            'shipping_weight_grams' => $validated['shipping_weight_grams'] ?? null,
-            'shipping_cost' => $shippingCost,
-        ]);
+        DB::transaction(function () use ($order, $validated, $shippingCost, $previousStatus) {
+            $updateData = [
+                'order_status' => $validated['order_status'],
+                'payment_status' => $validated['payment_status'],
+                'delivery_status' => $validated['delivery_status'],
+                'tracking_number' => $validated['tracking_number'] ?? null,
+                'shipping_method' => $validated['shipping_method'] ?? null,
+                'shipping_partner' => $validated['shipping_partner'] ?? null,
+                'shipping_weight_grams' => $validated['shipping_weight_grams'] ?? null,
+                'shipping_cost' => $shippingCost,
+            ];
+
+            // Set status timestamps when status changes
+            if ($previousStatus !== $validated['order_status']) {
+                $statusTimestampMap = [
+                    'design_approved' => 'confirmed_at',
+                    'paid' => 'paid_at',
+                    'printing' => 'printing_at',
+                    'packed' => 'packed_at',
+                    'shipped' => 'shipped_at',
+                    'delivered' => 'delivered_at',
+                    'cancelled' => 'cancelled_at',
+                    'refunded' => 'refunded_at',
+                    'refund_completed' => 'refunded_at',
+                ];
+
+                if (isset($statusTimestampMap[$validated['order_status']])) {
+                    $timestampField = $statusTimestampMap[$validated['order_status']];
+                    // Only set timestamp if not already set
+                    if (empty($order->{$timestampField})) {
+                        $updateData[$timestampField] = now();
+                    }
+                }
+            }
+
+            $order->update($updateData);
+
+            $restoreStatuses = ['cancelled', 'refund_completed', 'refunded'];
+            $isNewRestoreTransition = !in_array($previousStatus, $restoreStatuses, true)
+                && in_array($order->order_status, $restoreStatuses, true);
+
+            if ($isNewRestoreTransition) {
+                InventoryManager::restoreForOrder($order);
+            }
+        });
 
         if ($order->order_status === 'shipped' && $order->delivery_status === 'pending') {
             $order->update(['delivery_status' => 'in_transit']);
         }
 
         if ($order->order_status === 'delivered') {
-            $order->update(['delivery_status' => 'delivered']);
+            $order->update([
+                'delivery_status' => 'delivered',
+                'delivered_date' => $order->delivered_date ?? now(),
+            ]);
         }
 
         if ($previousPaymentStatus !== 'paid' && $order->payment_status === 'paid') {
