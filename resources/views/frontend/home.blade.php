@@ -21,6 +21,10 @@
 .product-img-wrapper:hover .uniform-product-img {
     transform: scale(1.05);
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> b975304 (Merge second developer codebase with existing features)
 /* Feature Section */
 .custom-design-features{
     background: #f9f9f9;
@@ -585,6 +589,7 @@
       <!-- category area2 end  -->
 
       <!-- testimonials area start -->
+      @if(isset($testimonials) && $testimonials->count())
       <section class="testimonials-area pt-120 pb-120">
          <div class="container">
             <div class="row justify-content-center">
@@ -598,60 +603,26 @@
             <div class="testimonial-wrapper">
                <div class="swiper-container testimonial-slider">
                   <div class="swiper-wrapper">
-                     <div class="swiper-slide">
-                        <div class="testimonial-item text-center">
-                           <div class="author-thumb mb-30" style="position:relative;">
-                              <img src="{{ asset('frontend/assets/img/member/member-img-01.jpg') }}" alt="Customer">
-                              <div class="author-icons" style="position:absolute;right:10px;bottom:8px;color:#fff;display:flex;gap:8px;align-items:center;font-size:16px;">
-                                 <i class="fas fa-user" aria-hidden="true"></i>
-                                 <i class="fas fa-user-circle" aria-hidden="true"></i>
+                     @foreach($testimonials as $testimonial)
+                        <div class="swiper-slide">
+                           <div class="testimonial-item text-center">
+                              @if($testimonial->image_path)
+                              <div class="author-thumb mb-30">
+                                 <img src="{{ Storage::url($testimonial->image_path) }}" alt="Customer">
+                              </div>
+                              @endif
+                              <div class="author-text">
+                                 <p>"{{ $testimonial->content }}"</p>
+                              </div>
+                              <div class="testimonial-author">
+                                 <div class="author-name">{{ $testimonial->author_name }}</div>
+                                 @if($testimonial->author_desc)
+                                    <div class="author-desc">{{ $testimonial->author_desc }}</div>
+                                 @endif
                               </div>
                            </div>
-                           <div class="author-text">
-                              <p>"The quality is amazing! My custom design turned out exactly as I imagined. The fabric is soft and the print is vibrant. Will definitely order more!"</p>
-                           </div>
-                           <div class="testimonial-author">
-                              <div class="author-name">Sarah Johnson</div>
-                              <div class="author-desc">Custom Design Customer</div>
-                           </div>
                         </div>
-                     </div>
-                     <div class="swiper-slide">
-                        <div class="testimonial-item text-center">
-                           <div class="author-thumb mb-30" style="position:relative;">
-                              <img src="{{ asset('frontend/assets/img/member/member-img-02.jpg') }}" alt="Customer">
-                              <div class="author-icons" style="position:absolute;right:10px;bottom:8px;color:#fff;display:flex;gap:8px;align-items:center;font-size:16px;">
-                                 <i class="fas fa-user" aria-hidden="true"></i>
-                                 <i class="fas fa-user-circle" aria-hidden="true"></i>
-                              </div>
-                           </div>
-                           <div class="author-text">
-                              <p>"Love the limited edition collection! The designs are unique and the t-shirts fit perfectly. Great quality and fast shipping too."</p>
-                           </div>
-                           <div class="testimonial-author">
-                              <div class="author-name">Michael Chen</div>
-                              <div class="author-desc">Limited Edition Fan</div>
-                           </div>
-                        </div>
-                     </div>
-                     <div class="swiper-slide">
-                        <div class="testimonial-item text-center">
-                           <div class="author-thumb mb-30" style="position:relative;">
-                              <img src="{{ asset('frontend/assets/img/member/member-img-04.jpg') }}" alt="Customer">
-                              <div class="author-icons" style="position:absolute;right:10px;bottom:8px;color:#fff;display:flex;gap:8px;align-items:center;font-size:16px;">
-                                 <i class="fas fa-user" aria-hidden="true"></i>
-                                 <i class="fas fa-user-circle" aria-hidden="true"></i>
-                              </div>
-                           </div>
-                           <div class="author-text">
-                              <p>"Excellent customer service and amazing products. The t-shirts are comfortable and stylish. Highly recommend Tinnity!"</p>
-                           </div>
-                           <div class="testimonial-author">
-                              <div class="author-name">Emily Davis</div>
-                              <div class="author-desc">Repeat Customer</div>
-                           </div>
-                        </div>
-                     </div>
+                     @endforeach
                   </div>
                   <!-- Add Navigation -->
                   <div class="testimonial-pagination"></div>
@@ -662,6 +633,7 @@
          </div>
       </section>
       <!-- testimonials area end -->
+      @endif
 
       <!-- instagram gallery section start -->
       <section class="instagram-gallery-area pt-120 pb-90">

@@ -34,6 +34,10 @@ class HomeController extends Controller
             ->with('images')
             ->get();
 
+        $testimonials = \App\Models\Testimonial::where('is_active', true)
+            ->orderBy('sort_order')
+            ->get();
+
         $trendyProducts = Product::where('is_active', true)
             ->with('images')
             ->get();
@@ -43,7 +47,8 @@ class HomeController extends Controller
             'bestSellerProducts', 
             'newArrivalProducts',
             'hotCollectionProducts',
-            'trendyProducts'
+            'trendyProducts',
+            'testimonials'
         ));
     }
 
@@ -207,7 +212,10 @@ class HomeController extends Controller
      */
     public function about()
     {
-        return view('frontend.about');
+        $testimonials = \App\Models\Testimonial::where('is_active', true)
+            ->orderBy('sort_order')
+            ->get();
+        return view('frontend.about', compact('testimonials'));
     }
 
     /**
@@ -215,7 +223,9 @@ class HomeController extends Controller
      */
     public function contact()
     {
-        return view('frontend.contact');
+        // pull contact settings to make phone/address editable from admin
+        $contactSettings = \App\Models\ContactSetting::first();
+        return view('frontend.contact', compact('contactSettings'));
     }
 
     /**
@@ -286,6 +296,7 @@ class HomeController extends Controller
      */
     public function refundPolicy()
     {
-        return view('frontend.refund-policy');
+        $contactSettings = \App\Models\ContactSetting::first();
+        return view('frontend.refund-policy', compact('contactSettings'));
     }
 }

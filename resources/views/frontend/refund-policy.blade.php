@@ -313,7 +313,14 @@
                               </svg>
                            </div>
                            <h5 class="mb-10">Email Support</h5>
-                           <p class="mb-10"><a href="mailto:refunds@tinnityecom.com">refunds@tinnityecom.com</a></p>
+                           @php
+                               $email1 = $contactSettings->email_primary ?? 'refunds@tinnityecom.com';
+                               $email2 = $contactSettings->email_secondary ?? '';
+                           @endphp
+                           <p class="mb-10"><a href="mailto:{{ $email1 }}">{{ $email1 }}</a></p>
+                           @if(!empty($email2))
+                               <p class="mb-10"><a href="mailto:{{ $email2 }}">{{ $email2 }}</a></p>
+                           @endif
                            <p class="text-small text-muted">Response within 24 hours</p>
                         </div>
                      </div>

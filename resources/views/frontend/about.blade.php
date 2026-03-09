@@ -521,6 +521,7 @@ $about = \App\Models\AboutSection::first();
       <!-- speciality area end  -->
 
       <!-- testimonial area start  -->
+      @if(isset($testimonials) && $testimonials->count())
       <div class="testimonial-area pt-85 pb-120">
          <div class="container">
             <div class="row">
@@ -528,60 +529,28 @@ $about = \App\Models\AboutSection::first();
                   <div class="testimonial-wrapper">
                      <div class="swiper-container testimonial-active">
                         <div class="swiper-wrapper">
-                           <div class="swiper-slide">
-                              <div class="testimonial-single">
-                                 <div class="testimonial-content">
-                                    <div class="testimonial-author">
-                                       <h4 class="author-name">Charlotte Sophia</h4>
-                                       <div class="author-desc">Team Leader, Codex</div>
-                                    </div>
-                                    <div class="author-text">
-                                       <p>Buying a package usually means you buy two or more services, with each service
-                                          coming at a discounted price. For
-                                          example, instead of buying a manicure for combo of the two carrot.</p>
-                                    </div>
-                                    <div class="author-thumb">
-                                       <img src="assets/img/testimonial/author-1.html" alt="author img">
-                                    </div>
-                                 </div>
-                              </div>
-                           </div>
-                           <div class="swiper-slide">
-                              <div class="testimonial-single">
-                                 <div class="testimonial-content">
-                                    <div class="testimonial-author">
-                                       <h4 class="author-name">Charlotte Sophia</h4>
-                                       <div class="author-desc">Team Leader, Codex</div>
-                                    </div>
-                                    <div class="author-text">
-                                       <p>Buying a package usually means you buy two or more services, with each service
-                                          coming at a discounted price. For
-                                          example, instead of buying a manicure for combo of the two carrot.</p>
-                                    </div>
-                                    <div class="author-thumb">
-                                       <img src="assets/img/testimonial/author-1.html" alt="author img">
+                           @foreach($testimonials as $testimonial)
+                              <div class="swiper-slide">
+                                 <div class="testimonial-single">
+                                    <div class="testimonial-content">
+                                       <div class="testimonial-author">
+                                          <h4 class="author-name">{{ $testimonial->author_name }}</h4>
+                                          @if($testimonial->author_desc)
+                                              <div class="author-desc">{{ $testimonial->author_desc }}</div>
+                                          @endif
+                                       </div>
+                                       <div class="author-text">
+                                          <p>{{ $testimonial->content }}</p>
+                                       </div>
+                                       @if($testimonial->image_path)
+                                          <div class="author-thumb">
+                                             <img src="{{ Storage::url($testimonial->image_path) }}" alt="author img">
+                                          </div>
+                                       @endif
                                     </div>
                                  </div>
                               </div>
-                           </div>
-                           <div class="swiper-slide">
-                              <div class="testimonial-single">
-                                 <div class="testimonial-content">
-                                    <div class="testimonial-author">
-                                       <h4 class="author-name">Charlotte Sophia</h4>
-                                       <div class="author-desc">Team Leader, Codex</div>
-                                    </div>
-                                    <div class="author-text">
-                                       <p>Buying a package usually means you buy two or more services, with each service
-                                          coming at a discounted price. For
-                                          example, instead of buying a manicure for combo of the two carrot.</p>
-                                    </div>
-                                    <div class="author-thumb">
-                                       <img src="assets/img/testimonial/author-1.html" alt="author img">
-                                    </div>
-                                 </div>
-                              </div>
-                           </div>
+                           @endforeach
                         </div>
 
                         <div class="testimonial-pagination">
@@ -600,6 +569,7 @@ $about = \App\Models\AboutSection::first();
             </div>
          </div>
       </div>
+      @endif
    </main>
 
 @endsection

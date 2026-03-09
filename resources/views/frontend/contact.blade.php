@@ -192,10 +192,12 @@
                                         </div>
                                         <div class="irc-item-content">
                                         <div class="irc-item-heading">Phone</div>
-                                        <span>Mobile : <a href="tel:(+88)872-670-780"><span>(+88)
-                                                    872-670-780</span></a></span>
-                                        <span>Hotline : <a href="tel:(+88)422-655-793"><span>(+88)
-                                                    422-655-793</span></a></span>
+                                        @php
+                                            $mobile = $contactSettings->mobile_phone ?? '(+88)872-670-780';
+                                            $hotline = $contactSettings->hotline_phone ?? '(+88)422-655-793';
+                                        @endphp
+                                        <span>Mobile : <a href="tel:{{ preg_replace('/\D+/', '', $mobile) }}"><span>{{ $mobile }}</span></a></span>
+                                        <span>Hotline : <a href="tel:{{ preg_replace('/\D+/', '', $hotline) }}"><span>{{ $hotline }}</span></a></span>
                                         </div>
                                     </div>
                                 </div>
@@ -216,8 +218,12 @@
                                         </div>
                                         <div class="irc-item-content">
                                         <div class="irc-item-heading">Email</div>
-                                        <span><a href="https://envato.bdevstech.com/cdn-cgi/l/email-protection#0b42656d644b6e736a667b676e25686466"><span class="__cf_email__" data-cfemail="92dbfcf4fdd2f7eaf3ffe2fef7bcf1fdff">[email&#160;protected]</span></a></span>
-                                        <span><a href="https://envato.bdevstech.com/cdn-cgi/l/email-protection#266549485247455266435e474b564a430845494b"><span class="__cf_email__" data-cfemail="0e4d61607a6f6d7a4e6b766f637e626b206d6163">[email&#160;protected]</span></a></span>
+                                        @php
+                                            $email1 = $contactSettings->email_primary ?? 'info@tinnityecom.com';
+                                            $email2 = $contactSettings->email_secondary ?? 'support@tinnityecom.com';
+                                        @endphp
+                                        <span><a href="mailto:{{ $email1 }}">{{ $email1 }}</a></span>
+                                        <span><a href="mailto:{{ $email2 }}">{{ $email2 }}</a></span>
                                         </div>
                                     </div>
                                 </div>
@@ -246,8 +252,7 @@
                                         </div>
                                         <div class="irc-item-content">
                                         <div class="irc-item-heading">Location</div>
-                                        <span>Abbot Kinney Blvd. New York,
-                                            USA-5785</span>
+                                        <span>{{ $contactSettings->address ?? 'Abbot Kinney Blvd. New York, USA-5785' }}</span>
                                         </div>
                                     </div>
                                 </div>

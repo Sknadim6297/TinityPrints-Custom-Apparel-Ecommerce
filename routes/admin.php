@@ -11,6 +11,8 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\RefundController;
 use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Admin\AboutSectionController;
+use App\Http\Controllers\Admin\ContactSettingController;
+use App\Http\Controllers\Admin\TestimonialController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -45,7 +47,17 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
 
     // Contacts
     Route::resource('contacts', ContactController::class)
-    ->only(['index', 'show', 'destroy']);
+        ->only(['index', 'show', 'destroy']);
+
+    // Contact page settings
+    Route::get('settings/contact', [ContactSettingController::class, 'edit'])
+        ->name('contact-settings.edit');
+    Route::post('settings/contact', [ContactSettingController::class, 'update'])
+        ->name('contact-settings.update');
+
+    // Testimonials management
+    Route::resource('testimonials', TestimonialController::class)
+        ->except(['show']);
     
     // Logout
     Route::post('logout', [AdminAuthenticatedSessionController::class, 'destroy'])
@@ -144,4 +156,8 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
 
     Route::post('about-section', [AboutSectionController::class, 'update'])
     ->name('about.update');
+
+    Route::get('/settings', function () {
+    return view('admin.settings.index');
+})->name('settings.index');
 });

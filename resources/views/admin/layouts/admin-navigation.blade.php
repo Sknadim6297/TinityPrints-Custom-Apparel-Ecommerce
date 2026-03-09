@@ -82,7 +82,7 @@
                             @endif">
                             Coupons
                         </a>
-                        <a href="#" class="px-3 py-2 rounded-md text-sm font-medium transition-all duration-150 text-gray-900 dark:text-gray-100 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-800">
+                        <a href="{{ route('admin.settings.index') }}" class="px-3 py-2 rounded-md text-sm font-medium transition-all duration-150 text-gray-900 dark:text-gray-100 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-800">
                             Settings
                         </a>
                     @endif
@@ -205,7 +205,7 @@
                 <a href="{{ route('admin.coupons.index') }}" class="text-gray-900 dark:text-gray-100 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                     Coupons
                 </a>
-                <a href="#" class="text-gray-900 dark:text-gray-100 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                <a href="{{ route('admin.settings.index') }}" class="text-gray-900 dark:text-gray-100 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                     Settings
                 </a>
             @endif
