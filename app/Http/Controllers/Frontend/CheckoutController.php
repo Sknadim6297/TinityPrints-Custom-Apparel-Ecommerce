@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
+use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\UserAddress;
@@ -180,8 +181,20 @@ class CheckoutController extends Controller
             // Clear cart
             Cart::where('user_id', auth()->id())->delete();
 
+            // Mark coupon as used by this user (if coupon was applied)
+            if ($couponCode) {
+                $coupon = Coupon::where('code', $couponCode)->first();
+                if ($coupon) {
+                    // Increment global usage count
+                    $coupon->increment('usage_count');
+                    
+                    // Mark coupon as used by this user (per-user tracking)
+                    $coupon->markAsUsedByUser(auth()->id());
+                }
+            }
+
             // Clear coupon session
-            session()->forget(['coupon_code', 'coupon_discount']);
+            session()->forget(['coupon_code', 'coupon_discount', 'applied_coupon']);
 
             // Notify admins
             AdminNotifier::notifyAll(

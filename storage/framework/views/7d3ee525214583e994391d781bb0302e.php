@@ -142,9 +142,6 @@
                                  <a href="<?php echo e(route('product.details', $product->id)); ?>" class="quick-view-btn"><i class="fal fa-eye"></i></a>
                                  <button type="button" class="wishlist-btn add-to-wishlist-btn" data-product-id="<?php echo e($product->id); ?>"><i class="fal fa-heart"></i></button>
                               </div>
-                              <div class="product-action-bottom">
-                                 <button type="button" class="add-cart-btn add-to-cart-btn" data-product-id="<?php echo e($product->id); ?>"><i class="fal fa-shopping-bag"></i>Add to Cart</button>
-                              </div>
                               <?php if($product->is_limited_edition): ?>
                               <div class="product-sticker-wrapper">
                                  <span class="product-sticker new">Limited</span>

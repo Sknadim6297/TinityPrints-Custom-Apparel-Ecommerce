@@ -278,14 +278,6 @@ class CartController extends Controller
             ->where('is_active', true)
             ->first();
 
-        // Check if coupon has been used by this user before
-        if ($coupon->hasBeenUsedByUser(auth()->id())) {
-            return response()->json([
-                'success' => false,
-                'message' => 'You have already used this coupon. Each coupon can be used only once.'
-            ], 422);
-        }
-
         if (!$coupon) {
             return response()->json([
                 'success' => false,
@@ -301,11 +293,20 @@ class CartController extends Controller
             ], 422);
         }
 
-        // Check usage limit
-        if ($coupon->usage_limit && $coupon->usage_count >= $coupon->usage_limit) {
+        // Check if coupon has reached its total usage limit (across all customers)
+        if ($coupon->hasReachedTotalUsageLimit()) {
             return response()->json([
                 'success' => false,
-                'message' => 'This coupon has reached its usage limit.'
+                'message' => 'This coupon has reached its maximum usage limit.'
+            ], 422);
+        }
+
+        // Check if user has reached the per-customer usage limit for this coupon
+        if ($coupon->hasReachedUsageLimit(auth()->id())) {
+            $limit = $coupon->per_customer_usage_limit;
+            return response()->json([
+                'success' => false,
+                'message' => "You have already used this coupon {$limit} time(s). Your usage limit reached."
             ], 422);
         }
 
@@ -348,6 +349,7 @@ class CartController extends Controller
         $total = max(0, $subtotal - $discount);
 
         // Store coupon in session (for both cart and checkout)
+        // Note: The coupon will be marked as used only when the order is successfully placed
         session([
             'applied_coupon' => [
                 'code' => $coupon->code,
@@ -358,12 +360,6 @@ class CartController extends Controller
             'coupon_code' => $coupon->code,
             'coupon_discount' => $discount
         ]);
-
-        // Increment usage count
-        $coupon->increment('usage_count');
-
-        // Mark coupon as used by this user (per-user tracking)
-        $coupon->markAsUsedByUser(auth()->id());
 
         return response()->json([
             'success' => true,
@@ -413,8 +409,8 @@ class CartController extends Controller
             ->map(function ($coupon) use ($subtotal, $appliedCode) {
                 $isApplied = $appliedCode && $coupon->code === $appliedCode;
                 $meetsMinimum = !$coupon->min_order_value || $subtotal >= $coupon->min_order_value;
-                $hasBeenUsed = $coupon->hasBeenUsedByUser(auth()->id());
-                $isAvailable = !$isApplied && $meetsMinimum && !$hasBeenUsed;
+                $hasReachedLimit = $coupon->hasReachedUsageLimit(auth()->id());
+                $isAvailable = !$isApplied && $meetsMinimum && !$hasReachedLimit;
                 
                 return [
                     'code' => $coupon->code,
@@ -425,7 +421,9 @@ class CartController extends Controller
                     'is_available' => $isAvailable,
                     'is_applied' => $isApplied,
                     'meets_minimum' => $meetsMinimum,
-                    'has_been_used' => $hasBeenUsed,
+                    'has_reached_limit' => $hasReachedLimit,
+                    'usage_limit' => $coupon->usage_limit,
+                    'user_usage_count' => $coupon->getUserUsageCount(auth()->id()),
                     'required_amount' => $coupon->min_order_value ? max(0, $coupon->min_order_value - $subtotal) : 0
                 ];
             })
