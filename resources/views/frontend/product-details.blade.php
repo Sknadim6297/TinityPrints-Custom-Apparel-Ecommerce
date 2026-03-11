@@ -433,7 +433,7 @@
       </section>
       <!-- shop details area end  -->
 
-      <div class="related_product pb-70">
+      <div class="related_product pb-0">
          <div class="container container-small">
             <div class="section-title mb-55">
                <h2>Related Products</h2>
@@ -560,7 +560,7 @@
          display: grid;
          grid-template-columns: repeat(4, 1fr);
          gap: 30px;
-         margin-bottom: 30px;
+         margin-bottom: 0;
       }
 
       @media (max-width: 1199px) {

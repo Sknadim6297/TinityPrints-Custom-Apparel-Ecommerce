@@ -10,10 +10,13 @@ class Product extends Model
         'name',
         'description',
         'category',
+        'category_id',
         'brand',
         'rating',
         'fit_type',
         'sleeve_type',
+        'sleeve_type_id',
+        'collection_type_id',
         'base_price',
         'is_limited_edition',
         'drop_month',
@@ -58,6 +61,21 @@ class Product extends Model
     public function admin()
     {
         return $this->belongsTo(Admin::class, 'created_by');
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class, 'category_id');
+    }
+
+    public function sleeveType()
+    {
+        return $this->belongsTo(SleeveType::class, 'sleeve_type_id');
+    }
+
+    public function collectionType()
+    {
+        return $this->belongsTo(CollectionType::class, 'collection_type_id');
     }
 
     public function reviews()

@@ -27,14 +27,62 @@
                             : 0;
                     @endphp
                     
-                    <a href="{{ route('admin.products.index') }}" class="px-3 py-2 rounded-md text-sm font-medium transition-all duration-150
-                        @if(request()->routeIs('admin.products.*'))
-                            bg-gray-100 dark:bg-gray-700 text-red-600 dark:text-red-400 shadow-sm
-                        @else
-                            text-gray-900 dark:text-gray-100 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-800
-                        @endif">
-                        Products
-                    </a>
+                    <div class="relative" x-data="{ productOpen: false }">
+                        <button
+                            @click="productOpen = !productOpen"
+                            @click.away="productOpen = false"
+                            type="button"
+                            class="inline-flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium transition-all duration-150
+                                @if(request()->routeIs('admin.products.*') || request()->routeIs('admin.categories.*') || request()->routeIs('admin.sleeve-types.*') || request()->routeIs('admin.collection-types.*'))
+                                    bg-gray-100 dark:bg-gray-700 text-red-600 dark:text-red-400 shadow-sm
+                                @else
+                                    text-gray-900 dark:text-gray-100 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-800
+                                @endif">
+                            Product Section
+                            <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': productOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+
+                        <div
+                            x-show="productOpen"
+                            x-transition
+                            class="absolute left-0 mt-2 w-56 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg p-2 z-50"
+                            style="display: none;">
+                            <a href="{{ route('admin.products.index') }}" class="block px-3 py-2 rounded-md text-sm transition-colors
+                                @if(request()->routeIs('admin.products.*'))
+                                    bg-red-50 dark:bg-gray-700 text-red-600 dark:text-red-400
+                                @else
+                                    text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700
+                                @endif">
+                                Manage Products
+                            </a>
+                            <a href="{{ route('admin.categories.index') }}" class="block px-3 py-2 rounded-md text-sm transition-colors
+                                @if(request()->routeIs('admin.categories.*'))
+                                    bg-red-50 dark:bg-gray-700 text-red-600 dark:text-red-400
+                                @else
+                                    text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700
+                                @endif">
+                                Categories
+                            </a>
+                            <a href="{{ route('admin.sleeve-types.index') }}" class="block px-3 py-2 rounded-md text-sm transition-colors
+                                @if(request()->routeIs('admin.sleeve-types.*'))
+                                    bg-red-50 dark:bg-gray-700 text-red-600 dark:text-red-400
+                                @else
+                                    text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700
+                                @endif">
+                                Sleeve Types
+                            </a>
+                            <a href="{{ route('admin.collection-types.index') }}" class="block px-3 py-2 rounded-md text-sm transition-colors
+                                @if(request()->routeIs('admin.collection-types.*'))
+                                    bg-red-50 dark:bg-gray-700 text-red-600 dark:text-red-400
+                                @else
+                                    text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700
+                                @endif">
+                                Collection Types
+                            </a>
+                        </div>
+                    </div>
                     
                     <a href="{{ route('admin.design-approvals.index') }}" class="px-3 py-2 rounded-md text-sm font-medium transition-all duration-150
                         @if(request()->routeIs('admin.design-approvals.*'))
@@ -180,8 +228,24 @@
                 Notifications
             </a>
             
+            <div class="px-3 pt-2 text-xs font-semibold tracking-wide uppercase text-gray-500 dark:text-gray-400">
+                Product Section
+            </div>
+
             <a href="{{ route('admin.products.index') }}" class="text-gray-900 dark:text-gray-100 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                Products
+                Manage Products
+            </a>
+
+            <a href="{{ route('admin.categories.index') }}" class="text-gray-900 dark:text-gray-100 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                Categories
+            </a>
+
+            <a href="{{ route('admin.sleeve-types.index') }}" class="text-gray-900 dark:text-gray-100 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                Sleeve Types
+            </a>
+
+            <a href="{{ route('admin.collection-types.index') }}" class="text-gray-900 dark:text-gray-100 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                Collection Types
             </a>
             
             <a href="{{ route('admin.design-approvals.index') }}" class="text-gray-900 dark:text-gray-100 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
+use App\Models\CollectionType;
 use App\Models\DesignRequest;
 use App\Models\Product;
 use Illuminate\Support\Str;
@@ -58,7 +60,10 @@ class HomeController extends Controller
     public function shop(Request $request, $category = null)
     {
         $query = Product::where('is_active', true)
-            ->with(['images', 'colors', 'sizes']);
+            ->with(['images', 'colors', 'sizes', 'category', 'collectionType']);
+
+        $selectedCategory = null;
+        $selectedCollection = null;
 
         // Search filter
         if ($request->filled('search')) {
@@ -71,10 +76,30 @@ class HomeController extends Controller
             });
         }
 
+        if ($request->filled('category_id')) {
+            $selectedCategory = Category::query()
+                ->where('is_active', true)
+                ->find($request->integer('category_id'));
+
+            if ($selectedCategory) {
+                $query->where('category_id', $selectedCategory->id);
+            }
+        }
+
         // Filter by category if provided
-        if ($category || $request->filled('category')) {
+        if (!$selectedCategory && ($category || $request->filled('category'))) {
             $categoryFilter = $category ?: $request->category;
             $query->where('category', $categoryFilter);
+        }
+
+        if ($request->filled('collection_type_id')) {
+            $selectedCollection = CollectionType::query()
+                ->where('is_active', true)
+                ->find($request->integer('collection_type_id'));
+
+            if ($selectedCollection) {
+                $query->where('collection_type_id', $selectedCollection->id);
+            }
         }
 
         // Limited Edition filter
@@ -137,7 +162,35 @@ class HomeController extends Controller
         }
 
         // Get filter data for display
-        $categoryStats = $this->getCategoryStats();
+        $categoryOptions = Category::query()
+            ->where('is_active', true)
+            ->withCount([
+                'products as active_products_count' => function ($query) {
+                    $query->where('is_active', true);
+                },
+            ])
+            ->orderBy('name')
+            ->get();
+
+        $collectionOptions = CollectionType::query()
+            ->where('is_active', true)
+            ->withCount([
+                'products as active_products_count' => function ($query) use ($selectedCategory) {
+                    $query->where('is_active', true);
+
+                    if ($selectedCategory) {
+                        $query->where('category_id', $selectedCategory->id);
+                    }
+                },
+            ])
+            ->orderBy('name')
+            ->get();
+
+        $limitedEditionCount = Product::query()
+            ->where('is_active', true)
+            ->where('is_limited_edition', true)
+            ->count();
+
         $availableSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
         $availableColors = Product::join('product_colors', 'products.id', '=', 'product_colors.product_id')
             ->where('products.is_active', true)
@@ -152,8 +205,14 @@ class HomeController extends Controller
                 ];
             })
             ->toArray();
-        $availableSleeveTypes = Product::where('is_active', true)
-            ->where('category', 't-shirt')
+        $availableSleeveTypes = Product::query()
+            ->where('is_active', true)
+            ->when($selectedCategory, function ($query) use ($selectedCategory) {
+                $query->where('category_id', $selectedCategory->id);
+            })
+            ->when($selectedCollection, function ($query) use ($selectedCollection) {
+                $query->where('collection_type_id', $selectedCollection->id);
+            })
             ->whereNotNull('sleeve_type')
             ->distinct()
             ->pluck('sleeve_type')
@@ -162,29 +221,39 @@ class HomeController extends Controller
         // Get total count for display
         $totalProducts = Product::where('is_active', true)->count();
         
+        // Get category stats for dynamic display
+        $allActiveCategories = Product::where('is_active', true)
+            ->distinct()
+            ->pluck('category')
+            ->filter(function($c) { return !is_null($c) && $c !== ''; })
+            ->toArray();
+        
+        $categoryStats = [];
+        $categoryStats['all'] = $totalProducts;
+        foreach ($allActiveCategories as $cat) {
+            $categoryStats[$cat] = Product::where('is_active', true)
+                ->where('category', $cat)
+                ->count();
+        }
+        $categoryStats['limited_edition'] = $limitedEditionCount;
+        
         $products = $query->paginate(12)->appends($request->except('page'));
 
         return view('frontend.shop', compact(
             'products', 
             'category', 
-            'categoryStats', 
+            'selectedCategory',
+            'selectedCollection',
+            'categoryOptions',
+            'collectionOptions',
+            'limitedEditionCount',
             'availableSizes', 
             'availableColors',
             'availableSleeveTypes',
-            'totalProducts'
+            'totalProducts',
+            'categoryStats',
+            'allActiveCategories'
         ));
-    }
-
-    /**
-     * Get category statistics for filter sidebar
-     */
-    private function getCategoryStats()
-    {
-        return [
-            't-shirt' => Product::where('category', 't-shirt')->where('is_active', true)->count(),
-            'accessories' => Product::where('category', 'accessories')->where('is_active', true)->count(),
-            'limited_edition' => Product::where('is_limited_edition', true)->where('is_active', true)->count(),
-        ];
     }
 
     /**

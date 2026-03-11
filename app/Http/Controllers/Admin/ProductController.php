@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
+use App\Models\CollectionType;
 use App\Models\Product;
 use App\Models\ProductColor;
 use App\Models\ProductImage;
 use App\Models\ProductSize;
+use App\Models\SleeveType;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -15,7 +18,7 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Product::with(['colors.images', 'sizes', 'admin']);
+        $query = Product::with(['colors.images', 'sizes', 'admin', 'category', 'sleeveType', 'collectionType']);
 
         if ($request->filled('search')) {
             $search = trim($request->search);
@@ -29,12 +32,16 @@ class ProductController extends Controller
         }
 
         // Apply filters
-        if ($request->filled('category')) {
-            $query->where('category', $request->category);
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
         }
 
-        if ($request->filled('sleeve_type')) {
-            $query->where('sleeve_type', $request->sleeve_type);
+        if ($request->filled('sleeve_type_id')) {
+            $query->where('sleeve_type_id', $request->sleeve_type_id);
+        }
+
+        if ($request->filled('collection_type_id')) {
+            $query->where('collection_type_id', $request->collection_type_id);
         }
 
         if ($request->filled('size')) {
@@ -71,9 +78,24 @@ class ProductController extends Controller
             }
         }
 
-        // Get segment counts
-        $tshirtCount = Product::where('category', 't-shirt')->count();
-        $accessoriesCount = Product::where('category', 'accessories')->count();
+        // Dynamic filter options and category counters
+        $categories = Category::query()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->withCount('products')
+            ->get();
+
+        $sleeveTypes = SleeveType::query()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        $collectionTypes = CollectionType::query()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        $categoryNameMap = Category::query()->pluck('name', 'id');
 
         // Get filter options
         $availableSizes = ProductSize::distinct()->pluck('size')->sort();
@@ -83,8 +105,10 @@ class ProductController extends Controller
 
         return view('admin.products.index', compact(
             'products', 
-            'tshirtCount', 
-            'accessoriesCount', 
+            'categories',
+            'sleeveTypes',
+            'collectionTypes',
+            'categoryNameMap',
             'availableSizes', 
             'availableColors'
         ));
@@ -100,9 +124,10 @@ class ProductController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'category' => 'nullable|in:t-shirt,accessories',
+            'category_id' => 'required|exists:categories,id',
             'fit_type' => 'required|in:regular,oversize,normal,slight_oversize',
-            'sleeve_type' => 'nullable|in:full,half',
+            'sleeve_type_id' => 'required|exists:sleeve_types,id',
+            'collection_type_id' => 'nullable|exists:collection_types,id',
             'base_price' => 'required|numeric|min:0.01',
             'is_limited_edition' => 'boolean',
             'drop_month' => 'nullable|string',
@@ -128,9 +153,10 @@ class ProductController extends Controller
         $product = Product::create([
             'name' => $validated['name'],
             'description' => $validated['description'],
-            'category' => $validated['category'],
+            'category_id' => $validated['category_id'],
             'fit_type' => $validated['fit_type'],
-            'sleeve_type' => $validated['sleeve_type'],
+            'sleeve_type_id' => $validated['sleeve_type_id'],
+            'collection_type_id' => $validated['collection_type_id'] ?? null,
             'base_price' => $validated['base_price'],
             'is_limited_edition' => $validated['is_limited_edition'] ?? false,
             'drop_month' => $validated['drop_month'],
@@ -214,9 +240,10 @@ class ProductController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'category' => 'required|in:t-shirt,accessories',
+            'category_id' => 'required|exists:categories,id',
             'fit_type' => 'required|in:regular,oversize,normal,slight_oversize',
-            'sleeve_type' => 'required|in:full,half',
+            'sleeve_type_id' => 'required|exists:sleeve_types,id',
+            'collection_type_id' => 'nullable|exists:collection_types,id',
             'base_price' => 'required|numeric|min:0.01',
             'is_limited_edition' => 'boolean',
             'drop_month' => 'nullable|string',
@@ -244,9 +271,10 @@ class ProductController extends Controller
         $product->update([
             'name' => $validated['name'],
             'description' => $validated['description'],
-            'category' => $validated['category'] ?? $product->category,
+            'category_id' => $validated['category_id'],
             'fit_type' => $validated['fit_type'],
-            'sleeve_type' => $validated['sleeve_type'] ?? $product->sleeve_type,
+            'sleeve_type_id' => $validated['sleeve_type_id'],
+            'collection_type_id' => $validated['collection_type_id'] ?? null,
             'base_price' => $validated['base_price'],
             'is_limited_edition' => $validated['is_limited_edition'] ?? false,
             'drop_month' => $validated['drop_month'],

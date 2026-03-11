@@ -66,36 +66,47 @@
 
                     <!-- Category -->
                     <div>
-                        <label for="category" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                        <label for="category_id" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                             Category *
                         </label>
-                        <select id="category" 
-                                name="category" 
+                        <select id="category_id" 
+                                name="category_id" 
                                 required
                                 class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400 transition-all duration-200">
                             <option value="">Select Category</option>
-                            <option value="t-shirt" {{ old('category') == 't-shirt' ? 'selected' : '' }}>T-Shirt</option>
-                            <option value="accessories" {{ old('category') == 'accessories' ? 'selected' : '' }}>Accessories</option>
                         </select>
-                        @error('category')
+                        @error('category_id')
                             <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <!-- Sleeve Type -->
                     <div>
-                        <label for="sleeve_type" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                        <label for="sleeve_type_id" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                             Sleeve Type *
                         </label>
-                        <select id="sleeve_type" 
-                                name="sleeve_type" 
+                        <select id="sleeve_type_id" 
+                                name="sleeve_type_id" 
                                 required
                                 class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400 transition-all duration-200">
                             <option value="">Select Sleeve Type</option>
-                            <option value="full" {{ old('sleeve_type') == 'full' ? 'selected' : '' }}>Full Sleeve</option>
-                            <option value="half" {{ old('sleeve_type') == 'half' ? 'selected' : '' }}>Half Sleeve</option>
                         </select>
-                        @error('sleeve_type')
+                        @error('sleeve_type_id')
+                            <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Collection Type -->
+                    <div>
+                        <label for="collection_type_id" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                            Collection Type
+                        </label>
+                        <select id="collection_type_id" 
+                                name="collection_type_id"
+                                class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400 transition-all duration-200">
+                            <option value="">Select Collection Type (Optional)</option>
+                        </select>
+                        @error('collection_type_id')
                             <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                         @enderror
                     </div>
@@ -462,5 +473,68 @@ document.addEventListener('DOMContentLoaded', function() {
         colorIndex++;
     });
 });
+
+// Load dropdown options from API
+document.addEventListener('DOMContentLoaded', function() {
+    loadDropdownOptions();
+});
+
+function loadDropdownOptions() {
+    fetch('{{ route("api.dropdowns.all") }}')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                populateCategoryDropdown(data.data.categories);
+                populateSleeveTypeDropdown(data.data.sleeveTypes);
+                populateCollectionTypeDropdown(data.data.collectionTypes);
+            }
+        })
+        .catch(error => console.error('Error loading dropdowns:', error));
+}
+
+function populateCategoryDropdown(categories) {
+    const select = document.getElementById('category_id');
+    const oldValue = '{{ old("category_id") }}';
+    
+    categories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category.id;
+        option.textContent = category.name;
+        if (oldValue == category.id) {
+            option.selected = true;
+        }
+        select.appendChild(option);
+    });
+}
+
+function populateSleeveTypeDropdown(sleeveTypes) {
+    const select = document.getElementById('sleeve_type_id');
+    const oldValue = '{{ old("sleeve_type_id") }}';
+    
+    sleeveTypes.forEach(sleeveType => {
+        const option = document.createElement('option');
+        option.value = sleeveType.id;
+        option.textContent = sleeveType.name;
+        if (oldValue == sleeveType.id) {
+            option.selected = true;
+        }
+        select.appendChild(option);
+    });
+}
+
+function populateCollectionTypeDropdown(collectionTypes) {
+    const select = document.getElementById('collection_type_id');
+    const oldValue = '{{ old("collection_type_id") }}';
+    
+    collectionTypes.forEach(collectionType => {
+        const option = document.createElement('option');
+        option.value = collectionType.id;
+        option.textContent = collectionType.name;
+        if (oldValue == collectionType.id) {
+            option.selected = true;
+        }
+        select.appendChild(option);
+    });
+}
 </script>
 @endsection

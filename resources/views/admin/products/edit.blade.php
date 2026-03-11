@@ -46,11 +46,10 @@
                     </div>
 
                     <div>
-                        <label for="category" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Category</label>
-                        <select id="category" name="category" required
+                        <label for="category_id" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Category</label>
+                        <select id="category_id" name="category_id" required
                                 class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400">
-                            <option value="t-shirt" {{ $product->category == 't-shirt' ? 'selected' : '' }}>T-Shirt</option>
-                            <option value="accessories" {{ $product->category == 'accessories' ? 'selected' : '' }}>Accessories</option>
+                            <option value="">Select Category</option>
                         </select>
                     </div>
 
@@ -61,11 +60,18 @@
                     </div>
 
                     <div>
-                        <label for="sleeve_type" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Sleeve Type</label>
-                        <select id="sleeve_type" name="sleeve_type" required
+                        <label for="sleeve_type_id" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Sleeve Type</label>
+                        <select id="sleeve_type_id" name="sleeve_type_id" required
                                 class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400">
-                            <option value="full" {{ $product->sleeve_type == 'full' ? 'selected' : '' }}>Full Sleeve</option>
-                            <option value="half" {{ $product->sleeve_type == 'half' ? 'selected' : '' }}>Half Sleeve</option>
+                            <option value="">Select Sleeve Type</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="collection_type_id" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Collection Type</label>
+                        <select id="collection_type_id" name="collection_type_id"
+                                class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400">
+                            <option value="">Select Collection Type (Optional)</option>
                         </select>
                     </div>
 
@@ -327,7 +333,70 @@
 </div>
 
 <script>
+
+// Load dropdown options from API
 document.addEventListener('DOMContentLoaded', function() {
+    loadDropdownOptions();
+});
+
+function loadDropdownOptions() {
+    fetch('{{ route("api.dropdowns.all") }}')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                populateCategoryDropdown(data.data.categories);
+                populateSleeveTypeDropdown(data.data.sleeveTypes);
+                populateCollectionTypeDropdown(data.data.collectionTypes);
+            }
+        })
+        .catch(error => console.error('Error loading dropdowns:', error));
+}
+
+function populateCategoryDropdown(categories) {
+    const select = document.getElementById('category_id');
+    const currentValue = {{ $product->category_id ?? 'null' }};
+    
+    categories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category.id;
+        option.textContent = category.name;
+        if (currentValue == category.id) {
+            option.selected = true;
+        }
+        select.appendChild(option);
+    });
+}
+
+function populateSleeveTypeDropdown(sleeveTypes) {
+    const select = document.getElementById('sleeve_type_id');
+    const currentValue = {{ $product->sleeve_type_id ?? 'null' }};
+    
+    sleeveTypes.forEach(sleeveType => {
+        const option = document.createElement('option');
+        option.value = sleeveType.id;
+        option.textContent = sleeveType.name;
+        if (currentValue == sleeveType.id) {
+            option.selected = true;
+        }
+        select.appendChild(option);
+    });
+}
+
+function populateCollectionTypeDropdown(collectionTypes) {
+    const select = document.getElementById('collection_type_id');
+    const currentValue = {{ $product->collection_type_id ?? 'null' }};
+    
+    collectionTypes.forEach(collectionType => {
+        const option = document.createElement('option');
+        option.value = collectionType.id;
+        option.textContent = collectionType.name;
+        if (currentValue == collectionType.id) {
+            option.selected = true;
+        }
+        select.appendChild(option);
+    });
+}
+</script>
     const limitedEditionCheckbox = document.getElementById('is_limited_edition');
     const dropControlContainer = document.getElementById('drop_control_container');
     const addColorBtn = document.getElementById('add-color-btn');

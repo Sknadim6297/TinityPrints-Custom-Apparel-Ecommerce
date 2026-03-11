@@ -38,7 +38,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                         <div>
                             <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Category</p>
-                            <p class="font-semibold text-gray-900 dark:text-gray-100 mt-1">{{ ucfirst($product->category) }}</p>
+                            <p class="font-semibold text-gray-900 dark:text-gray-100 mt-1">{{ $product->category?->name ?? 'Uncategorized' }}</p>
                         </div>
                         <div>
                             <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Price</p>
@@ -46,7 +46,11 @@
                         </div>
                         <div>
                             <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Sleeve Type</p>
-                            <p class="font-semibold text-gray-900 dark:text-gray-100 mt-1">{{ ucfirst(str_replace('_', ' ', $product->sleeve_type)) }}</p>
+                            <p class="font-semibold text-gray-900 dark:text-gray-100 mt-1">{{ $product->sleeveType?->name ?? 'N/A' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Collection Type</p>
+                            <p class="font-semibold text-gray-900 dark:text-gray-100 mt-1">{{ $product->collectionType?->name ?? 'N/A' }}</p>
                         </div>
                         <div>
                             <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Fit Type</p>

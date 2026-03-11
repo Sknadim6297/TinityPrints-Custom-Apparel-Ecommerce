@@ -90,14 +90,14 @@
                            </div>
                            <div class="action-item action-item-filter d-lg-none">
                               <a href="javascript:void(0)" class="view-filter-button">
-                                 <i class="flaticon-filter"></i>
+                                 Filter
                               </a>
                            </div>
                         </div>
                      </div>
 
                      <!-- Active Filters Display -->
-                     @if(request()->hasAny(['search', 'category', 'size', 'color', 'sleeve_type', 'limited_edition', 'min_price', 'max_price']))
+                     @if(request()->hasAny(['search', 'category', 'collection_type_id', 'size', 'color', 'sleeve_type', 'limited_edition', 'min_price', 'max_price']))
                      <div class="active-filters mb-3 p-3" style="background-color: #f8f9fa; border-radius: 8px;">
                         <h6 class="mb-2" style="color: var(--clr-common-heading); font-weight: 600;">Active Filters:</h6>
                         <div class="filter-tags d-flex flex-wrap align-items-center">
@@ -105,7 +105,17 @@
                               <span class="badge mr-2 mb-2" style="background-color: var(--clr-common-heading); color: white; padding: 8px 12px; border-radius: 20px;">Search: "{{ request('search') }}" <a href="{{ request()->fullUrlWithoutQuery('search') }}" class="ml-1 text-white" style="text-decoration: none; font-weight: bold;">×</a></span>
                            @endif
                            @if(request('category'))
-                              <span class="badge mr-2 mb-2" style="background-color: var(--clr-common-heading); color: white; padding: 8px 12px; border-radius: 20px;">{{ request('category') == 't-shirt' ? 'T-Shirts' : 'Accessories' }} <a href="{{ request()->fullUrlWithoutQuery('category') }}" class="ml-1 text-white" style="text-decoration: none; font-weight: bold;">×</a></span>
+                              <span class="badge mr-2 mb-2" style="background-color: var(--clr-common-heading); color: white; padding: 8px 12px; border-radius: 20px;">{{ ucfirst(str_replace('-', ' ', request('category'))) }} <a href="{{ request()->fullUrlWithoutQuery('category') }}" class="ml-1 text-white" style="text-decoration: none; font-weight: bold;">×</a></span>
+                           @endif
+                           @if(request('collection_type_id'))
+                              @php
+                                  $selectedCollectionForBadge = collect($collectionOptions)->find(function($item) {
+                                      return $item->id == request('collection_type_id');
+                                  });
+                              @endphp
+                              @if($selectedCollectionForBadge)
+                              <span class="badge mr-2 mb-2" style="background-color: #e83e8c; color: white; padding: 8px 12px; border-radius: 20px;">{{ $selectedCollectionForBadge->name }} <a href="{{ request()->fullUrlWithoutQuery('collection_type_id') }}" class="ml-1 text-white" style="text-decoration: none; font-weight: bold;">×</a></span>
+                              @endif
                            @endif
                            @if(request('limited_edition'))
                               <span class="badge mr-2 mb-2" style="background-color: #ffc107; color: #000; padding: 8px 12px; border-radius: 20px; font-weight: 600;">Limited Edition <a href="{{ request()->fullUrlWithoutQuery('limited_edition') }}" class="ml-1" style="text-decoration: none; color: #000; font-weight: bold;">×</a></span>
@@ -124,7 +134,7 @@
                               <span class="badge mr-2 mb-2" style="background-color: var(--clr-common-heading); color: white; padding: 8px 12px; border-radius: 20px;">{{ ucfirst(request('sleeve_type')) }} Sleeve <a href="{{ request()->fullUrlWithoutQuery('sleeve_type') }}" class="ml-1 text-white" style="text-decoration: none; font-weight: bold;">×</a></span>
                            @endif
                            @if(request('min_price') || request('max_price'))
-                              <span class="badge mr-2 mb-2" style="background-color: var(--clr-common-heading); color: white; padding: 8px 12px; border-radius: 20px;">Price: £{{ request('min_price', 0) }} - £{{ request('max_price', '∞') }} <a href="{{ request()->fullUrlWithoutQuery(['min_price', 'max_price']) }}" class="ml-1 text-white" style="text-decoration: none; font-weight: bold;">×</a></span>
+                                <span class="badge mr-2 mb-2" style="background-color: var(--clr-common-heading); color: white; padding: 8px 12px; border-radius: 20px;">Price: ₹{{ request('min_price', 0) }} - ₹{{ request('max_price', '∞') }} <a href="{{ request()->fullUrlWithoutQuery(['min_price', 'max_price']) }}" class="ml-1 text-white" style="text-decoration: none; font-weight: bold;">×</a></span>
                            @endif
                            <a href="{{ route('shop') }}" class="btn btn-sm ml-2" style="background-color: transparent; border: 2px solid var(--clr-common-heading); color: var(--clr-common-heading); padding: 6px 16px; border-radius: 20px; font-weight: 600; transition: all 0.3s;">Clear All</a>
                         </div>
@@ -194,7 +204,7 @@
                               <div class="filter-widget-content">
                                  <div class="filter-widget-search">
                                     <input type="text" name="search" placeholder="Search here.." value="{{ request('search') }}">
-                                    <button type="submit"><i class="fas fa-search"></i></button>
+                                    <button type="submit">Search</button>
                                  </div>
                               </div>
                            </div>
@@ -205,22 +215,22 @@
                                  <div class="category-items">
                                     <a href="{{ route('shop') }}" class="category-item {{ !request('category') ? 'active' : '' }}">
                                        <div class="category-name">All Products</div> 
-                                       <span class="category-items-number">{{ $totalProducts ?? 0 }}</span>
+                                       <span class="category-items-number">{{ $categoryStats['all'] ?? 0 }}</span>
                                     </a>
-                                    <a href="{{ route('shop', ['category' => 't-shirt'] + request()->except('category')) }}" class="category-item {{ request('category') == 't-shirt' ? 'active' : '' }}">
-                                       <div class="category-name"><i class="fas fa-tshirt mr-2"></i>T-Shirts</div> 
-                                       <span class="category-items-number">{{ $categoryStats['t-shirt'] ?? 0 }}</span>
+                                    @foreach($allActiveCategories as $cat)
+                                    <a href="{{ route('shop', ['category' => $cat] + request()->except('category')) }}" class="category-item {{ request('category') == $cat ? 'active' : '' }}">
+                                       <div class="category-name">
+                                          {{ ucfirst(str_replace('-', ' ', $cat)) }}
+                                       </div> 
+                                       <span class="category-items-number">{{ $categoryStats[$cat] ?? 0 }}</span>
                                     </a>
-                                    <a href="{{ route('shop', ['category' => 'accessories'] + request()->except('category')) }}" class="category-item {{ request('category') == 'accessories' ? 'active' : '' }}">
-                                       <div class="category-name"><i class="fas fa-gem mr-2"></i>Accessories</div> 
-                                       <span class="category-items-number">{{ $categoryStats['accessories'] ?? 0 }}</span>
-                                    </a>
+                                    @endforeach
                                  </div>
                               </div>
                            </div>
                            
                            <div class="filter-widget">
-                              <h4 class="filter-widget-title drop-btn"><i class="fas fa-fire mr-2" style="color: #ffc107;"></i>Limited Edition</h4>
+                              <h4 class="filter-widget-title drop-btn">Limited Edition</h4>
                               <div class="filter-widget-content">
                                  <div class="category-items">
                                     <a href="{{ route('shop', ['limited_edition' => 'yes'] + request()->except('limited_edition')) }}" class="category-item {{ request('limited_edition') == 'yes' ? 'active' : '' }}" style="{{ request('limited_edition') == 'yes' ? 'background-color: #fff3cd; border-left-color: #ffc107;' : '' }}">
@@ -230,6 +240,26 @@
                                  </div>
                               </div>
                            </div>
+
+                           @if(isset($collectionOptions) && count($collectionOptions) > 0)
+                           <div class="filter-widget">
+                              <h4 class="filter-widget-title drop-btn">Collections</h4>
+                              <div class="filter-widget-content">
+                                 <div class="category-items">
+                                    @foreach($collectionOptions as $collection)
+                                    <a href="{{ route('shop', ['collection_type_id' => $collection->id] + request()->except('collection_type_id')) }}" 
+                                       class="category-item {{ request('collection_type_id') == $collection->id ? 'active' : '' }}"
+                                       style="{{ request('collection_type_id') == $collection->id ? 'background-color: #f0e6f0; border-left-color: #e83e8c;' : '' }}">
+                                       <div class="category-name">
+                                          {{ $collection->name }}
+                                       </div> 
+                                       <span class="category-items-number">{{ $collection->active_products_count ?? 0 }}</span>
+                                    </a>
+                                    @endforeach
+                                 </div>
+                              </div>
+                           </div>
+                           @endif
                            
                            <div class="filter-widget">
                               <h4 class="filter-widget-title drop-btn">Size</h4>
@@ -275,7 +305,6 @@
                                            $colorHex = is_array($color) ? ($color['hex'] ?? '#cccccc') : '#cccccc';
                                            $isChecked = in_array($colorName, (array)request('color', []));
                                            $lightColors = ['#ffffff', '#ffff00', '#f0e68c', '#add8e6', '#90ee90', '#ffd700', '#fffacd'];
-                                           $textColor = in_array(strtolower($colorHex), $lightColors) ? '#000' : '#fff';
                                            $borderColor = $isChecked ? 'var(--clr-common-heading)' : '#ddd';
                                            $labelClass = 'color-option' . ($isChecked ? ' active-color' : '');
                                        ?>
@@ -283,9 +312,6 @@
                                               style="background-color: {{ $colorHex }}; display: inline-block; width: 40px; height: 40px; margin: 0; cursor: pointer; border-radius: 50%; border: 3px solid {{ $borderColor }}; position: relative; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
                                               title="{{ ucfirst($colorName) }}">
                                           <input type="checkbox" name="color[]" value="{{ $colorName }}" {{ $isChecked ? 'checked' : '' }} onchange="document.getElementById('filter-form').submit()" style="display: none;">
-                                          @if($isChecked)
-                                          <i class="fas fa-check" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: {{ $textColor }}; font-weight: bold;"></i>
-                                          @endif
                                        </label>
                                        @endforeach
                                     </div>
@@ -302,13 +328,13 @@
                                  <div class="filter-price">
                                     <div class="price-inputs">
                                        <div class="mb-2">
-                                          <label for="min_price" class="small" style="color: var(--clr-common-text);">Min Price (£)</label>
+                                            <label for="min_price" class="small" style="color: var(--clr-common-text);">Min Price (₹)</label>
                                           <input type="number" name="min_price" id="min_price" placeholder="0" 
                                                  value="{{ request('min_price') }}" class="form-control" 
                                                  style="border: 1px solid var(--clr-common-border); border-radius: 8px; padding: 10px;">
                                        </div>
                                        <div class="mb-2">
-                                          <label for="max_price" class="small" style="color: var(--clr-common-text);">Max Price (£)</label>
+                                              <label for="max_price" class="small" style="color: var(--clr-common-text);">Max Price (₹)</label>
                                           <input type="number" name="max_price" id="max_price" placeholder="1000" 
                                                  value="{{ request('max_price') }}" class="form-control"
                                                  style="border: 1px solid var(--clr-common-border); border-radius: 8px; padding: 10px;">
@@ -326,7 +352,7 @@
                            <div class="filter-widget">
                               <a href="{{ route('shop') }}" class="btn w-100" 
                                  style="background-color: transparent; border: 2px solid var(--clr-common-heading); color: var(--clr-common-heading); padding: 12px; border-radius: 8px; font-weight: 600; text-align: center; transition: all 0.3s; display: block;">
-                                 <i class="fas fa-times-circle mr-2"></i>Clear All Filters
+                                 Clear All Filters
                               </a>
                            </div>
                         </div>
@@ -488,4 +514,3 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 @endsection
-

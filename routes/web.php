@@ -9,6 +9,7 @@ use App\Http\Controllers\Frontend\CheckoutController;
 use App\Http\Controllers\Frontend\OrderController;
 use App\Http\Controllers\Frontend\CustomDesignController;
 use App\Http\Controllers\Frontend\StockAlertController;
+use App\Http\Controllers\Frontend\DropdownController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
@@ -37,6 +38,14 @@ Route::get('/refund-policy', [HomeController::class, 'refundPolicy'])->name('ref
 Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
 Route::post('/contact', [HomeController::class, 'contactSubmit'])->name('contact.submit');
 Route::post('/contact-store', [ContactController::class, 'store'])->name('contact.store');
+
+// API Routes for Dropdowns
+Route::prefix('api')->group(function () {
+    Route::get('/dropdowns/categories', [DropdownController::class, 'getCategories'])->name('api.dropdowns.categories');
+    Route::get('/dropdowns/sleeve-types', [DropdownController::class, 'getSleeveTypes'])->name('api.dropdowns.sleeve-types');
+    Route::get('/dropdowns/collection-types', [DropdownController::class, 'getCollectionTypes'])->name('api.dropdowns.collection-types');
+    Route::get('/dropdowns/all', [DropdownController::class, 'getAllDropdowns'])->name('api.dropdowns.all');
+});
 
 // Cart Routes (Protected - requires authentication)
 Route::middleware('auth')->group(function () {

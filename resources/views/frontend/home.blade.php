@@ -151,7 +151,7 @@
                                  </div>
                                  <div class="banner-pricing" data-animation="fadeIn" data-delay=".7s">
                                     Exclusively
-                                    <span class="price-now">£89</span>
+                                    <span class="price-now">₹89</span>
                                  </div>
                               </div>
                            </div>
@@ -397,67 +397,6 @@
          </div>
       </section>
       <!-- custom design promotion section end -->
-
-      <!-- how it works section start -->
-      <section class="how-it-works-area pt-120 pb-120 bg-gray">
-         <div class="container">
-            <div class="row justify-content-center mb-60">
-               <div class="col-xl-8">
-                  <div class="section-title text-center">
-                     <h2 class="section-main-title mb-35">
-                        <i class="fas fa-cogs"></i> How It Works
-                     </h2>
-                     <p>Get your perfect t-shirt in 5 simple steps</p>
-                  </div>
-               </div>
-            </div>
-
-            <div class="row">
-               <div class="col-lg-12">
-                  <div class="process-steps">
-                     <div class="row justify-content-center">
-                        <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
-                           <div class="process-step-item h-100">
-                              <div class="step-number-circle">1</div>
-                              <h5 class="step-title-sm">Choose Product</h5>
-                              <p class="step-text-sm">Select t-shirt or upload custom design</p>
-                           </div>
-                        </div>
-                        <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
-                           <div class="process-step-item h-100">
-                              <div class="step-number-circle">2</div>
-                              <h5 class="step-title-sm">Admin Approval</h5>
-                              <p class="step-text-sm">Design reviewed & approved by team</p>
-                           </div>
-                        </div>
-                        <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
-                           <div class="process-step-item h-100">
-                              <div class="step-number-circle">3</div>
-                              <h5 class="step-title-sm">Payment</h5>
-                              <p class="step-text-sm">Secure payment gateway</p>
-                           </div>
-                        </div>
-                        <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
-                           <div class="process-step-item h-100">
-                              <div class="step-number-circle">4</div>
-                              <h5 class="step-title-sm">Printing</h5>
-                              <p class="step-text-sm">HD quality printing on premium fabric</p>
-                           </div>
-                        </div>
-                        <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
-                           <div class="process-step-item h-100">
-                              <div class="step-number-circle">5</div>
-                              <h5 class="step-title-sm">Delivery</h5>
-                              <p class="step-text-sm">Fast shipping to your door</p>
-                           </div>
-                        </div>
-                     </div>
-                  </div>
-               </div>
-            </div>
-         </div>
-      </section>
-      <!-- how it works section end -->
 
       <!-- why choose us section start -->
       <section class="why-choose-us-area pt-120 pb-120">

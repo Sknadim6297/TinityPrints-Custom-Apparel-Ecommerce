@@ -14,7 +14,7 @@
                     Product Management
                 </h2>
                 <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    Manage T-Shirt & Accessory Products
+                    Manage products by category
                 </p>
             </div>
             <a href="{{ route('admin.products.create') }}" 
@@ -26,48 +26,11 @@
             </a>
         </div>
 
-        <!-- Product Segments -->
-        <div class="mb-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-6 rounded-xl text-white shadow-lg">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h3 class="text-xl font-bold">T-Shirts</h3>
-                            <p class="text-blue-100 mt-1">Premium collection</p>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-3xl font-bold">{{ $tshirtCount }}</div>
-                            <div class="text-blue-100 text-sm">Products</div>
-                        </div>
-                    </div>
-                    <a href="?category=t-shirt" class="inline-block mt-3 text-blue-100 hover:text-white text-sm underline">
-                        View T-Shirts →
-                    </a>
-                </div>
-                
-                <div class="bg-gradient-to-r from-purple-500 to-purple-600 p-6 rounded-xl text-white shadow-lg">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h3 class="text-xl font-bold">Accessories (Bags)</h3>
-                            <p class="text-purple-100 mt-1">Perfect companions</p>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-3xl font-bold">{{ $accessoriesCount }}</div>
-                            <div class="text-purple-100 text-sm">Products</div>
-                        </div>
-                    </div>
-                    <a href="?category=accessories" class="inline-block mt-3 text-purple-100 hover:text-white text-sm underline">
-                        View Accessories →
-                    </a>
-                </div>
-            </div>
-        </div>
-
         <!-- Advanced Filters -->
         <div class="mb-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-6">
             <h3 class="font-semibold text-lg text-gray-800 dark:text-gray-200 mb-4">Filters</h3>
             <form method="GET" class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-8 gap-4">
                     <!-- Search -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Search</label>
@@ -78,20 +41,33 @@
                     <!-- Category Filter -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Category</label>
-                        <select name="category" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                        <select name="category_id" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <option value="">All Categories</option>
-                            <option value="t-shirt" {{ request('category') == 't-shirt' ? 'selected' : '' }}>T-Shirts</option>
-                            <option value="accessories" {{ request('category') == 'accessories' ? 'selected' : '' }}>Accessories</option>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}" {{ (string) request('category_id') === (string) $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                            @endforeach
                         </select>
                     </div>
 
                     <!-- Sleeve Type Filter -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Sleeve Type</label>
-                        <select name="sleeve_type" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                        <select name="sleeve_type_id" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <option value="">All Sleeves</option>
-                            <option value="full" {{ request('sleeve_type') == 'full' ? 'selected' : '' }}>Full Sleeve</option>
-                            <option value="half" {{ request('sleeve_type') == 'half' ? 'selected' : '' }}>Half Sleeve</option>
+                            @foreach($sleeveTypes as $sleeveType)
+                                <option value="{{ $sleeveType->id }}" {{ (string) request('sleeve_type_id') === (string) $sleeveType->id ? 'selected' : '' }}>{{ $sleeveType->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Collection Type Filter -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Collection Type</label>
+                        <select name="collection_type_id" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                            <option value="">All Collections</option>
+                            @foreach($collectionTypes as $collectionType)
+                                <option value="{{ $collectionType->id }}" {{ (string) request('collection_type_id') === (string) $collectionType->id ? 'selected' : '' }}>{{ $collectionType->name }}</option>
+                            @endforeach
                         </select>
                     </div>
 
@@ -214,8 +190,8 @@
 
                             <!-- Category Badge -->
                             <div class="absolute top-3 right-3">
-                                <span class="bg-{{ $product->category == 't-shirt' ? 'blue' : 'purple' }}-500 text-white text-xs font-medium px-2 py-1 rounded-full shadow-lg">
-                                    {{ $product->category == 't-shirt' ? 'T-Shirt' : 'Accessory' }}
+                                <span class="bg-blue-500 text-white text-xs font-medium px-2 py-1 rounded-full shadow-lg">
+                                    {{ $categoryNameMap[$product->category_id] ?? 'Uncategorized' }}
                                 </span>
                             </div>
 
@@ -246,12 +222,21 @@
 
                             <!-- Product Details -->
                             <div class="space-y-2 mb-4">
-                                @if($product->sleeve_type && $product->category == 't-shirt')
+                                @if($product->sleeveType)
                                     <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                                         </svg>
-                                        {{ ucfirst($product->sleeve_type) }} Sleeve
+                                        {{ $product->sleeveType->name }}
+                                    </div>
+                                @endif
+
+                                @if($product->collectionType)
+                                    <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14-4H5m14 8H5m14 4H5" />
+                                        </svg>
+                                        {{ $product->collectionType->name }}
                                     </div>
                                 @endif
 
@@ -334,7 +319,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                 </svg>
                 <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-3">No Products Found</h3>
-                @if(request()->hasAny(['search', 'category', 'sleeve_type', 'size', 'color', 'limited_edition', 'story', 'stock_status']))
+                @if(request()->hasAny(['search', 'category_id', 'sleeve_type_id', 'collection_type_id', 'size', 'color', 'limited_edition', 'story', 'stock_status']))
                     <p class="text-gray-500 dark:text-gray-400 mb-6">No products match your current filters. Try adjusting your search criteria.</p>
                     <a href="{{ route('admin.products.index') }}" 
                        class="inline-flex items-center bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg transition-colors mr-3">

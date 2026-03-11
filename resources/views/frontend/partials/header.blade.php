@@ -135,8 +135,168 @@
                               <li><a href="{{ route('home') }}">Home</a></li>
                               <li><a href="{{ route('custom-design') }}">Custom Design</a></li>
                               <li><a href="{{ route('limited-edition') }}">Limited Edition</a></li>
-                              <li><a href="{{ route('shop.category', 't-shirt') }}">T-Shirts</a></li>
-                              <li><a href="{{ route('shop.category', 'accessories') }}">Accessories</a></li>
+                              @php
+                                 $desktopShopMenu = collect($shopMenu ?? []);
+                                 $defaultCategoryId = data_get($desktopShopMenu->first(), 'id');
+                                 $defaultCollectionId = data_get(collect(data_get($desktopShopMenu->first(), 'collections', []))->first(), 'id');
+                              @endphp
+                              <li class="shop-menu-item has-shop-mega" data-shop-menu>
+                                 <a href="{{ route('shop') }}" class="shop-menu-link" data-shop-menu-toggle aria-expanded="false">
+                                    <span>Shop</span>
+                                    <i class="fal fa-angle-down"></i>
+                                 </a>
+                                 <div class="shop-mega-menu" data-shop-menu-panel>
+                                    <div class="shop-mega-shell">
+                                       <div class="shop-mega-column shop-mega-column-categories">
+                                          <div class="shop-mega-column-head">
+                                             <div>
+                                                <span class="shop-mega-eyebrow">Browse</span>
+                                                <strong>Categories</strong>
+                                             </div>
+                                             <a href="{{ route('shop') }}">All products</a>
+                                          </div>
+                                          <div class="shop-mega-list">
+                                             @forelse($desktopShopMenu as $menuCategory)
+                                                <button
+                                                   type="button"
+                                                   class="shop-mega-trigger {{ $defaultCategoryId === $menuCategory['id'] ? 'is-active' : '' }}"
+                                                   data-panel-level="category"
+                                                   data-target="category-{{ $menuCategory['id'] }}"
+                                                >
+                                                   <span class="shop-mega-trigger-copy">
+                                                      <strong>{{ $menuCategory['name'] }}</strong>
+                                                      <small>{{ collect($menuCategory['collections'])->count() }} collections</small>
+                                                   </span>
+                                                   <span class="shop-mega-trigger-meta">{{ $menuCategory['product_count'] }}</span>
+                                                   <i class="fal fa-angle-right"></i>
+                                                </button>
+                                             @empty
+                                                <div class="shop-mega-empty-state">
+                                                   <strong>No categories available</strong>
+                                                   <p>Add active categories, collections, and products to populate the menu.</p>
+                                                </div>
+                                             @endforelse
+                                          </div>
+                                       </div>
+
+                                       <div class="shop-mega-column shop-mega-column-collections">
+                                          @forelse($desktopShopMenu as $menuCategory)
+                                             @php($menuCollections = collect($menuCategory['collections']))
+                                             <div
+                                                class="shop-mega-panel {{ $defaultCategoryId === $menuCategory['id'] ? 'is-active' : '' }}"
+                                                data-panel-level="category"
+                                                data-panel="category-{{ $menuCategory['id'] }}"
+                                             >
+                                                <div class="shop-mega-column-head">
+                                                   <div>
+                                                      <span class="shop-mega-eyebrow">Category</span>
+                                                      <strong>{{ $menuCategory['name'] }}</strong>
+                                                   </div>
+                                                   <a href="{{ route('shop', ['category_id' => $menuCategory['id']]) }}">Explore</a>
+                                                </div>
+                                                <div class="shop-mega-list">
+                                                   @forelse($menuCollections as $menuCollection)
+                                                      <button
+                                                         type="button"
+                                                         class="shop-mega-trigger {{ $defaultCategoryId === $menuCategory['id'] && $defaultCollectionId === $menuCollection['id'] ? 'is-active' : '' }}"
+                                                         data-panel-level="collection"
+                                                         data-target="collection-{{ $menuCategory['id'] }}-{{ $menuCollection['id'] }}"
+                                                      >
+                                                         <span class="shop-mega-trigger-copy">
+                                                            <strong>{{ $menuCollection['name'] }}</strong>
+                                                            <small>{{ $menuCollection['product_count'] }} products</small>
+                                                         </span>
+                                                         <span class="shop-mega-trigger-meta">Open</span>
+                                                         <i class="fal fa-angle-right"></i>
+                                                      </button>
+                                                   @empty
+                                                      <div class="shop-mega-empty-state compact">
+                                                         <strong>No collections yet</strong>
+                                                         <p>This category has no active collections linked to products.</p>
+                                                      </div>
+                                                   @endforelse
+                                                </div>
+                                             </div>
+                                          @empty
+                                             <div class="shop-mega-panel is-active" data-panel-level="category" data-panel="category-empty">
+                                                <div class="shop-mega-empty-state">
+                                                   <strong>No collections available</strong>
+                                                   <p>The second column will appear here once active category data exists.</p>
+                                                </div>
+                                             </div>
+                                          @endforelse
+                                       </div>
+
+                                       <div class="shop-mega-column shop-mega-column-products">
+                                          @forelse($desktopShopMenu as $menuCategory)
+                                             @foreach(collect($menuCategory['collections']) as $menuCollection)
+                                                @php($menuProducts = collect($menuCollection['products']))
+                                                <div
+                                                   class="shop-mega-panel {{ $defaultCategoryId === $menuCategory['id'] && $defaultCollectionId === $menuCollection['id'] ? 'is-active' : '' }}"
+                                                   data-panel-level="collection"
+                                                   data-panel="collection-{{ $menuCategory['id'] }}-{{ $menuCollection['id'] }}"
+                                                >
+                                                   <div class="shop-mega-column-head">
+                                                      <div>
+                                                         <span class="shop-mega-eyebrow">Collection</span>
+                                                         <strong>{{ $menuCollection['name'] }}</strong>
+                                                      </div>
+                                                      <a href="{{ route('shop', ['category_id' => $menuCategory['id'], 'collection_type_id' => $menuCollection['id']]) }}">View all</a>
+                                                   </div>
+                                                   <div class="shop-mega-product-list">
+                                                      @forelse($menuProducts as $menuProduct)
+                                                         <a href="{{ route('product.details', $menuProduct['id']) }}" class="shop-mega-product-link">
+                                                            <span class="shop-mega-product-name">{{ $menuProduct['name'] }}</span>
+                                                            <i class="fal fa-arrow-right"></i>
+                                                         </a>
+                                                      @empty
+                                                         <div class="shop-mega-empty-state compact">
+                                                            <strong>No products available</strong>
+                                                            <p>This collection does not have active products yet.</p>
+                                                         </div>
+                                                      @endforelse
+                                                   </div>
+                                                </div>
+                                             @endforeach
+                                          @empty
+                                             <div class="shop-mega-panel is-active" data-panel-level="collection" data-panel="collection-empty">
+                                                <div class="shop-mega-empty-state">
+                                                   <strong>No products available</strong>
+                                                   <p>The third column will show products once collections are available.</p>
+                                                </div>
+                                             </div>
+                                          @endforelse
+                                       </div>
+                                    </div>
+                                 </div>
+                                 <ul class="shop-mobile-tree">
+                                    @forelse($desktopShopMenu as $menuCategory)
+                                       <li>
+                                          <a href="{{ route('shop', ['category_id' => $menuCategory['id']]) }}">{{ $menuCategory['name'] }}</a>
+                                          @if(collect($menuCategory['collections'])->isNotEmpty())
+                                             <ul>
+                                                @foreach(collect($menuCategory['collections']) as $menuCollection)
+                                                   <li>
+                                                      <a href="{{ route('shop', ['category_id' => $menuCategory['id'], 'collection_type_id' => $menuCollection['id']]) }}">{{ $menuCollection['name'] }}</a>
+                                                      @if(collect($menuCollection['products'])->isNotEmpty())
+                                                         <ul>
+                                                            @foreach(collect($menuCollection['products']) as $menuProduct)
+                                                               <li>
+                                                                  <a href="{{ route('product.details', $menuProduct['id']) }}">{{ $menuProduct['name'] }}</a>
+                                                               </li>
+                                                            @endforeach
+                                                         </ul>
+                                                      @endif
+                                                   </li>
+                                                @endforeach
+                                             </ul>
+                                          @endif
+                                       </li>
+                                    @empty
+                                       <li><a href="{{ route('shop') }}">All Products</a></li>
+                                    @endforelse
+                                 </ul>
+                              </li>
                               {{-- <li><a href="{{ route('about') }}">About Us</a></li> --}}
                               {{-- <li><a href="{{ route('refund-policy') }}">Refund Policy</a></li> --}}
                               {{-- <li><a href="{{ route('contact') }}">Contact</a></li> --}}
@@ -163,6 +323,427 @@
    <!-- Add your site or application content here -->
    <main>
 
+   <style>
+      .main-menu3 .shop-menu-item {
+         position: relative;
+      }
+
+      .main-menu3 .shop-menu-link {
+         display: inline-flex;
+         align-items: center;
+         gap: 8px;
+      }
+
+      .main-menu3 .shop-menu-link i {
+         font-size: 12px;
+         transition: transform 0.25s ease;
+      }
+
+      .main-menu3 .shop-menu-item.is-open .shop-menu-link i {
+         transform: rotate(180deg);
+      }
+
+      .main-menu3 .shop-menu-item .shop-mega-menu {
+         position: absolute;
+         top: calc(100% + 18px);
+         left: 0;
+         width: min(940px, calc(100vw - 32px));
+         opacity: 0;
+         visibility: hidden;
+         pointer-events: none;
+         transform: translateY(12px);
+         transition: opacity 0.22s ease, transform 0.22s ease, visibility 0.22s ease;
+         z-index: 999;
+      }
+
+      .main-menu3 .shop-menu-item.is-open .shop-mega-menu {
+         opacity: 1;
+         visibility: visible;
+         pointer-events: auto;
+         transform: translateY(0);
+      }
+
+      .main-menu3 .shop-mega-shell {
+         display: grid;
+         grid-template-columns: minmax(210px, 0.9fr) minmax(240px, 1fr) minmax(260px, 1.1fr);
+         min-height: 400px;
+         background: linear-gradient(180deg, #ffffff 0%, #fbf7f1 100%);
+         border: 1px solid rgba(22, 22, 22, 0.08);
+         border-radius: 24px;
+         overflow: hidden;
+         box-shadow: 0 28px 80px rgba(18, 22, 33, 0.18);
+      }
+
+      .main-menu3 .shop-mega-column {
+         min-width: 0;
+         background: rgba(255, 255, 255, 0.76);
+         backdrop-filter: blur(12px);
+         border-right: 1px solid rgba(23, 23, 23, 0.08);
+      }
+
+      .main-menu3 .shop-mega-column:last-child {
+         border-right: 0;
+      }
+
+      .main-menu3 .shop-mega-column-head {
+         display: flex;
+         align-items: flex-start;
+         justify-content: space-between;
+         gap: 16px;
+         padding: 20px 22px 16px;
+         border-bottom: 1px solid rgba(23, 23, 23, 0.08);
+      }
+
+      .main-menu3 .shop-mega-column-head strong {
+         display: block;
+         color: #171717;
+         font-size: 18px;
+         line-height: 1.2;
+      }
+
+      .main-menu3 .shop-mega-column-head a {
+         flex-shrink: 0;
+         color: #8a5a21;
+         font-size: 13px;
+         font-weight: 700;
+         letter-spacing: 0.02em;
+         text-transform: uppercase;
+      }
+
+      .main-menu3 .shop-mega-eyebrow {
+         display: block;
+         margin-bottom: 6px;
+         color: #9a7a4b;
+         font-size: 11px;
+         font-weight: 700;
+         letter-spacing: 0.16em;
+         text-transform: uppercase;
+      }
+
+      .main-menu3 .shop-mega-list,
+      .main-menu3 .shop-mega-product-list {
+         padding: 14px;
+         max-height: 330px;
+         overflow-y: auto;
+      }
+
+      .main-menu3 .shop-mega-trigger {
+         width: 100%;
+         display: grid;
+         grid-template-columns: minmax(0, 1fr) auto auto;
+         align-items: center;
+         gap: 12px;
+         border: 0;
+         border-radius: 18px;
+         background: transparent;
+         color: #171717;
+         padding: 15px 16px;
+         text-align: left;
+         transition: background 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease, color 0.22s ease;
+      }
+
+      .main-menu3 .shop-mega-trigger + .shop-mega-trigger,
+      .main-menu3 .shop-mega-product-link + .shop-mega-product-link {
+         margin-top: 8px;
+      }
+
+      .main-menu3 .shop-mega-trigger-copy {
+         min-width: 0;
+      }
+
+      .main-menu3 .shop-mega-trigger-copy strong,
+      .main-menu3 .shop-mega-product-name {
+         display: block;
+         color: inherit;
+         font-size: 15px;
+         line-height: 1.35;
+      }
+
+      .main-menu3 .shop-mega-trigger-copy small {
+         display: block;
+         margin-top: 4px;
+         color: #6c6c6c;
+         font-size: 12px;
+         line-height: 1.4;
+      }
+
+      .main-menu3 .shop-mega-trigger-meta {
+         display: inline-flex;
+         align-items: center;
+         justify-content: center;
+         min-width: 34px;
+         height: 28px;
+         padding: 0 10px;
+         border-radius: 999px;
+         background: rgba(23, 23, 23, 0.08);
+         color: #171717;
+         font-size: 11px;
+         font-weight: 700;
+      }
+
+      .main-menu3 .shop-mega-trigger i,
+      .main-menu3 .shop-mega-product-link i {
+         color: #8b8b8b;
+         font-size: 14px;
+      }
+
+      .main-menu3 .shop-mega-trigger:hover,
+      .main-menu3 .shop-mega-trigger.is-active {
+         background: #171717;
+         color: #ffffff;
+         transform: translateX(4px);
+         box-shadow: 0 18px 40px rgba(23, 23, 23, 0.14);
+      }
+
+      .main-menu3 .shop-mega-trigger:hover .shop-mega-trigger-copy small,
+      .main-menu3 .shop-mega-trigger.is-active .shop-mega-trigger-copy small,
+      .main-menu3 .shop-mega-trigger:hover i,
+      .main-menu3 .shop-mega-trigger.is-active i {
+         color: rgba(255, 255, 255, 0.78);
+      }
+
+      .main-menu3 .shop-mega-trigger:hover .shop-mega-trigger-meta,
+      .main-menu3 .shop-mega-trigger.is-active .shop-mega-trigger-meta {
+         background: rgba(255, 255, 255, 0.16);
+         color: #ffffff;
+      }
+
+      .main-menu3 .shop-mega-panel {
+         display: none;
+         height: 100%;
+      }
+
+      .main-menu3 .shop-mega-panel.is-active {
+         display: block;
+      }
+
+      .main-menu3 .shop-mega-product-link {
+         display: flex;
+         align-items: center;
+         justify-content: space-between;
+         gap: 16px;
+         padding: 14px 16px;
+         border-radius: 18px;
+         background: rgba(255, 255, 255, 0.78);
+         border: 1px solid rgba(23, 23, 23, 0.06);
+         transition: border-color 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease;
+      }
+
+      .main-menu3 .shop-mega-product-link:hover {
+         border-color: rgba(139, 90, 33, 0.24);
+         box-shadow: 0 16px 36px rgba(139, 90, 33, 0.12);
+         transform: translateX(4px);
+      }
+
+      .main-menu3 .shop-mega-empty-state {
+         padding: 28px 20px;
+         color: #5d5d5d;
+      }
+
+      .main-menu3 .shop-mega-empty-state strong {
+         display: block;
+         margin-bottom: 8px;
+         color: #171717;
+         font-size: 15px;
+      }
+
+      .main-menu3 .shop-mega-empty-state p {
+         margin: 0;
+         font-size: 13px;
+         line-height: 1.6;
+      }
+
+      .main-menu3 .shop-mega-empty-state.compact {
+         padding: 18px 16px;
+      }
+
+      .main-menu3 .shop-mobile-tree {
+         display: none;
+      }
+
+      @media (max-width: 1399.98px) {
+         .main-menu3 .shop-mega-menu {
+            width: min(860px, calc(100vw - 32px));
+         }
+
+         .main-menu3 .shop-mega-shell {
+            grid-template-columns: minmax(190px, 0.85fr) minmax(220px, 0.95fr) minmax(240px, 1fr);
+         }
+      }
+
+      @media (max-width: 1199.98px) {
+         .main-menu3 .shop-mega-menu {
+            width: min(760px, calc(100vw - 24px));
+         }
+
+         .main-menu3 .shop-mega-shell {
+            grid-template-columns: minmax(170px, 0.85fr) minmax(200px, 0.95fr) minmax(220px, 1fr);
+         }
+
+         .main-menu3 .shop-mega-column-head {
+            padding: 18px 18px 14px;
+         }
+
+         .main-menu3 .shop-mega-column-head strong {
+            font-size: 16px;
+         }
+      }
+
+      @media (max-width: 991.98px) {
+         .main-menu3 .shop-mega-menu {
+            display: none !important;
+         }
+
+         .main-menu3 .shop-mobile-tree {
+            display: block;
+         }
+      }
+   </style>
+
+   <script>
+      document.addEventListener('DOMContentLoaded', function () {
+         var shopMenus = document.querySelectorAll('[data-shop-menu]');
+
+         shopMenus.forEach(function (shopMenu) {
+            var toggle = shopMenu.querySelector('[data-shop-menu-toggle]');
+            var panel = shopMenu.querySelector('[data-shop-menu-panel]');
+
+            if (!toggle || !panel) {
+               return;
+            }
+
+            var closeMenu = function () {
+               shopMenu.classList.remove('is-open');
+               toggle.setAttribute('aria-expanded', 'false');
+               panel.style.left = '';
+            };
+
+            var positionPanel = function () {
+               if (window.innerWidth < 992) {
+                  panel.style.left = '';
+                  return;
+               }
+
+               var itemRect = shopMenu.getBoundingClientRect();
+               var panelWidth = panel.offsetWidth;
+               var viewportPadding = 16;
+               var desiredLeft = itemRect.left - 140;
+               var clampedLeft = Math.max(
+                  viewportPadding,
+                  Math.min(desiredLeft, window.innerWidth - panelWidth - viewportPadding)
+               );
+
+               panel.style.left = (clampedLeft - itemRect.left) + 'px';
+            };
+
+            var openMenu = function () {
+               if (window.innerWidth < 992) {
+                  return;
+               }
+
+               positionPanel();
+               shopMenu.classList.add('is-open');
+               toggle.setAttribute('aria-expanded', 'true');
+            };
+
+            var resetCollectionPanels = function () {
+               shopMenu.querySelectorAll('.shop-mega-trigger[data-panel-level="collection"]').forEach(function (button) {
+                  button.classList.remove('is-active');
+               });
+
+               shopMenu.querySelectorAll('.shop-mega-panel[data-panel-level="collection"]').forEach(function (panelItem) {
+                  panelItem.classList.remove('is-active');
+               });
+            };
+
+            var activatePanel = function (level, target, triggerButton) {
+               if (!target) {
+                  return;
+               }
+
+               shopMenu.querySelectorAll('.shop-mega-trigger[data-panel-level="' + level + '"]').forEach(function (button) {
+                  button.classList.remove('is-active');
+               });
+
+               if (triggerButton) {
+                  triggerButton.classList.add('is-active');
+               }
+
+               shopMenu.querySelectorAll('.shop-mega-panel[data-panel-level="' + level + '"]').forEach(function (panelItem) {
+                  panelItem.classList.toggle('is-active', panelItem.dataset.panel === target);
+               });
+
+               if (level === 'category') {
+                  var activeCategoryPanel = shopMenu.querySelector('.shop-mega-panel[data-panel-level="category"][data-panel="' + target + '"]');
+                  var firstCollectionButton = activeCategoryPanel ? activeCategoryPanel.querySelector('.shop-mega-trigger[data-panel-level="collection"]') : null;
+
+                  if (firstCollectionButton) {
+                     activatePanel('collection', firstCollectionButton.dataset.target, firstCollectionButton);
+                  } else {
+                     resetCollectionPanels();
+                  }
+               }
+            };
+
+            shopMenu.querySelectorAll('.shop-mega-trigger[data-panel-level]').forEach(function (button) {
+               button.addEventListener('click', function () {
+                  openMenu();
+                  activatePanel(button.dataset.panelLevel, button.dataset.target, button);
+               });
+            });
+
+            toggle.addEventListener('click', function (event) {
+               if (window.innerWidth < 992) {
+                  return;
+               }
+
+               event.preventDefault();
+
+               if (shopMenu.classList.contains('is-open')) {
+                  closeMenu();
+                  return;
+               }
+
+               document.querySelectorAll('[data-shop-menu].is-open').forEach(function (openShopMenu) {
+                  if (openShopMenu !== shopMenu) {
+                     openShopMenu.classList.remove('is-open');
+                     var openToggle = openShopMenu.querySelector('[data-shop-menu-toggle]');
+
+                     if (openToggle) {
+                        openToggle.setAttribute('aria-expanded', 'false');
+                     }
+                  }
+               });
+
+               openMenu();
+            });
+
+            document.addEventListener('click', function (event) {
+               if (!shopMenu.contains(event.target)) {
+                  closeMenu();
+               }
+            });
+
+            document.addEventListener('keydown', function (event) {
+               if (event.key === 'Escape') {
+                  closeMenu();
+               }
+            });
+
+            window.addEventListener('resize', function () {
+               if (window.innerWidth < 992) {
+                  closeMenu();
+                  return;
+               }
+
+               if (shopMenu.classList.contains('is-open')) {
+                  positionPanel();
+               }
+            });
+         });
+      });
+   </script>
+
 
       <!-- side toggle start -->
       <div class="fix">
@@ -182,7 +763,7 @@
                <div class="mobile-menu d-lg-none fix"></div>
                <div class="offset-profile-action d-lg-none">
                   <div class="offset-widget mb-40">
-                     @auth
+                     @if(auth()->check())
                         <div class="mobile-user-info mb-20 text-center">
                            <div class="user-icon" style="display: inline-block; margin-bottom: 10px;">
                               <svg xmlns="http://www.w3.org/2000/svg" width="32" height="38"
@@ -198,9 +779,9 @@
                            </div>
                            <div class="user-name" style="font-weight: 600; font-size: 16px;">{{ Auth::user()->name }}</div>
                         </div>
-                     @endauth
+                     @endif
                      <div class="action-list action-list-header1 mb-20">
-                        @auth
+                        @if(auth()->check())
                            <div class="action-item">
                               <a href="{{ route('orders') }}" class="action-btn-text">My Orders</a>
                            </div>
@@ -216,37 +797,24 @@
                                  <button type="submit" class="action-btn-text">Logout</button>
                               </form>
                            </div>
-                        @else
+                        @endif
+                        @if(!auth()->check())
                            <div class="action-item">
                               <a href="{{ route('login') }}" class="action-btn-text">Sign in</a>
                            </div>
-                        @endauth
+                        @endif
                      </div>
                      <div class="action-list action-list-header1">
                         <div class="action-item action-item-cart">
                            <a href="{{ route('cart.index') }}">
                               <i class="fal fa-shopping-bag"></i>
-                              @auth
-                                 @php
-                                    $cartCount = \App\Models\Cart::where('user_id', auth()->id())->count();
-                                 @endphp
-                                 <span class="action-item-number cart-count">{{ $cartCount }}</span>
-                              @else
-                                 <span class="action-item-number cart-count">0</span>
-                              @endauth
+                              <span class="action-item-number cart-count">{{ auth()->check() ? \App\Models\Cart::where('user_id', auth()->id())->count() : 0 }}</span>
                            </a>
                         </div>
                         <div class="action-item action-item-wishlist">
                            <a href="{{ route('wishlist.index') }}">
                               <i class="fal fa-heart"></i>
-                              @auth
-                                 @php
-                                    $wishlistCount = \App\Models\Wishlist::where('user_id', auth()->id())->count();
-                                 @endphp
-                                 <span class="action-item-number wishlist-count">{{ $wishlistCount }}</span>
-                              @else
-                                 <span class="action-item-number wishlist-count">0</span>
-                              @endauth
+                              <span class="action-item-number wishlist-count">{{ auth()->check() ? \App\Models\Wishlist::where('user_id', auth()->id())->count() : 0 }}</span>
                            </a>
                         </div>
                      </div>
@@ -269,18 +837,18 @@
             <button class="close-sidebar">Close<i class="fal fa-times"></i></button>
             <h4 class="sidebar-action-title">Shopping Cart</h4>
             <div class="sidebar-action-list">
-               @auth
-                  @php
+               @if(auth()->check())
+                  <?php
                      $sidebarCartItems = \App\Models\Cart::where('user_id', auth()->id())
                         ->with(['product.images', 'color'])
                         ->latest()
                         ->take(3)
                         ->get();
-                     $sidebarCartTotal = $sidebarCartItems->sum(function($item) {
+                     $sidebarCartTotal = $sidebarCartItems->sum(function ($item) {
                         return $item->product->price * $item->quantity;
                      });
-                  @endphp
-                  
+                  ?>
+
                   @forelse($sidebarCartItems as $cartItem)
                      <div class="sidebar-list-item">
                         <div class="product-image pos-rel">
@@ -316,9 +884,9 @@
                      <i class="fal fa-shopping-cart" style="font-size: 48px; color: #ddd;"></i>
                      <p class="text-muted mt-2">Please login to view cart</p>
                   </div>
-               @endauth
+               @endif
             </div>
-            @auth
+            @if(auth()->check())
                @if($sidebarCartItems->count() > 0)
                   <div class="product-price-total">
                      <span>Subtotal :</span>
@@ -329,7 +897,7 @@
                      <a href="{{ route('checkout') }}" class="border-btn">Checkout</a>
                   </div>
                @endif
-            @endauth
+            @endif
          </div>
       </div>
       <div class="fix">
@@ -337,15 +905,15 @@
             <button class="close-sidebar">Close<i class="fal fa-times"></i></button>
             <h4 class="sidebar-action-title">Wishlist</h4>
             <div class="sidebar-action-list">
-               @auth
-                  @php
+               @if(auth()->check())
+                  <?php
                      $sidebarWishlistItems = \App\Models\Wishlist::where('user_id', auth()->id())
                         ->with(['product.images'])
                         ->latest()
                         ->take(3)
                         ->get();
-                  @endphp
-                  
+                  ?>
+
                   @forelse($sidebarWishlistItems as $wishlistItem)
                      <div class="sidebar-list-item">
                         <div class="product-image pos-rel">
@@ -380,7 +948,7 @@
                      <i class="fal fa-heart" style="font-size: 48px; color: #ddd;"></i>
                      <p class="text-muted mt-2">Please login to view wishlist</p>
                   </div>
-               @endauth
+               @endif
             </div>
             <div class="sidebar-action-btn">
                <a href="{{ route('wishlist.index') }}" class="fill-btn">View Wishlist</a>

@@ -13,6 +13,9 @@ use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Admin\AboutSectionController;
 use App\Http\Controllers\Admin\ContactSettingController;
 use App\Http\Controllers\Admin\TestimonialController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\SleeveTypeController;
+use App\Http\Controllers\Admin\CollectionTypeController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -81,6 +84,19 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
         ->name('products.addColor');
     Route::delete('colors/{color}', [ProductController::class, 'deleteColor'])
         ->name('colors.destroy');
+
+    // Dynamic Dropdown Management (Categories, Sleeve Types, Collection Types)
+    Route::resource('categories', CategoryController::class);
+    Route::patch('categories/{category}/toggle', [CategoryController::class, 'toggle'])
+        ->name('categories.toggle');
+    
+    Route::resource('sleeve-types', SleeveTypeController::class);
+    Route::patch('sleeve-types/{sleeveType}/toggle', [SleeveTypeController::class, 'toggle'])
+        ->name('sleeve-types.toggle');
+    
+    Route::resource('collection-types', CollectionTypeController::class);
+    Route::patch('collection-types/{collectionType}/toggle', [CollectionTypeController::class, 'toggle'])
+        ->name('collection-types.toggle');
     
     // Routes for Super Admin only
     Route::middleware('admin.role:super_admin')->group(function () {
