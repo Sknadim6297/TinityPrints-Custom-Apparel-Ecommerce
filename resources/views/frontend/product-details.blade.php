@@ -156,6 +156,124 @@
                            ->values()
                            ->take(10);
                         $imageCount = $productImages->count();
+
+                        $rawDescription = trim((string) ($product->description ?? ''));
+                        $normalizedDescription = preg_replace('/<br\\s*\\/?>(\\s*)/i', "\n", $rawDescription);
+                        $normalizedDescription = html_entity_decode(strip_tags((string) $normalizedDescription), ENT_QUOTES, 'UTF-8');
+                        $normalizedDescription = preg_replace('/\R+/', "\n", (string) $normalizedDescription);
+                        $descriptionLines = array_values(array_filter(array_map('trim', explode("\n", (string) $normalizedDescription)), function ($line) {
+                           return $line !== '';
+                        }));
+
+                        $sections = [
+                           'details' => ['title' => 'Product Details', 'items' => []],
+                           'wash' => ['title' => 'Wash Care', 'items' => []],
+                           'size' => ['title' => 'Size & Fit', 'items' => []],
+                           'additional' => ['title' => 'Additional Information', 'items' => []],
+                           'description' => ['title' => 'Product Description', 'items' => []],
+                        ];
+
+                        $currentSection = null;
+
+                        foreach ($descriptionLines as $line) {
+                           $normalizedLine = strtolower(trim(preg_replace('/\s+/', ' ', $line)));
+
+                           if (str_contains($normalizedLine, 'product details')) {
+                              $currentSection = 'details';
+                              continue;
+                           }
+
+                           if (str_contains($normalizedLine, 'wash care')) {
+                              $currentSection = 'wash';
+                              continue;
+                           }
+
+                           if (str_contains($normalizedLine, 'size and fit') || str_contains($normalizedLine, 'size & fit')) {
+                              $currentSection = 'size';
+                              continue;
+                           }
+
+                           if (str_contains($normalizedLine, 'additional information') || str_contains($normalizedLine, 'please note')) {
+                              $currentSection = 'additional';
+                              continue;
+                           }
+
+                           if (str_contains($normalizedLine, 'product description')) {
+                              $currentSection = 'description';
+                              continue;
+                           }
+
+                           if (! $currentSection) {
+                              $currentSection = 'description';
+                           }
+
+                           if (preg_match('/^([^:]{2,60}):\s*(.+)$/', $line, $matches)) {
+                              $sections[$currentSection]['items'][] = [
+                                 'type' => 'pair',
+                                 'label' => trim($matches[1]),
+                                 'value' => trim($matches[2]),
+                              ];
+                           } else {
+                              $sections[$currentSection]['items'][] = [
+                                 'type' => 'text',
+                                 'value' => $line,
+                              ];
+                           }
+                        }
+
+                        $nonDescriptionCount = count($sections['details']['items']) + count($sections['wash']['items']) + count($sections['size']['items']) + count($sections['additional']['items']);
+                        $hasStructuredSections = $nonDescriptionCount > 0;
+
+                        $structuredDescriptionHtml = '';
+
+                        if ($hasStructuredSections) {
+                           $structuredDescriptionHtml .= '<div class="product-structured-desc">';
+
+                           foreach (['details', 'wash', 'size', 'additional'] as $key) {
+                              if (empty($sections[$key]['items'])) {
+                                 continue;
+                              }
+
+                              $structuredDescriptionHtml .= '<h5>' . e($sections[$key]['title']) . '</h5>';
+                              $structuredDescriptionHtml .= '<ul>';
+
+                              foreach ($sections[$key]['items'] as $item) {
+                                 if ($item['type'] === 'pair') {
+                                    $structuredDescriptionHtml .= '<li><strong class="spec-label">' . e($item['label']) . ':</strong> ' . e($item['value']) . '</li>';
+                                 } else {
+                                    $structuredDescriptionHtml .= '<li>' . e($item['value']) . '</li>';
+                                 }
+                              }
+
+                              $structuredDescriptionHtml .= '</ul>';
+                           }
+
+                           if (! empty($sections['description']['items'])) {
+                              $descParts = [];
+                              foreach ($sections['description']['items'] as $item) {
+                                 if ($item['type'] === 'pair') {
+                                    $descParts[] = $item['label'] . ': ' . $item['value'];
+                                 } else {
+                                    $descParts[] = $item['value'];
+                                 }
+                              }
+
+                              $structuredDescriptionHtml .= '<h5>' . e($sections['description']['title']) . '</h5>';
+                              $structuredDescriptionHtml .= '<p>' . e(implode(' ', $descParts)) . '</p>';
+                           }
+
+                           $structuredDescriptionHtml .= '</div>';
+                        } else {
+                           $fallbackText = $normalizedDescription !== ''
+                              ? $normalizedDescription
+                              : 'No detailed description available for this product.';
+                           $structuredDescriptionHtml = '<p>' . nl2br(e($fallbackText)) . '</p>';
+                        }
+
+                        $summarySource = $normalizedDescription !== ''
+                           ? preg_replace('/\s+/', ' ', trim($normalizedDescription))
+                           : 'No description available for this product.';
+                        $productSummary = \Illuminate\Support\Str::limit((string) $summarySource, 220);
                      @endphp
                      <div class="product-details-tab">
                         <div class="tab-content" id="productDetailsTab">
@@ -202,22 +320,19 @@
                      <h4 class="product-name mb-10">{{ $product->name }}</h4>
                      <span class="product-price">INR {{ number_format($product->price, 2) }}</span>
 
-                     <p class="mb-30">{{ $product->description ?: 'No description available for this product.' }}</p>
+                     <p class="mb-30">{{ $productSummary }}</p>
                      
                      @if($product->sizes->count() > 0)
                         <div class="available-sizes mb-20">
-                           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                              <span style="font-weight: 600;">Select Size: <span class="text-danger">*</span></span>
-                              <button type="button" class="btn-link" data-bs-toggle="modal" data-bs-target="#sizeChartModal" style="font-size: 14px; color: #171717; text-decoration: underline; padding: 0; border: none; cursor: pointer; background: none;">
-                                 View Size Chart
-                              </button>
+                           <div class="size-selector-header">
+                              <span class="size-selector-label">Select Size: <span class="text-danger">*</span></span>
                            </div>
-                           <div class="product-available-sizes" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                           <div class="product-available-sizes">
                               @foreach($product->sizes as $size)
                                  @php
                                     $isInStock = (int) $size->stock_quantity > 0;
                                  @endphp
-                                 <div class="size-pill-wrapper" style="display: inline-flex; flex-direction: column; gap: 6px; align-items: flex-start;">
+                                 <div class="size-pill-wrapper">
                                     <label class="size-option {{ $isInStock ? '' : 'size-option-disabled' }}" style="cursor: {{ $isInStock ? 'pointer' : 'not-allowed' }};">
                                        <input
                                           type="radio"
@@ -228,7 +343,7 @@
                                           {{ $isInStock ? '' : 'disabled' }}
                                           required
                                        >
-                                       <span class="size-badge" style="display: inline-block; border: 2px solid #ddd; border-radius: 4px; font-weight: 600; transition: all 0.3s;">
+                                       <span class="size-badge">
                                           {{ strtoupper($size->size) }}
                                        </span>
                                     </label>
@@ -246,6 +361,13 @@
                                  </div>
                               @endforeach
                            </div>
+
+                           <div class="size-chart-action-row">
+                              <button type="button" class="btn-link size-chart-trigger" data-bs-toggle="modal" data-bs-target="#sizeChartModal">
+                                 View Size Chart
+                              </button>
+                           </div>
+
                            <div class="stock-alert-message" style="display:none; margin-top: 8px; font-size: 14px;"></div>
                         </div>
                      @endif
@@ -291,17 +413,17 @@
                <div class="">
                   <nav class="product-details-nav">
                      <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                        <a class="nav-item nav-link show" id="nav-general-tab" data-bs-toggle="tab" href="#nav-general"
-                           role="tab" aria-selected="false">Description</a>
-                        <a class="nav-item nav-link active" id="nav-seller-tab" data-bs-toggle="tab" href="#nav-seller"
-                           role="tab" aria-selected="true">Reviews</a>
+                        <a class="nav-item nav-link active" id="nav-general-tab" data-bs-toggle="tab" href="#nav-general"
+                           role="tab" aria-selected="true">Description</a>
+                        <a class="nav-item nav-link" id="nav-seller-tab" data-bs-toggle="tab" href="#nav-seller"
+                           role="tab" aria-selected="false">Reviews</a>
                      </div>
                   </nav>
                   <div class="tab-content product-details-content" id="nav-tabContent">
-                     <div class="tab-pane fade" id="nav-general" role="tabpanel">
+                     <div class="tab-pane fade active show" id="nav-general" role="tabpanel">
                         <div class="tabs-wrapper mt-35">
                            <div class="product__details-des">
-                              <p>{{ $product->description ?: 'No detailed description available for this product.' }}</p>
+                              {!! $structuredDescriptionHtml !!}
                               @if($product->is_limited_edition && $product->drop_story)
                                  <div class="mt-20">
                                     <h5>Drop Story</h5>
@@ -311,7 +433,7 @@
                            </div>
                         </div>
                      </div>
-                     <div class="tab-pane fade active show" id="nav-seller" role="tabpanel">
+                     <div class="tab-pane fade" id="nav-seller" role="tabpanel">
                         <div class="tabs-wrapper mt-35">
                            <!-- Display Existing Reviews -->
                            @php
@@ -433,46 +555,41 @@
       </section>
       <!-- shop details area end  -->
 
-      <div class="related_product pb-0">
+      <div class="related_product">
          <div class="container container-small">
-            <div class="section-title mb-55">
-               <h2>Related Products</h2>
+            <div class="section-header related-header mb-35">
+               <div>
+                  <h2>Related Products</h2>
+                  <p>You may also like</p>
+               </div>
+               <a href="{{ route('shop') }}" class="shop-link">View All</a>
             </div>
-            <div class="products-wrapper">
+            <div class="product-grid related-grid">
                @forelse($relatedProducts as $relatedProduct)
                   @php($productImage = optional($relatedProduct->images->first())->image_path)
                   @php($productColors = ($relatedProduct->colors ?? collect())->where('is_active', true))
-                  <div class="single-product">
-                     <div class="product-image pos-rel">
+                  <div class="product-card related-product-card">
+                     @if($relatedProduct->is_limited_edition)
+                        <span class="badge">LIMITED</span>
+                     @elseif($relatedProduct->created_at >= now()->subDays(30))
+                        <span class="badge">NEW</span>
+                     @endif
+
+                     <button type="button" class="wishlist add-to-wishlist-btn" data-product-id="{{ $relatedProduct->id }}" aria-label="Add to wishlist">♡</button>
+
+                     <div class="product-img">
                         <a href="{{ route('product.details', $relatedProduct->id) }}">
                            <img src="{{ $productImage ? Storage::url($productImage) : asset('frontend/assets/img/product/product-img1.jpg') }}" alt="{{ $relatedProduct->name }}">
                         </a>
-                        <div class="product-action">
-                           <a href="{{ route('product.details', $relatedProduct->id) }}" class="quick-view-btn"><i class="fal fa-eye"></i></a>
-                           <button type="button" class="wishlist-btn add-to-wishlist-btn" data-product-id="{{ $relatedProduct->id }}"><i class="fal fa-heart"></i></button>
-                        </div>
-                        @if($relatedProduct->is_limited_edition)
-                           <div class="product-sticker-wrapper">
-                              <span class="product-sticker new">Limited</span>
-                           </div>
-                        @elseif($relatedProduct->created_at >= now()->subDays(30))
-                           <div class="product-sticker-wrapper">
-                              <span class="product-sticker new">New</span>
-                           </div>
-                        @endif
+                        <a href="{{ route('product.details', $relatedProduct->id) }}" class="cart-btn text-center">VIEW PRODUCT</a>
                      </div>
-                     <div class="product-desc">
-                        <div class="product-name"><a href="{{ route('product.details', $relatedProduct->id) }}">{{ $relatedProduct->name }}</a></div>
-                        <div class="product-price">
-                           <span class="price-now">INR {{ number_format($relatedProduct->price, 2) }}</span>
+
+                     <div class="product-info">
+                        <h4>{{ strtoupper($relatedProduct->name) }}</h4>
+                        <div class="price">
+                           <span class="new">INR {{ number_format($relatedProduct->price, 2) }}</span>
                         </div>
-                        @if($productColors->count() > 0)
-                           <div class="product-color-nav" style="display: flex; gap: 8px; margin-top: 10px;">
-                              @foreach($productColors->take(4) as $color)
-                                 <div class="color-circle" style="width: 24px; height: 24px; border-radius: 50%; background-color: {{ $color->hex_code }}; border: 2px solid #ddd; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" title="{{ $color->color_name }}"></div>
-                              @endforeach
-                           </div>
-                        @endif
+                        
                      </div>
                   </div>
                @empty
@@ -555,58 +672,181 @@
 
    <!-- Reviews rating CSS -->
    <style>
-      /* Related Products Grid Layout */
-      .related_product .products-wrapper {
+      /* Related products styled like home product cards */
+      .related_product {
+         padding: 60px 0 60px;
+         background: #fff;
+         border-top: 1px solid #f0f0f0;
+         margin-top: 40px;
+      }
+
+      .related_product .related-header {
+         display: flex;
+         justify-content: space-between;
+         align-items: center;
+      }
+
+      .related_product .related-header h2 {
+         margin: 0;
+         font-size: 32px;
+      }
+
+      .related_product .related-header p {
+         margin: 0;
+         color: #777;
+      }
+
+      .related_product .shop-link {
+         text-decoration: none;
+         font-weight: 600;
+         color: #000;
+      }
+
+      .related_product .related-grid {
          display: grid;
-         grid-template-columns: repeat(4, 1fr);
-         gap: 30px;
-         margin-bottom: 0;
+         grid-template-columns: repeat(4, minmax(0, 1fr));
+         gap: 25px;
       }
 
-      @media (max-width: 1199px) {
-         .related_product .products-wrapper {
-            grid-template-columns: repeat(3, 1fr);
-         }
-      }
-
-      @media (max-width: 767px) {
-         .related_product .products-wrapper {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-         }
-      }
-
-      @media (max-width: 480px) {
-         .related_product .products-wrapper {
-            grid-template-columns: 1fr;
-         }
-      }
-
-      /* FIX PRODUCT IMAGE SIZE */
-      .related_product .single-product .product-image {
-         width: 100%;
-         height: 320px;
-         overflow: hidden;
+      .related_product .related-product-card {
          position: relative;
+         display: flex;
+         flex-direction: column;
       }
 
-      /* IMAGE */
-      .related_product .single-product .product-image img {
+      .related_product .product-img {
+         position: relative;
+         overflow: hidden;
+      }
+
+      .related_product .product-img img {
          width: 100%;
-         height: 100%;
+         height: 360px;
          object-fit: cover;
          display: block;
       }
 
-      /* PRODUCT CARD */
-      .related_product .single-product {
-         width: 100%;
+      .related_product .product-info {
+         padding-top: 10px;
       }
 
-      /* PRODUCT DESCRIPTION */
-      .related_product .product-desc {
-         padding: 15px;
-         text-align: center;
+      .related_product .product-info h4 {
+         font-size: 14px;
+         margin-bottom: 5px;
+      }
+
+      .related_product .price {
+         font-size: 14px;
+      }
+
+      .related_product .price .new {
+         color: #e53935;
+         font-weight: 600;
+      }
+
+      .related_product .badge {
+         position: absolute;
+         top: 10px;
+         left: 10px;
+         background: #e53935;
+         color: #fff;
+         padding: 4px 10px;
+         font-size: 12px;
+         border-radius: 4px;
+         z-index: 3;
+      }
+
+      .related_product .wishlist {
+         position: absolute;
+         right: 10px;
+         top: 10px;
+         font-size: 20px;
+         cursor: pointer;
+         z-index: 3;
+         border: none;
+         background: transparent;
+         line-height: 1;
+         padding: 0;
+      }
+
+      .related_product .cart-btn {
+         position: absolute;
+         bottom: -50px;
+         left: 0;
+         width: 100%;
+         background: #000;
+         color: #fff;
+         border: none;
+         padding: 12px;
+         transition: 0.3s;
+      }
+
+      .related_product .product-img:hover .cart-btn {
+         bottom: 0;
+      }
+
+      @media (max-width: 992px) {
+         .related_product .related-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+         }
+
+         .related_product .related-header {
+            flex-wrap: wrap;
+            gap: 10px;
+         }
+      }
+
+      @media (max-width: 576px) {
+         .related_product .related-grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
+         }
+
+         .related_product .related-header h2 {
+            font-size: 26px;
+         }
+
+         .related_product .product-img img {
+            height: 340px;
+         }
+      }
+
+      .product-structured-desc h5 {
+         font-size: 18px;
+         font-weight: 700;
+         margin: 0 0 10px;
+      }
+
+      .product-structured-desc ul {
+         margin: 0 0 18px;
+         padding-left: 20px;
+      }
+
+      .product-structured-desc li {
+         margin-bottom: 8px;
+         line-height: 1.6;
+      }
+
+      .product-structured-desc p {
+         margin: 0 0 16px;
+         line-height: 1.8;
+      }
+
+      .product-structured-desc .spec-label {
+         font-weight: 700;
+      }
+
+      @media (max-width: 576px) {
+         .product-structured-desc h5 {
+            font-size: 16px;
+         }
+
+         .product-structured-desc li,
+         .product-structured-desc p {
+            font-size: 14px;
+            line-height: 1.65;
+         }
       }
 
       /* Size Chart Modal Styles */
@@ -711,6 +951,67 @@
          background-color: #171717;
          color: #fff;
       }
+
+      .size-selector-header {
+         margin-bottom: 10px;
+      }
+
+      .size-selector-label {
+         font-weight: 600;
+      }
+
+      .product-available-sizes {
+         display: flex;
+         gap: 10px;
+         flex-wrap: wrap;
+      }
+
+      .size-pill-wrapper {
+         display: inline-flex;
+         flex-direction: column;
+         gap: 6px;
+         align-items: flex-start;
+      }
+
+      .size-badge {
+         display: inline-block;
+         min-width: 46px;
+         text-align: center;
+         padding: 10px 12px;
+         border: 2px solid #ddd;
+         border-radius: 4px;
+         font-weight: 600;
+         line-height: 1;
+         transition: all 0.3s;
+      }
+
+      .size-chart-action-row {
+         display: flex;
+         width: 100%;
+         margin-top: 12px;
+      }
+
+      .size-chart-trigger {
+         font-size: 14px;
+         color: #171717;
+         text-decoration: underline;
+         padding: 0;
+         border: none;
+         cursor: pointer;
+         background: none;
+      }
+
+      @media (max-width: 576px) {
+         .size-chart-action-row {
+            justify-content: flex-start;
+         }
+
+         .size-badge {
+            min-width: 44px;
+            padding: 9px 10px;
+         }
+      }
+
       .size-option-disabled .size-badge {
          color: #999;
          border-style: dashed;

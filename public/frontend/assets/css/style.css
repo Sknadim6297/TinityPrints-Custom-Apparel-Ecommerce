@@ -4505,13 +4505,6 @@ input.radio-box[type=radio]:checked::before {
   background: var(--clr-theme-1);
   color: var(--clr-common-white);
 }
-
-.available-sizes {
-  display: flex;
-  gap: 5px;
-  margin-bottom: 25px;
-}
-
 .product-details-tab .tab-content .tab-pane {
   width: 100%;
   padding-top: 110%;

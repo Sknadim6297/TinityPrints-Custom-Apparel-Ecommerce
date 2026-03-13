@@ -35,6 +35,7 @@
     <style>
         /* Hero Banner Section */
 
+        html,
         body {
             overflow-x: hidden;
         }
@@ -462,6 +463,47 @@
             width: 100%;
         }
 
+        @media (max-width: 992px) {
+            .product-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 18px;
+            }
+
+            .section-header {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .best-seller .container,
+            .limited-edition .container {
+                padding: 0 14px;
+            }
+
+            .section-header {
+                align-items: flex-start;
+                margin-bottom: 20px;
+            }
+
+            .section-header h2 {
+                font-size: 26px;
+            }
+
+            .product-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .product-card {
+                min-height: auto;
+            }
+
+            .product-img img {
+                height: 340px;
+            }
+        }
+
         .product-card {
             position: relative;
             min-height: 450px;
@@ -720,6 +762,39 @@
             padding-left: 140px;
         }
 
+        @media (max-width: 992px) {
+            .custom-design-section {
+                flex-direction: column;
+                height: auto;
+                margin: 50px 0;
+            }
+
+            .custom-left,
+            .custom-right {
+                width: 100%;
+                clip-path: none;
+            }
+
+            .custom-left {
+                padding: 50px 20px 30px;
+            }
+
+            .custom-right {
+                margin-left: 0;
+                padding: 30px 20px 50px;
+            }
+
+            .custom-left h2,
+            .custom-right h2 {
+                font-size: 36px;
+            }
+
+            .custom-left .content,
+            .custom-right .content {
+                max-width: 100%;
+            }
+        }
+
         .custom-left .content {
             max-width: 380px;
         }
@@ -913,6 +988,56 @@
             color: #000;
             text-decoration: none;
             border-bottom: 1px solid #000;
+        }
+
+        @media (max-width: 992px) {
+            .blog-section {
+                padding: 0 16px;
+            }
+
+            .blog-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 22px;
+            }
+
+            .blog-content h3 {
+                font-size: 20px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .blog-section {
+                padding: 0 14px;
+            }
+
+            .blog-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+                margin-bottom: 24px;
+            }
+
+            .blog-header h2 {
+                font-size: 28px;
+            }
+
+            .blog-grid {
+                grid-template-columns: 1fr;
+                gap: 18px;
+            }
+
+            .blog-card img {
+                height: 220px;
+            }
+
+            .blog-content h3 {
+                font-size: 18px;
+                line-height: 1.35;
+            }
+
+            .blog-content p {
+                font-size: 13px;
+            }
         }
 
         .why-choose-section {

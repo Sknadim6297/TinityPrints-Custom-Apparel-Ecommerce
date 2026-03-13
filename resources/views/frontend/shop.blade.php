@@ -45,6 +45,8 @@
         .stock-label { font-size: 13px; color: #444; }
 
         .filter-group select { width: 100%; padding: 8px 10px; font-size: 13px; border: 1px solid #ddd; background: #fff; cursor: pointer; outline: none; }
+        .filter-text-input { width: 100%; padding: 9px 10px; font-size: 13px; border: 1px solid #ddd; background: #fff; outline: none; }
+        .filter-text-input:focus { border-color: #999; }
         .filter-buttons { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
         .clear-btn { background: none; border: none; font-size: 12px; color: #999; cursor: pointer; text-decoration: none; letter-spacing: .5px; text-transform: uppercase; }
         .clear-btn:hover { color: #333; }
@@ -139,10 +141,18 @@
                 <button class="mobile-filter-toggle" id="mobile-filter-btn" type="button">
                     <i class="fas fa-sliders-h"></i> Filters
                     @php
-                        $activeCount = count(array_filter([request('in_stock'), request('min_price'), request('max_price'), request('limited_edition'), request('collection_type_id')]))
-                                     + count((array) request('size', []))
-                                     + count((array) request('category_id', []))
-                                     + count((array) request('color', []));
+                        $activeCount = 0;
+                        $activeCount += request()->filled('search') ? 1 : 0;
+                        $activeCount += request()->filled('min_price') ? 1 : 0;
+                        $activeCount += request()->filled('max_price') ? 1 : 0;
+                        $activeCount += (request('stock') && request('stock') !== 'all') || request('in_stock') ? 1 : 0;
+                        $activeCount += request('edition') && request('edition') !== 'all' ? 1 : 0;
+                        $activeCount += request('story') && request('story') !== 'all' ? 1 : 0;
+                        $activeCount += count((array) request('size', []));
+                        $activeCount += count((array) request('category_id', []));
+                        $activeCount += count((array) request('sleeve_type', []));
+                        $activeCount += count((array) request('collection_type_id', []));
+                        $activeCount += count((array) request('color', []));
                     @endphp
                     @if($activeCount > 0)
                         <span style="background:#000;color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;display:inline-flex;align-items:center;justify-content:center;margin-left:4px;">{{ $activeCount }}</span>
@@ -164,32 +174,30 @@
                             <span class="product-count">{{ $products->total() }} PRODUCTS</span>
                         </div>
 
-                        @if(request()->filled('search'))
-                            <input type="hidden" name="search" value="{{ e(request('search')) }}">
-                        @endif
-
-                        @if(request()->filled('limited_edition'))
-                            <input type="hidden" name="limited_edition" value="{{ request('limited_edition') }}">
-                        @endif
-
-                        @if(request()->filled('collection_type_id'))
-                            <input type="hidden" name="collection_type_id" value="{{ request('collection_type_id') }}">
-                        @endif
-
                         @if(!$category && request()->filled('category'))
                             <input type="hidden" name="category" value="{{ request('category') }}">
                         @endif
 
                         <div class="filter-group">
-                            <h5>AVAILABILITY</h5>
-                            <div class="stock-toggle-row">
-                                <label class="switch">
-                                    <input type="checkbox" name="in_stock" value="1"
-                                        {{ request('in_stock') ? 'checked' : '' }}
-                                        onchange="this.form.submit()">
-                                    <span class="slider"></span>
+                            <h5>SEARCH</h5>
+                            <input type="text" name="search" value="{{ request('search') }}" class="filter-text-input" placeholder="Search products...">
+                        </div>
+
+                        <div class="filter-group">
+                            <h5>STOCK</h5>
+                            <div class="filter-options">
+                                <label>
+                                    <input type="radio" name="stock" value="all" {{ ($stockFilter ?? request('stock', 'all')) === 'all' ? 'checked' : '' }}>
+                                    All
                                 </label>
-                                <span class="stock-label">In stock only</span>
+                                <label>
+                                    <input type="radio" name="stock" value="in" {{ ($stockFilter ?? request('stock')) === 'in' || request('in_stock') ? 'checked' : '' }}>
+                                    In Stock
+                                </label>
+                                <label>
+                                    <input type="radio" name="stock" value="out" {{ ($stockFilter ?? request('stock')) === 'out' ? 'checked' : '' }}>
+                                    Out of Stock
+                                </label>
                             </div>
                         </div>
 
@@ -226,6 +234,39 @@
                                 @endforeach
                             </div>
                         </div>
+
+                        @if(count($availableSleeveTypes) > 0)
+                        <div class="filter-group">
+                            <h5>SLEEVE TYPE</h5>
+                            <div class="filter-options">
+                                @foreach($availableSleeveTypes as $sleeveType)
+                                    <label>
+                                        <input type="checkbox" name="sleeve_type[]"
+                                            value="{{ $sleeveType }}"
+                                            {{ in_array($sleeveType, (array) request('sleeve_type', [])) ? 'checked' : '' }}>
+                                        {{ ucfirst(str_replace(['-', '_'], ' ', $sleeveType)) }}
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+                        @endif
+
+                        @if($collectionOptions->count() > 0)
+                        <div class="filter-group">
+                            <h5>COLLECTION TYPE</h5>
+                            <div class="filter-options">
+                                @foreach($collectionOptions as $collection)
+                                    <label>
+                                        <input type="checkbox" name="collection_type_id[]"
+                                            value="{{ $collection->id }}"
+                                            {{ in_array($collection->id, array_map('intval', (array) request('collection_type_id', []))) ? 'checked' : '' }}>
+                                        {{ $collection->name }}
+                                        <span style="color:#bbb;font-size:11px;">({{ $collection->active_products_count }})</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+                        @endif
 
                         @if($categoryOptions->count() > 0)
                         <div class="filter-group">
@@ -269,6 +310,42 @@
                             </div>
                         </div>
                         @endif
+
+                        <div class="filter-group">
+                            <h5>EDITION</h5>
+                            <div class="filter-options">
+                                <label>
+                                    <input type="radio" name="edition" value="all" {{ ($editionFilter ?? request('edition', 'all')) === 'all' ? 'checked' : '' }}>
+                                    All
+                                </label>
+                                <label>
+                                    <input type="radio" name="edition" value="limited" {{ ($editionFilter ?? request('edition')) === 'limited' || request('limited_edition') ? 'checked' : '' }}>
+                                    Limited Edition
+                                </label>
+                                <label>
+                                    <input type="radio" name="edition" value="regular" {{ ($editionFilter ?? request('edition')) === 'regular' ? 'checked' : '' }}>
+                                    Regular
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <h5>STORY</h5>
+                            <div class="filter-options">
+                                <label>
+                                    <input type="radio" name="story" value="all" {{ ($storyFilter ?? request('story', 'all')) === 'all' ? 'checked' : '' }}>
+                                    All
+                                </label>
+                                <label>
+                                    <input type="radio" name="story" value="has" {{ ($storyFilter ?? request('story')) === 'has' ? 'checked' : '' }}>
+                                    Has Story
+                                </label>
+                                <label>
+                                    <input type="radio" name="story" value="none" {{ ($storyFilter ?? request('story')) === 'none' ? 'checked' : '' }}>
+                                    No Story
+                                </label>
+                            </div>
+                        </div>
 
                         <div class="filter-group">
                             <h5>SORT BY</h5>

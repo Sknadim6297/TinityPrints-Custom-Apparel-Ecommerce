@@ -79,6 +79,15 @@ class HomeController extends Controller
         $query = Product::where('is_active', true)
             ->with(['images', 'colors', 'sizes', 'category', 'collectionType']);
 
+        $stockFilter = $request->input('stock', 'all');
+        $editionFilter = $request->input('edition', 'all');
+        $storyFilter = $request->input('story', 'all');
+
+        // Backward compatibility for old limited_edition query param
+        if ($request->filled('limited_edition') && $request->limited_edition !== 'all' && $editionFilter === 'all') {
+            $editionFilter = 'limited';
+        }
+
         $selectedCategory = null;
         $selectedCollection = null;
         $isLimitedEdition = false;
@@ -125,7 +134,13 @@ class HomeController extends Controller
             });
         }
 
-        if ($request->filled('collection_type_id')) {
+        $collectionTypeIds = array_values(array_filter((array) $request->input('collection_type_id', [])));
+        if (!empty($collectionTypeIds)) {
+            $query->whereIn('collection_type_id', $collectionTypeIds);
+            $selectedCollection = CollectionType::query()
+                ->where('is_active', true)
+                ->find($collectionTypeIds[0]);
+        } elseif ($request->filled('collection_type_id')) {
             $selectedCollection = CollectionType::query()
                 ->where('is_active', true)
                 ->find($request->integer('collection_type_id'));
@@ -135,15 +150,21 @@ class HomeController extends Controller
             }
         }
 
-        // Limited Edition filter
-        if ($request->filled('limited_edition') && $request->limited_edition !== 'all') {
+        // Edition filter
+        if ($editionFilter === 'limited') {
             $query->where('is_limited_edition', true);
             $isLimitedEdition = true;
+        } elseif ($editionFilter === 'regular') {
+            $query->where('is_limited_edition', false);
         }
 
-        // In-stock filter
-        if ($request->filled('in_stock') && $request->in_stock == '1') {
+        // Stock filter (in/out/all)
+        if (($request->filled('in_stock') && $request->in_stock == '1') || $stockFilter === 'in') {
             $query->whereHas('sizes', function ($q) {
+                $q->where('stock_quantity', '>', 0);
+            });
+        } elseif ($stockFilter === 'out') {
+            $query->whereDoesntHave('sizes', function ($q) {
                 $q->where('stock_quantity', '>', 0);
             });
         }
@@ -174,7 +195,23 @@ class HomeController extends Controller
 
         // Sleeve Type filter
         if ($request->filled('sleeve_type')) {
-            $query->where('sleeve_type', $request->sleeve_type);
+            $sleeveTypes = array_values(array_filter((array) $request->input('sleeve_type', [])));
+            if (!empty($sleeveTypes)) {
+                $query->whereIn('sleeve_type', $sleeveTypes);
+            } elseif (is_string($request->sleeve_type)) {
+                $query->where('sleeve_type', $request->sleeve_type);
+            }
+        }
+
+        // Story filter
+        if ($storyFilter === 'has') {
+            $query->whereNotNull('drop_story')
+                ->where('drop_story', '!=', '');
+        } elseif ($storyFilter === 'none') {
+            $query->where(function ($q) {
+                $q->whereNull('drop_story')
+                    ->orWhere('drop_story', '=','');
+            });
         }
 
         // Sorting
@@ -290,6 +327,9 @@ class HomeController extends Controller
             'category', 
             'pageTitle',
             'isLimitedEdition',
+            'stockFilter',
+            'editionFilter',
+            'storyFilter',
             'selectedCategory',
             'selectedCollection',
             'categoryOptions',
