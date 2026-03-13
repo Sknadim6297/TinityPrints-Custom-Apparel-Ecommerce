@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\SleeveTypeController;
 use App\Http\Controllers\Admin\CollectionTypeController;
+use App\Http\Controllers\Admin\HomeSettingController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -57,6 +58,12 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
         ->name('contact-settings.edit');
     Route::post('settings/contact', [ContactSettingController::class, 'update'])
         ->name('contact-settings.update');
+
+    // Home page general settings
+    Route::get('settings/home', [HomeSettingController::class, 'edit'])
+        ->name('home-settings.edit');
+    Route::post('settings/home', [HomeSettingController::class, 'update'])
+        ->name('home-settings.update');
 
     // Testimonials management
     Route::resource('testimonials', TestimonialController::class)

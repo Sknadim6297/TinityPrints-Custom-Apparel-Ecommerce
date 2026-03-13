@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\CollectionType;
 use App\Models\DesignRequest;
+use App\Models\HomeSetting;
 use App\Models\Product;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -17,6 +18,12 @@ class HomeController extends Controller
      */
     public function index()
     {
+        $homeSettingRecord = HomeSetting::first();
+        $homeSettings = HomeSetting::mergedData($homeSettingRecord?->data);
+
+        $bestSellerLimit = max(1, (int) ($homeSettings['best_seller']['product_limit'] ?? 8));
+        $limitedEditionLimit = max(1, (int) ($homeSettings['limited_edition']['product_limit'] ?? 4));
+
         // Get featured products for the home page
         $featuredProducts = Product::where('is_active', true)
             ->with('images')
@@ -25,6 +32,14 @@ class HomeController extends Controller
         $bestSellerProducts = Product::where('is_active', true)
             ->with('images')
             ->orderBy('created_at', 'desc')
+            ->take($bestSellerLimit)
+            ->get();
+
+        $limitedEditionProducts = Product::where('is_active', true)
+            ->where('is_limited_edition', true)
+            ->with('images')
+            ->orderBy('created_at', 'desc')
+            ->take($limitedEditionLimit)
             ->get();
 
         $newArrivalProducts = Product::where('is_active', true)
@@ -45,8 +60,10 @@ class HomeController extends Controller
             ->get();
 
         return view('frontend.home', compact(
+            'homeSettings',
             'featuredProducts', 
             'bestSellerProducts', 
+            'limitedEditionProducts',
             'newArrivalProducts',
             'hotCollectionProducts',
             'trendyProducts',
@@ -64,6 +81,7 @@ class HomeController extends Controller
 
         $selectedCategory = null;
         $selectedCollection = null;
+        $isLimitedEdition = false;
 
         // Search filter
         if ($request->filled('search')) {
@@ -76,20 +94,35 @@ class HomeController extends Controller
             });
         }
 
-        if ($request->filled('category_id')) {
-            $selectedCategory = Category::query()
-                ->where('is_active', true)
-                ->find($request->integer('category_id'));
-
-            if ($selectedCategory) {
-                $query->where('category_id', $selectedCategory->id);
-            }
+        $categoryIds = array_values(array_filter((array) $request->input('category_id', [])));
+        if (!empty($categoryIds)) {
+            $query->whereIn('category_id', $categoryIds);
+            $selectedCategory = Category::where('is_active', true)->find($categoryIds[0]);
         }
 
-        // Filter by category if provided
-        if (!$selectedCategory && ($category || $request->filled('category'))) {
+        // Filter by category slug if provided via URL segment
+        if (empty($categoryIds) && ($category || $request->filled('category'))) {
             $categoryFilter = $category ?: $request->category;
-            $query->where('category', $categoryFilter);
+            $normalizedCategory = Str::of($categoryFilter)->replace(['-', '_'], ' ')->lower()->value();
+
+            $selectedCategory = Category::query()
+                ->where('is_active', true)
+                ->where(function ($categoryQuery) use ($categoryFilter, $normalizedCategory) {
+                    $categoryQuery->where('slug', $categoryFilter)
+                        ->orWhereRaw('LOWER(name) = ?', [$normalizedCategory]);
+                })
+                ->first();
+
+            $query->where(function ($productQuery) use ($categoryFilter, $selectedCategory) {
+                if ($selectedCategory) {
+                    $productQuery->where('category_id', $selectedCategory->id)
+                        ->orWhere('category', $categoryFilter);
+
+                    return;
+                }
+
+                $productQuery->where('category', $categoryFilter);
+            });
         }
 
         if ($request->filled('collection_type_id')) {
@@ -105,11 +138,19 @@ class HomeController extends Controller
         // Limited Edition filter
         if ($request->filled('limited_edition') && $request->limited_edition !== 'all') {
             $query->where('is_limited_edition', true);
+            $isLimitedEdition = true;
+        }
+
+        // In-stock filter
+        if ($request->filled('in_stock') && $request->in_stock == '1') {
+            $query->whereHas('sizes', function ($q) {
+                $q->where('stock_quantity', '>', 0);
+            });
         }
 
         // Size filter
         if ($request->filled('size')) {
-            $sizes = is_array($request->size) ? $request->size : [$request->size];
+            $sizes = array_map('strtolower', is_array($request->size) ? $request->size : [$request->size]);
             $query->whereHas('sizes', function($q) use ($sizes) {
                 $q->whereIn('size', $sizes);
             });
@@ -124,13 +165,11 @@ class HomeController extends Controller
         }
 
         // Price range filter
-        if ($request->filled('min_price') || $request->filled('max_price')) {
-            if ($request->filled('min_price')) {
-                $query->where('price', '>=', $request->min_price);
-            }
-            if ($request->filled('max_price')) {
-                $query->where('price', '<=', $request->max_price);
-            }
+        if ($request->filled('min_price')) {
+            $query->where('base_price', '>=', (float) $request->min_price);
+        }
+        if ($request->filled('max_price')) {
+            $query->where('base_price', '<=', (float) $request->max_price);
         }
 
         // Sleeve Type filter
@@ -142,10 +181,10 @@ class HomeController extends Controller
         $sortBy = $request->get('sort', 'default');
         switch ($sortBy) {
             case 'price_low':
-                $query->orderBy('price', 'asc');
+                $query->orderBy('base_price', 'asc');
                 break;
             case 'price_high':
-                $query->orderBy('price', 'desc');
+                $query->orderBy('base_price', 'desc');
                 break;
             case 'newest':
                 $query->orderBy('created_at', 'desc');
@@ -239,9 +278,18 @@ class HomeController extends Controller
         
         $products = $query->paginate(12)->appends($request->except('page'));
 
+        $pageTitle = $isLimitedEdition
+            ? 'Limited Edition'
+            : ($selectedCollection?->name ?? $selectedCategory?->name ?? ($category ? ucwords(str_replace(['-', '_'], ' ', $category)) : 'Shop'));
+
+        $maxPrice = (int) ceil(Product::where('is_active', true)->max('base_price') ?? 5000);
+        $maxPrice = max($maxPrice, 500);
+
         return view('frontend.shop', compact(
             'products', 
             'category', 
+            'pageTitle',
+            'isLimitedEdition',
             'selectedCategory',
             'selectedCollection',
             'categoryOptions',
@@ -252,7 +300,8 @@ class HomeController extends Controller
             'availableSleeveTypes',
             'totalProducts',
             'categoryStats',
-            'allActiveCategories'
+            'allActiveCategories',
+            'maxPrice'
         ));
     }
 
@@ -351,7 +400,6 @@ class HomeController extends Controller
      */
     public function limitedEdition()
     {
-        // Get limited edition products
         $limitedProducts = Product::where('is_limited_edition', true)
             ->where('is_active', true)
             ->with(['images', 'colors', 'sizes'])

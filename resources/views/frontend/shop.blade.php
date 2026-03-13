@@ -1,516 +1,470 @@
-@extends('frontend.layout.app')
+﻿@extends('frontend.layout.app')
 
-@section('title', 'Shop')
+@section('title', ($pageTitle ?? 'Shop') === 'Shop' ? 'Shop' : ($pageTitle ?? 'Shop') . ' - Shop')
+
 @section('content')
-<style>
- /* FIX PRODUCT IMAGE SIZE */
 
-.single-product .product-image{
-    width:100%;
-    height:320px;
-    overflow:hidden;
-    position:relative;
-}
+    <style>
+        .shop-main-area { padding: 60px 0 80px; }
+        .shop-layout { display: flex; gap: 40px; align-items: flex-start; }
 
-/* IMAGE */
-.single-product .product-image img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    display:block;
-}
+        .filter-sidebar {
+            width: 280px; flex-shrink: 0; background: #fff;
+            padding: 20px; border: 1px solid #eee;
+            position: sticky; top: 100px;
+        }
+        .filter-header { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+        .filter-header h4 { font-size: 13px; font-weight: 700; letter-spacing: 1px; margin-bottom: 4px; }
+        .product-count { font-size: 12px; color: #888; }
+        .filter-group { margin-bottom: 18px; padding-bottom: 18px; border-bottom: 1px solid #f0f0f0; }
+        .filter-group:last-of-type { border-bottom: none; }
+        .filter-group h5 { font-size: 11px; margin-bottom: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #333; }
+        .filter-options label { display: flex; align-items: center; gap: 8px; font-size: 13px; margin-bottom: 6px; cursor: pointer; color: #444; }
+        .filter-options label:hover { color: #000; }
+        .filter-options input[type="checkbox"] { width: 14px; height: 14px; cursor: pointer; accent-color: #000; }
 
-/* PRODUCT CARD */
-.single-product{
-    width:100%;
-}
+        .color-options { display: flex; gap: 8px; flex-wrap: wrap; }
+        .color-swatch { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #ddd; cursor: pointer; transition: transform .2s, border-color .2s; display: inline-block; }
+        .color-swatch:hover { transform: scale(1.15); }
+        .color-swatch.selected { border-color: #000; transform: scale(1.15); box-shadow: 0 0 0 2px #fff, 0 0 0 4px #000; }
 
-/* PRODUCT DESCRIPTION */
-.product-desc{
-    padding:15px;
-    text-align:center;
-}
-</style>
-<!-- page title area start  -->
-      <section class="page-title-area" data-background="{{ asset('frontend/assets/img/banner/banner-1-1.jpeg') }}">
-         <div class="container">
+        .price-range-wrap { padding: 4px 0; }
+        .price-display { display: flex; justify-content: space-between; font-size: 12px; color: #555; margin-bottom: 10px; font-weight: 600; }
+        .price-slider-track { position: relative; height: 4px; background: #ddd; border-radius: 2px; margin: 8px 0 6px; }
+        .price-slider-track input[type="range"] { position: absolute; width: 100%; height: 4px; background: none; pointer-events: none; -webkit-appearance: none; margin: 0; top: 0; }
+        .price-slider-track input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #000; cursor: pointer; pointer-events: all; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.3); }
+        .price-slider-track input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: #000; cursor: pointer; pointer-events: all; border: 2px solid #fff; }
+
+        .switch { position: relative; display: inline-block; width: 38px; height: 20px; margin-right: 8px; }
+        .switch input { display: none; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #ccc; border-radius: 20px; transition: .3s; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: .3s; }
+        input:checked + .slider { background: #000; }
+        input:checked + .slider:before { transform: translateX(18px); }
+        .stock-toggle-row { display: flex; align-items: center; }
+        .stock-label { font-size: 13px; color: #444; }
+
+        .filter-group select { width: 100%; padding: 8px 10px; font-size: 13px; border: 1px solid #ddd; background: #fff; cursor: pointer; outline: none; }
+        .filter-buttons { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
+        .clear-btn { background: none; border: none; font-size: 12px; color: #999; cursor: pointer; text-decoration: none; letter-spacing: .5px; text-transform: uppercase; }
+        .clear-btn:hover { color: #333; }
+        .apply-btn { background: #000; color: #fff; border: none; padding: 10px 22px; font-size: 12px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; cursor: pointer; transition: background .2s; text-decoration: none; display: inline-block; }
+        .apply-btn:hover { background: #333; color: #fff; }
+
+        .mobile-filter-bar { display: none; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 12px 0; border-bottom: 1px solid #eee; }
+        .mobile-filter-toggle { display: flex; align-items: center; gap: 8px; background: none; border: 1px solid #000; padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer; }
+
+        .products-area { flex: 1; min-width: 0; }
+        .results-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #eee; }
+        .results-count { font-size: 13px; color: #888; }
+
+        .product-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+        .product-card { background: #fff; }
+        .product-image { position: relative; height: 400px; overflow: hidden; }
+        .product-image img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s ease; }
+        .product-card:hover .product-image img { transform: scale(1.05); }
+        .product-badge { position: absolute; top: 12px; left: 12px; background: #ff3b30; color: #fff; font-size: 11px; font-weight: 600; padding: 4px 10px; letter-spacing: .5px; z-index: 2; }
+        .product-badge.badge-limited { background: #1a1a1a; }
+
+        .wishlist-btn { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; border-radius: 50%; border: none; background: #fff; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,.2); z-index: 2; transition: background .2s; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+        .wishlist-btn:hover { background: #ffe4e4; }
+        .wishlist-btn.wl-active i { color: #e60023 !important; }
+
+        .add-cart-btn { position: absolute; bottom: -50px; left: 0; width: 100%; background: #000; color: #fff; border: none; padding: 13px; font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; transition: bottom .3s ease; cursor: pointer; z-index: 2; }
+        .product-card:hover .add-cart-btn { bottom: 0; }
+
+        .product-info { padding: 14px 0 10px; }
+        .product-title { font-size: 13px; font-weight: 600; margin-bottom: 6px; line-height: 1.4; }
+        .product-title a { text-decoration: none; color: #111; }
+        .product-title a:hover { color: #555; }
+        .product-price { font-size: 13px; }
+        .base-price { color: #333; font-weight: 600; }
+        .product-category-tag { font-size: 11px; color: #aaa; margin-top: 4px; text-transform: uppercase; letter-spacing: .4px; }
+
+        .no-products { text-align: center; padding: 80px 20px; color: #888; }
+        .no-products p { font-size: 16px; margin-bottom: 20px; }
+
+        .shop-pagination { margin-top: 50px; display: flex; justify-content: center; }
+        .shop-pagination nav { display: flex; justify-content: center; }
+        .shop-pagination .pagination { display: flex; gap: 4px; list-style: none; padding: 0; margin: 0; flex-wrap: wrap; justify-content: center; }
+        .shop-pagination .pagination li a,
+        .shop-pagination .pagination li span { display: inline-flex; align-items: center; justify-content: center; min-width: 38px; height: 38px; padding: 0 10px; border: 1px solid #ddd; color: #333; text-decoration: none; font-size: 13px; transition: all .2s; background: #fff; }
+        .shop-pagination .pagination li.active span { background: #000; color: #fff; border-color: #000; }
+        .shop-pagination .pagination li a:hover { background: #000; color: #fff; border-color: #000; }
+
+        .filter-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,.5); z-index: 9998; }
+        .filter-overlay.active { display: block; }
+
+        @media(max-width: 1200px) {
+            .product-grid { grid-template-columns: repeat(2, 1fr); }
+            .filter-sidebar { display: none; position: fixed; top: 0; left: 0; height: 100vh; z-index: 9999; overflow-y: auto; width: 300px; box-shadow: 4px 0 20px rgba(0,0,0,.2); }
+            .filter-sidebar.mobile-open { display: block; }
+            .mobile-filter-bar { display: flex; }
+        }
+        @media(max-width: 768px) { .product-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; } .product-image { height: 250px; } }
+        @media(max-width: 480px) { .product-grid { grid-template-columns: 1fr; } }
+    </style>
+
+    <section class="page-title-area">
+        <div class="container">
             <div class="row">
-               <div class="col-lg-12">
-                  <div class="page-title-wrapper text-center">
-                     <h1 class="page-title mb-10">
-                        @if($category == 't-shirt')
-                           T-Shirts
-                        @elseif($category == 'accessories')
-                           Accessories
-                        @else
-                           Shop
-                        @endif
-                     </h1>
-                     <div class="breadcrumb-menu">
-                        <nav aria-label="Breadcrumbs" class="breadcrumb-trail breadcrumbs">
-                           <ul class="trail-items">
-                              <li class="trail-item trail-begin"><a href="{{ route('home') }}"><span>Home</span></a></li>
-                              @if($category)
-                                 <li class="trail-item"><a href="{{ route('shop') }}"><span>Shop</span></a></li>
-                                 <li class="trail-item trail-end">
-                                    <span>{{ $category == 't-shirt' ? 'T-Shirts' : 'Accessories' }}</span>
-                                 </li>
-                              @else
-                                 <li class="trail-item trail-end"><span>Shop</span></li>
-                              @endif
-                           </ul>
-                        </nav>
-                     </div>
-                  </div>
-               </div>
-            </div>
-         </div>
-      </section>
-      <!-- page title area end  -->
-
-      <!-- shop main area start  -->
-      <div class="shop-main-area pt-120 pb-10">
-         <div class="container">
-            <div class="row">
-               <div class="col-xl-9 col-lg-8 col-md-12">
-                  <div class="shop-main-wrapper mb-60">
-                     <div class="shop-main-wrapper-head mb-30">
-                        <div class="swowing-list">Showing <span>{{ $products->firstItem() ?? 0 }} - {{ $products->lastItem() ?? 0 }} of {{ $products->total() }}</span> Products</div>
-                        <div class="sort-type-filter">
-                           <div class="sorting-type">
-                              <span>Sort by : </span>
-                              <select class="sorting-list" name="sorting-list" id="sorting-list" onchange="updateSort(this.value)">
-                                 <option value="default" {{ request('sort') == 'default' ? 'selected' : '' }}>Default</option>
-                                 <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Newest</option>
-                                 <option value="price_low" {{ request('sort') == 'price_low' ? 'selected' : '' }}>Price: Low to High</option>
-                                 <option value="price_high" {{ request('sort') == 'price_high' ? 'selected' : '' }}>Price: High to Low</option>
-                                 <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>Name: A to Z</option>
-                                 <option value="name_desc" {{ request('sort') == 'name_desc' ? 'selected' : '' }}>Name: Z to A</option>
-                              </select>
-                           </div>
-                           <div class="action-item action-item-filter d-lg-none">
-                              <a href="javascript:void(0)" class="view-filter-button">
-                                 Filter
-                              </a>
-                           </div>
-                        </div>
-                     </div>
-
-                     <!-- Active Filters Display -->
-                     @if(request()->hasAny(['search', 'category', 'collection_type_id', 'size', 'color', 'sleeve_type', 'limited_edition', 'min_price', 'max_price']))
-                     <div class="active-filters mb-3 p-3" style="background-color: #f8f9fa; border-radius: 8px;">
-                        <h6 class="mb-2" style="color: var(--clr-common-heading); font-weight: 600;">Active Filters:</h6>
-                        <div class="filter-tags d-flex flex-wrap align-items-center">
-                           @if(request('search'))
-                              <span class="badge mr-2 mb-2" style="background-color: var(--clr-common-heading); color: white; padding: 8px 12px; border-radius: 20px;">Search: "{{ request('search') }}" <a href="{{ request()->fullUrlWithoutQuery('search') }}" class="ml-1 text-white" style="text-decoration: none; font-weight: bold;">×</a></span>
-                           @endif
-                           @if(request('category'))
-                              <span class="badge mr-2 mb-2" style="background-color: var(--clr-common-heading); color: white; padding: 8px 12px; border-radius: 20px;">{{ ucfirst(str_replace('-', ' ', request('category'))) }} <a href="{{ request()->fullUrlWithoutQuery('category') }}" class="ml-1 text-white" style="text-decoration: none; font-weight: bold;">×</a></span>
-                           @endif
-                           @if(request('collection_type_id'))
-                              @php
-                                  $selectedCollectionForBadge = collect($collectionOptions)->find(function($item) {
-                                      return $item->id == request('collection_type_id');
-                                  });
-                              @endphp
-                              @if($selectedCollectionForBadge)
-                              <span class="badge mr-2 mb-2" style="background-color: #e83e8c; color: white; padding: 8px 12px; border-radius: 20px;">{{ $selectedCollectionForBadge->name }} <a href="{{ request()->fullUrlWithoutQuery('collection_type_id') }}" class="ml-1 text-white" style="text-decoration: none; font-weight: bold;">×</a></span>
-                              @endif
-                           @endif
-                           @if(request('limited_edition'))
-                              <span class="badge mr-2 mb-2" style="background-color: #ffc107; color: #000; padding: 8px 12px; border-radius: 20px; font-weight: 600;">Limited Edition <a href="{{ request()->fullUrlWithoutQuery('limited_edition') }}" class="ml-1" style="text-decoration: none; color: #000; font-weight: bold;">×</a></span>
-                           @endif
-                           @if(request('size'))
-                              @foreach((array)request('size') as $size)
-                              <span class="badge mr-2 mb-2" style="background-color: var(--clr-common-heading); color: white; padding: 8px 12px; border-radius: 20px;">Size: {{ $size }} <a href="{{ request()->fullUrlWithoutQuery(['size']) }}" class="ml-1 text-white" style="text-decoration: none; font-weight: bold;">×</a></span>
-                              @endforeach
-                           @endif
-                           @if(request('color'))
-                              @foreach((array)request('color') as $color)
-                              <span class="badge mr-2 mb-2" style="background-color: var(--clr-common-heading); color: white; padding: 8px 12px; border-radius: 20px;">Color: {{ $color }} <a href="{{ request()->fullUrlWithoutQuery(['color']) }}" class="ml-1 text-white" style="text-decoration: none; font-weight: bold;">×</a></span>
-                              @endforeach
-                           @endif
-                           @if(request('sleeve_type'))
-                              <span class="badge mr-2 mb-2" style="background-color: var(--clr-common-heading); color: white; padding: 8px 12px; border-radius: 20px;">{{ ucfirst(request('sleeve_type')) }} Sleeve <a href="{{ request()->fullUrlWithoutQuery('sleeve_type') }}" class="ml-1 text-white" style="text-decoration: none; font-weight: bold;">×</a></span>
-                           @endif
-                           @if(request('min_price') || request('max_price'))
-                                <span class="badge mr-2 mb-2" style="background-color: var(--clr-common-heading); color: white; padding: 8px 12px; border-radius: 20px;">Price: ₹{{ request('min_price', 0) }} - ₹{{ request('max_price', '∞') }} <a href="{{ request()->fullUrlWithoutQuery(['min_price', 'max_price']) }}" class="ml-1 text-white" style="text-decoration: none; font-weight: bold;">×</a></span>
-                           @endif
-                           <a href="{{ route('shop') }}" class="btn btn-sm ml-2" style="background-color: transparent; border: 2px solid var(--clr-common-heading); color: var(--clr-common-heading); padding: 6px 16px; border-radius: 20px; font-weight: 600; transition: all 0.3s;">Clear All</a>
-                        </div>
-                     </div>
-                     @endif
-                     
-                     <div class="products-wrapper">
-                        @forelse($products as $product)
-                        @php($productImage = optional($product->images->first())->image_path)
-                        @php($productColors = $product->colors ?? collect())
-                        <div class="single-product">
-                           <div class="product-image pos-rel">
-                              <a href="{{ route('product.details', $product->id) }}" class="">
-                                 <img src="{{ $productImage ? Storage::url($productImage) : asset('frontend/assets/img/product/product-img1.jpg') }}" alt="{{ $product->name }}">
-                              </a>
-                              <div class="product-action">
-                                 <a href="{{ route('product.details', $product->id) }}" class="quick-view-btn"><i class="fal fa-eye"></i></a>
-                                 <button type="button" class="wishlist-btn add-to-wishlist-btn" data-product-id="{{ $product->id }}"><i class="fal fa-heart"></i></button>
-                              </div>
-                              @if($product->is_limited_edition)
-                              <div class="product-sticker-wrapper">
-                                 <span class="product-sticker new">Limited</span>
-                              </div>
-                              @elseif($product->created_at >= now()->subDays(30))
-                              <div class="product-sticker-wrapper">
-                                 <span class="product-sticker new">New</span>
-                              </div>
-                              @endif
-                           </div>
-                           <div class="product-desc">
-                              <div class="product-name"><a href="{{ route('product.details', $product->id) }}">{{ $product->name }}</a></div>
-                              <div class="product-price">
-                                 <span class="price-now">INR {{ number_format($product->price, 2) }}</span>
-                              </div>
-                              @if($productColors->count() > 0)
-                              <div class="product-color-nav" style="display: flex; gap: 8px; margin-top: 10px;">
-                                 @foreach($productColors as $color)
-                                 <div class="color-circle" style="width: 24px; height: 24px; border-radius: 50%; background-color: {{ $color->hex_code }}; border: 2px solid #ddd; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" title="{{ $color->color_name }}"></div>
-                                 @endforeach
-                              </div>
-                              @endif
-                           </div>
-                        </div>
-                        @empty
-                        <div class="col-12">
-                           <div class="text-center py-5">
-                              <i class="fas fa-box-open" style="font-size: 64px; color: var(--clr-common-border); margin-bottom: 20px;"></i>
-                              <h3 style="color: var(--clr-common-heading);">No products found</h3>
-                              <p style="color: var(--clr-common-text);">Try adjusting your filters or check back later for new products.</p>
-                              <a href="{{ route('shop') }}" class="btn mt-3" 
-                                 style="background-color: var(--clr-common-heading); color: white; padding: 12px 24px; border-radius: 8px; font-weight: 600; text-decoration: none;">
-                                 Clear Filters
-                              </a>
-                           </div>
-                        </div>
-                        @endforelse
-                     </div>
-
-                  </div>
-               </div>
-               <div class="col-xl-3 col-lg-4 col-md-6">
-                  <div class="sidebar-widget-wrapper mb-110 d-none d-lg-block">
-                     <form method="GET" action="{{ route('shop', $category ?? '') }}" id="filter-form">
-                        <div class="product-filters mb-50">
-                           <div class="filter-widget">
-                              <h4 class="filter-widget-title drop-btn">Search</h4>
-                              <div class="filter-widget-content">
-                                 <div class="filter-widget-search">
-                                    <input type="text" name="search" placeholder="Search here.." value="{{ request('search') }}">
-                                    <button type="submit">Search</button>
-                                 </div>
-                              </div>
-                           </div>
-                           
-                           <div class="filter-widget">
-                              <h4 class="filter-widget-title drop-btn">Category</h4>
-                              <div class="filter-widget-content">
-                                 <div class="category-items">
-                                    <a href="{{ route('shop') }}" class="category-item {{ !request('category') ? 'active' : '' }}">
-                                       <div class="category-name">All Products</div> 
-                                       <span class="category-items-number">{{ $categoryStats['all'] ?? 0 }}</span>
-                                    </a>
-                                    @foreach($allActiveCategories as $cat)
-                                    <a href="{{ route('shop', ['category' => $cat] + request()->except('category')) }}" class="category-item {{ request('category') == $cat ? 'active' : '' }}">
-                                       <div class="category-name">
-                                          {{ ucfirst(str_replace('-', ' ', $cat)) }}
-                                       </div> 
-                                       <span class="category-items-number">{{ $categoryStats[$cat] ?? 0 }}</span>
-                                    </a>
-                                    @endforeach
-                                 </div>
-                              </div>
-                           </div>
-                           
-                           <div class="filter-widget">
-                              <h4 class="filter-widget-title drop-btn">Limited Edition</h4>
-                              <div class="filter-widget-content">
-                                 <div class="category-items">
-                                    <a href="{{ route('shop', ['limited_edition' => 'yes'] + request()->except('limited_edition')) }}" class="category-item {{ request('limited_edition') == 'yes' ? 'active' : '' }}" style="{{ request('limited_edition') == 'yes' ? 'background-color: #fff3cd; border-left-color: #ffc107;' : '' }}">
-                                       <div class="category-name">Limited Edition Only</div> 
-                                       <span class="category-items-number" style="{{ request('limited_edition') == 'yes' ? 'color: #ffc107; font-weight: 600;' : '' }}">{{ $categoryStats['limited_edition'] ?? 0 }}</span>
-                                    </a>
-                                 </div>
-                              </div>
-                           </div>
-
-                           @if(isset($collectionOptions) && count($collectionOptions) > 0)
-                           <div class="filter-widget">
-                              <h4 class="filter-widget-title drop-btn">Collections</h4>
-                              <div class="filter-widget-content">
-                                 <div class="category-items">
-                                    @foreach($collectionOptions as $collection)
-                                    <a href="{{ route('shop', ['collection_type_id' => $collection->id] + request()->except('collection_type_id')) }}" 
-                                       class="category-item {{ request('collection_type_id') == $collection->id ? 'active' : '' }}"
-                                       style="{{ request('collection_type_id') == $collection->id ? 'background-color: #f0e6f0; border-left-color: #e83e8c;' : '' }}">
-                                       <div class="category-name">
-                                          {{ $collection->name }}
-                                       </div> 
-                                       <span class="category-items-number">{{ $collection->active_products_count ?? 0 }}</span>
-                                    </a>
-                                    @endforeach
-                                 </div>
-                              </div>
-                           </div>
-                           @endif
-                           
-                           <div class="filter-widget">
-                              <h4 class="filter-widget-title drop-btn">Size</h4>
-                              <div class="filter-widget-content">
-                                 <div class="category-sizes">
-                                    @foreach(['XS' => 'Extra Small', 'S' => 'Small', 'M' => 'Medium', 'L' => 'Large', 'XL' => 'Extra Large', 'XXL' => 'Double XL'] as $sizeKey => $sizeName)
-                                    <div class="category-size">
-                                       <input class="check-box" type="checkbox" name="size[]" value="{{ $sizeKey }}" id="size-{{ $sizeKey }}" {{ in_array($sizeKey, (array)request('size', [])) ? 'checked' : '' }} onchange="document.getElementById('filter-form').submit()">
-                                       <label class="check-label" for="size-{{ $sizeKey }}">{{ $sizeName }}</label>
-                                    </div>
-                                    @endforeach
-                                 </div>
-                              </div>
-                           </div>
-                           
-                           @if(isset($availableSleeveTypes) && count($availableSleeveTypes) > 0)
-                           <div class="filter-widget">
-                              <h4 class="filter-widget-title drop-btn">Sleeve Type</h4>
-                              <div class="filter-widget-content">
-                                 <div class="category-sizes">
-                                    @foreach($availableSleeveTypes as $sleeveType)
-                                    <div class="category-size">
-                                       <input class="radio-box" type="radio" name="sleeve_type" value="{{ $sleeveType }}" id="sleeve-{{ strtolower(str_replace(' ', '-', $sleeveType)) }}" {{ request('sleeve_type') == $sleeveType ? 'checked' : '' }} onchange="document.getElementById('filter-form').submit()">
-                                       <label class="check-label" for="sleeve-{{ strtolower(str_replace(' ', '-', $sleeveType)) }}">{{ ucfirst($sleeveType) }}</label>
-                                    </div>
-                                    @endforeach
-                                 </div>
-                              </div>
-                           </div>
-                           @endif
-                           
-                           <div class="filter-widget">
-                              <h4 class="filter-widget-title drop-btn">Colour</h4>
-                              <div class="filter-widget-content">
-                                 <div class="category-colours">
-                                    <?php
-                                       $colorsForFilter = isset($availableColors) ? $availableColors : [];
-                                    ?>
-                                    <div class="color-grid d-flex flex-wrap" style="gap: 10px;">
-                                       @foreach($colorsForFilter as $color)
-                                       <?php
-                                           $colorName = is_array($color) ? ($color['name'] ?? $color) : $color;
-                                           $colorHex = is_array($color) ? ($color['hex'] ?? '#cccccc') : '#cccccc';
-                                           $isChecked = in_array($colorName, (array)request('color', []));
-                                           $lightColors = ['#ffffff', '#ffff00', '#f0e68c', '#add8e6', '#90ee90', '#ffd700', '#fffacd'];
-                                           $borderColor = $isChecked ? 'var(--clr-common-heading)' : '#ddd';
-                                           $labelClass = 'color-option' . ($isChecked ? ' active-color' : '');
-                                       ?>
-                                       <label class="{{ $labelClass }}" 
-                                              style="background-color: {{ $colorHex }}; display: inline-block; width: 40px; height: 40px; margin: 0; cursor: pointer; border-radius: 50%; border: 3px solid {{ $borderColor }}; position: relative; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
-                                              title="{{ ucfirst($colorName) }}">
-                                          <input type="checkbox" name="color[]" value="{{ $colorName }}" {{ $isChecked ? 'checked' : '' }} onchange="document.getElementById('filter-form').submit()" style="display: none;">
-                                       </label>
-                                       @endforeach
-                                    </div>
-                                    @if(count($colorsForFilter) === 0)
-                                    <p class="text-muted small">No colors available</p>
+                <div class="col-lg-12">
+                    <div class="page-title-wrapper text-center">
+                        <h1 class="page-title mb-10">
+                            {{ $pageTitle ?? 'Shop' }}
+                        </h1>
+                        <div class="breadcrumb-menu">
+                            <nav aria-label="Breadcrumbs" class="breadcrumb-trail breadcrumbs">
+                                <ul class="trail-items">
+                                    <li class="trail-item trail-begin"><a href="{{ route('home') }}"><span>Home</span></a></li>
+                                    <li class="trail-item {{ ($pageTitle ?? 'Shop') === 'Shop' ? 'trail-end' : '' }}"><a href="{{ route('shop') }}"><span>Shop</span></a></li>
+                                    @if(($pageTitle ?? 'Shop') !== 'Shop')
+                                        <li class="trail-item trail-end"><span>{{ $pageTitle }}</span></li>
                                     @endif
-                                 </div>
-                              </div>
-                           </div>
-                           
-                           <div class="filter-widget">
-                              <h4 class="filter-widget-title drop-btn">Price Range</h4>
-                              <div class="filter-widget-content">
-                                 <div class="filter-price">
-                                    <div class="price-inputs">
-                                       <div class="mb-2">
-                                            <label for="min_price" class="small" style="color: var(--clr-common-text);">Min Price (₹)</label>
-                                          <input type="number" name="min_price" id="min_price" placeholder="0" 
-                                                 value="{{ request('min_price') }}" class="form-control" 
-                                                 style="border: 1px solid var(--clr-common-border); border-radius: 8px; padding: 10px;">
-                                       </div>
-                                       <div class="mb-2">
-                                              <label for="max_price" class="small" style="color: var(--clr-common-text);">Max Price (₹)</label>
-                                          <input type="number" name="max_price" id="max_price" placeholder="1000" 
-                                                 value="{{ request('max_price') }}" class="form-control"
-                                                 style="border: 1px solid var(--clr-common-border); border-radius: 8px; padding: 10px;">
-                                       </div>
-                                       <button type="submit" class="btn btn-sm mt-2 w-100" 
-                                               style="background-color: var(--clr-common-heading); color: white; padding: 10px; border-radius: 8px; font-weight: 600; border: none; transition: all 0.3s;">
-                                          Apply Price Filter
-                                       </button>
-                                    </div>
-                                 </div>
-                              </div>
-                           </div>
-                           
-                           <!-- Clear Filters Button -->
-                           <div class="filter-widget">
-                              <a href="{{ route('shop') }}" class="btn w-100" 
-                                 style="background-color: transparent; border: 2px solid var(--clr-common-heading); color: var(--clr-common-heading); padding: 12px; border-radius: 8px; font-weight: 600; text-align: center; transition: all 0.3s; display: block;">
-                                 Clear All Filters
-                              </a>
-                           </div>
+                                </ul>
+                            </nav>
                         </div>
-                     </form>
-                  </div>
-               </div>
+                    </div>
+                </div>
             </div>
-            
-            <!-- Pagination -->
-            @if($products->hasPages())
-            <div class="row">
-               <div class="col-12">
-                  <div class="pagination-wrapper mt-40 mb-60">
-                     {{ $products->links() }}
-                  </div>
-               </div>
+        </div>
+    </section>
+
+    <section class="shop-main-area">
+        <div class="container">
+
+            <div class="filter-overlay" id="filter-overlay"></div>
+
+            <div class="mobile-filter-bar">
+                <button class="mobile-filter-toggle" id="mobile-filter-btn" type="button">
+                    <i class="fas fa-sliders-h"></i> Filters
+                    @php
+                        $activeCount = count(array_filter([request('in_stock'), request('min_price'), request('max_price'), request('limited_edition'), request('collection_type_id')]))
+                                     + count((array) request('size', []))
+                                     + count((array) request('category_id', []))
+                                     + count((array) request('color', []));
+                    @endphp
+                    @if($activeCount > 0)
+                        <span style="background:#000;color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;display:inline-flex;align-items:center;justify-content:center;margin-left:4px;">{{ $activeCount }}</span>
+                    @endif
+                </button>
+                <span class="results-count">{{ $products->total() }} products</span>
             </div>
-            @endif
-            
-         </div>
-      </div>
 
-<style>
-.category-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 16px;
-    margin-bottom: 8px;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    color: var(--clr-common-text);
-    border-left: 3px solid transparent;
-}
+            <div class="shop-layout">
 
-.category-item:hover {
-    background-color: #f8f9fa;
-    color: var(--clr-common-heading);
-    text-decoration: none;
-}
+                <div class="filter-sidebar" id="filter-sidebar">
+                    <button id="close-filter-btn" type="button"
+                        style="display:none;position:absolute;top:14px;right:14px;background:none;border:none;font-size:22px;cursor:pointer;line-height:1;">&times;</button>
 
-.category-item.active {
-    background-color: #f8f9fa;
-    border-left-color: var(--clr-common-heading);
-    color: var(--clr-common-heading);
-    font-weight: 600;
-}
+                    <form action="{{ $category ? route('shop.category', $category) : route('shop') }}" method="GET" id="filter-form">
 
-.category-item .category-name {
-    font-weight: 500;
-}
+                        <div class="filter-header">
+                            <h4>FILTER AND SORT</h4>
+                            <span class="product-count">{{ $products->total() }} PRODUCTS</span>
+                        </div>
 
-.category-item .category-items-number {
-    background-color: var(--clr-common-heading);
-    color: white;
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 600;
-}
+                        @if(request()->filled('search'))
+                            <input type="hidden" name="search" value="{{ e(request('search')) }}">
+                        @endif
 
-.filter-widget-title {
-    color: var(--clr-common-heading);
-    font-weight: 600;
-    margin-bottom: 16px;
-}
+                        @if(request()->filled('limited_edition'))
+                            <input type="hidden" name="limited_edition" value="{{ request('limited_edition') }}">
+                        @endif
 
-.color-option {
-    transition: all 0.3s ease;
-}
+                        @if(request()->filled('collection_type_id'))
+                            <input type="hidden" name="collection_type_id" value="{{ request('collection_type_id') }}">
+                        @endif
 
-.color-option:hover {
-    transform: scale(1.1);
-}
+                        @if(!$category && request()->filled('category'))
+                            <input type="hidden" name="category" value="{{ request('category') }}">
+                        @endif
 
-.check-box:checked + .check-label {
-    color: var(--clr-common-heading);
-    font-weight: 600;
-}
+                        <div class="filter-group">
+                            <h5>AVAILABILITY</h5>
+                            <div class="stock-toggle-row">
+                                <label class="switch">
+                                    <input type="checkbox" name="in_stock" value="1"
+                                        {{ request('in_stock') ? 'checked' : '' }}
+                                        onchange="this.form.submit()">
+                                    <span class="slider"></span>
+                                </label>
+                                <span class="stock-label">In stock only</span>
+                            </div>
+                        </div>
 
-.radio-box:checked + .check-label {
-    color: var(--clr-common-heading);
-    font-weight: 600;
-}
+                        <div class="filter-group">
+                            <h5>PRICE</h5>
+                            <div class="price-range-wrap">
+                                <div class="price-display">
+                                    <span>Rs.<span id="min-price-display">{{ number_format((int)request('min_price', 0)) }}</span></span>
+                                    <span>Rs.<span id="max-price-display">{{ number_format((int)request('max_price', $maxPrice)) }}</span></span>
+                                </div>
+                                <div class="price-slider-track">
+                                    <input type="range" id="min-price-slider"
+                                        min="0" max="{{ $maxPrice }}" step="50"
+                                        value="{{ (int)request('min_price', 0) }}">
+                                    <input type="range" id="max-price-slider"
+                                        min="0" max="{{ $maxPrice }}" step="50"
+                                        value="{{ (int)request('max_price', $maxPrice) }}">
+                                </div>
+                                <input type="hidden" name="min_price" id="min-price-input" value="{{ request('min_price', '') }}">
+                                <input type="hidden" name="max_price" id="max-price-input" value="{{ request('max_price', '') }}">
+                            </div>
+                        </div>
 
-.btn:hover {
-    opacity: 0.9;
-    transform: translateY(-2px);
-}
+                        <div class="filter-group">
+                            <h5>SIZE</h5>
+                            <div class="filter-options">
+                                @foreach($availableSizes as $size)
+                                    <label>
+                                        <input type="checkbox" name="size[]"
+                                            value="{{ strtolower($size) }}"
+                                            {{ in_array(strtolower($size), array_map('strtolower', (array) request('size', []))) ? 'checked' : '' }}>
+                                        {{ strtoupper($size) }}
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
 
-.product-sticker.limited {
-    animation: pulse 2s infinite;
-}
+                        @if($categoryOptions->count() > 0)
+                        <div class="filter-group">
+                            <h5>CATEGORY</h5>
+                            <div class="filter-options">
+                                @foreach($categoryOptions as $cat)
+                                    <label>
+                                        <input type="checkbox" name="category_id[]"
+                                            value="{{ $cat->id }}"
+                                            {{ in_array($cat->id, (array) request('category_id', [])) ? 'checked' : '' }}>
+                                        {{ $cat->name }}
+                                        <span style="color:#bbb;font-size:11px;">({{ $cat->active_products_count }})</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+                        @endif
 
-@keyframes pulse {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.05);
-    }
-}
-</style>
+                        @if(count($availableColors) > 0)
+                        <div class="filter-group">
+                            <h5>COLOR</h5>
+                            <div class="color-options" id="color-swatches">
+                                @foreach($availableColors as $clr)
+                                    @php
+                                        $cSlug    = Str::slug($clr['name']);
+                                        $bgStyle  = !empty($clr['hex']) ? $clr['hex'] : $clr['name'];
+                                        $cChecked = in_array($clr['name'], (array) request('color', []));
+                                    @endphp
+                                    <span class="color-swatch {{ $cChecked ? 'selected' : '' }}"
+                                          style="background:{{ $bgStyle }}"
+                                          title="{{ $clr['name'] }}"
+                                          data-slug="{{ $cSlug }}"></span>
+                                    <input type="checkbox"
+                                           name="color[]"
+                                           value="{{ $clr['name'] }}"
+                                           id="color-cb-{{ $cSlug }}"
+                                           class="color-checkbox"
+                                           style="display:none"
+                                           {{ $cChecked ? 'checked' : '' }}>
+                                @endforeach
+                            </div>
+                        </div>
+                        @endif
 
-<script>
-// Update sort parameter and submit form
-function updateSort(sortValue) {
-    const url = new URL(window.location.href);
-    url.searchParams.set('sort', sortValue);
-    window.location.href = url.toString();
-}
+                        <div class="filter-group">
+                            <h5>SORT BY</h5>
+                            <select name="sort" onchange="this.form.submit()">
+                                <option value="default"    {{ request('sort','default') == 'default'    ? 'selected' : '' }}>Featured</option>
+                                <option value="newest"     {{ request('sort') == 'newest'               ? 'selected' : '' }}>Newest</option>
+                                <option value="price_low"  {{ request('sort') == 'price_low'            ? 'selected' : '' }}>Price: Low to High</option>
+                                <option value="price_high" {{ request('sort') == 'price_high'           ? 'selected' : '' }}>Price: High to Low</option>
+                                <option value="name_asc"   {{ request('sort') == 'name_asc'             ? 'selected' : '' }}>Name: A to Z</option>
+                                <option value="name_desc"  {{ request('sort') == 'name_desc'            ? 'selected' : '' }}>Name: Z to A</option>
+                            </select>
+                        </div>
 
-// Auto-submit form on filter changes
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('filter-form');
-    
-    // Preserve scroll position on form submit
-    if (form) {
-        form.addEventListener('submit', function() {
-            const scrollPosition = window.pageYOffset;
-            sessionStorage.setItem('scrollPosition', scrollPosition);
+                        <div class="filter-buttons">
+                            <a href="{{ route('shop') }}" class="clear-btn">CLEAR ALL</a>
+                            <button type="submit" class="apply-btn">APPLY</button>
+                        </div>
+
+                    </form>
+                </div>
+
+                <div class="products-area">
+
+                    <div class="results-bar">
+                        <span class="results-count">
+                            @if($products->total() > 0)
+                                Showing {{ $products->firstItem() }}-{{ $products->lastItem() }} of {{ $products->total() }} products
+                            @else
+                                No products found
+                            @endif
+                        </span>
+                        @php
+                            $activeCount = $activeCount ?? 0;
+                        @endphp
+                        @if($activeCount > 0)
+                            <a href="{{ route('shop') }}" style="font-size:12px;color:#999;text-decoration:none;">x Clear filters ({{ $activeCount }})</a>
+                        @endif
+                    </div>
+
+                    @if($products->count() > 0)
+
+                        <div class="product-grid">
+                            @foreach($products as $product)
+                                @php
+                                    $firstImg = $product->images->first();
+                                    $imgUrl   = $firstImg
+                                        ? asset('storage/' . $firstImg->image_path)
+                                        : asset('frontend/assets/img/product_category/product-cat-6.jpeg');
+                                @endphp
+
+                                <div class="product-card">
+                                    <div class="product-image">
+
+                                        @if($product->is_limited_edition)
+                                            <span class="product-badge badge-limited">LIMITED</span>
+                                        @endif
+
+                                        <button class="wishlist-btn" type="button"
+                                                onclick="event.stopPropagation(); addToWishlist({{ $product->id }}, this)"
+                                                title="Add to Wishlist">
+                                            <i class="far fa-heart"></i>
+                                        </button>
+
+                                        <a href="{{ route('product.details', $product->id) }}" style="display:block;width:100%;height:100%;">
+                                            <img src="{{ $imgUrl }}" alt="{{ $product->name }}" loading="lazy">
+                                        </a>
+
+                                        <button class="add-cart-btn" type="button"
+                                            onclick="window.location='{{ route('product.details', $product->id) }}'">
+                                            SELECT OPTIONS
+                                        </button>
+
+                                    </div>
+
+                                    <div class="product-info">
+                                        <h4 class="product-title">
+                                            <a href="{{ route('product.details', $product->id) }}">{{ $product->name }}</a>
+                                        </h4>
+                                        <div class="product-price">
+                                            <span class="base-price">Rs.{{ number_format($product->base_price, 2) }}</span>
+                                        </div>
+                                        @if($product->relationLoaded('category') && $product->getRelation('category'))
+                                            <div class="product-category-tag">{{ $product->getRelation('category')->name }}</div>
+                                        @endif
+                                    </div>
+                                </div>
+
+                            @endforeach
+                        </div>
+
+                        @if($products->hasPages())
+                            <div class="shop-pagination">
+                                {{ $products->links() }}
+                            </div>
+                        @endif
+
+                    @else
+                        <div class="no-products">
+                            <i class="fas fa-search" style="font-size:48px;color:#ddd;display:block;margin-bottom:20px;"></i>
+                            <p>No products found matching your filters.</p>
+                            <a href="{{ route('shop') }}" class="apply-btn">CLEAR FILTERS</a>
+                        </div>
+                    @endif
+
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <script>
+        const SHOP_MAX_PRICE = {{ $maxPrice }};
+
+        const minSlider  = document.getElementById('min-price-slider');
+        const maxSlider  = document.getElementById('max-price-slider');
+        const minDisplay = document.getElementById('min-price-display');
+        const maxDisplay = document.getElementById('max-price-display');
+        const minInput   = document.getElementById('min-price-input');
+        const maxInput   = document.getElementById('max-price-input');
+
+        function fmtNum(n) { return parseInt(n).toLocaleString('en-IN'); }
+
+        function syncSliders() {
+            let lo = parseInt(minSlider.value);
+            let hi = parseInt(maxSlider.value);
+            if (lo > hi) { minSlider.value = hi; lo = hi; }
+            if (hi < lo) { maxSlider.value = lo; hi = lo; }
+            minDisplay.textContent = fmtNum(lo);
+            maxDisplay.textContent = fmtNum(hi);
+            minInput.value = lo > 0             ? lo : '';
+            maxInput.value = hi < SHOP_MAX_PRICE ? hi : '';
+        }
+
+        if (minSlider && maxSlider) {
+            minSlider.addEventListener('input', syncSliders);
+            maxSlider.addEventListener('input', syncSliders);
+        }
+
+        document.querySelectorAll('#color-swatches .color-swatch').forEach(function(sw) {
+            sw.addEventListener('click', function() {
+                var slug = this.dataset.slug;
+                var cb   = document.getElementById('color-cb-' + slug);
+                if (cb) {
+                    cb.checked = !cb.checked;
+                    this.classList.toggle('selected', cb.checked);
+                }
+            });
         });
-    }
-    
-    // Restore scroll position after page load
-    const savedScrollPosition = sessionStorage.getItem('scrollPosition');
-    if (savedScrollPosition) {
-        window.scrollTo(0, parseInt(savedScrollPosition));
-        sessionStorage.removeItem('scrollPosition');
-    }
-    
-    // Add hover effects to filter buttons
-    const clearButton = document.querySelector('a[href*="shop"].btn');
-    if (clearButton) {
-        clearButton.addEventListener('mouseenter', function() {
-            this.style.backgroundColor = 'var(--clr-common-heading)';
-            this.style.color = 'white';
-        });
-        clearButton.addEventListener('mouseleave', function() {
-            this.style.backgroundColor = 'transparent';
-            this.style.color = 'var(--clr-common-heading)';
-        });
-    }
-    
-    // Add hover effects to price filter button
-    const priceButton = document.querySelector('.filter-price button[type="submit"]');
-    if (priceButton) {
-        priceButton.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-2px)';
-            this.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-        });
-        priceButton.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0)';
-            this.style.boxShadow = 'none';
-        });
-    }
-});
-</script>
+
+        var sidebar  = document.getElementById('filter-sidebar');
+        var overlay  = document.getElementById('filter-overlay');
+        var openBtn  = document.getElementById('mobile-filter-btn');
+        var closeBtn = document.getElementById('close-filter-btn');
+
+        function openFilterSidebar() {
+            sidebar.classList.add('mobile-open');
+            overlay.classList.add('active');
+            if (closeBtn) closeBtn.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeFilterSidebar() {
+            sidebar.classList.remove('mobile-open');
+            overlay.classList.remove('active');
+            if (closeBtn) closeBtn.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+
+        if (openBtn)  openBtn.addEventListener('click', openFilterSidebar);
+        if (closeBtn) closeBtn.addEventListener('click', closeFilterSidebar);
+        if (overlay)  overlay.addEventListener('click', closeFilterSidebar);
+
+        function addToWishlist(productId, btn) {
+            @auth
+            if (btn.disabled) return;
+            btn.disabled = true;
+            fetch('{{ route("wishlist.store") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': (document.querySelector('meta[name="csrf-token"]') || {getAttribute: function(){return '{{ csrf_token() }}';}}).getAttribute('content')
+                },
+                body: JSON.stringify({ product_id: productId })
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                btn.classList.add('wl-active');
+                var icon = btn.querySelector('i');
+                if (icon) { icon.className = 'fas fa-heart'; icon.style.color = '#e60023'; }
+            })
+            .catch(function() {})
+            .finally(function() { btn.disabled = false; });
+            @else
+            window.location = '{{ route("login") }}';
+            @endauth
+        }
+    </script>
 
 @endsection
