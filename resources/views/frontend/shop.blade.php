@@ -403,9 +403,10 @@
                                             <span class="product-badge badge-limited">LIMITED</span>
                                         @endif
 
-                                        <button class="wishlist-btn" type="button"
-                                                onclick="event.stopPropagation(); addToWishlist({{ $product->id }}, this)"
-                                                title="Add to Wishlist">
+                                        <button class="wishlist-btn add-to-wishlist-btn" type="button"
+                                            data-product-id="{{ $product->id }}"
+                                            onclick="return window.tinnityToggleWishlist(event, this);"
+                                            title="Add to Wishlist">
                                             <i class="far fa-heart"></i>
                                         </button>
 

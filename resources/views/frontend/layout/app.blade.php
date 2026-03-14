@@ -10,6 +10,11 @@
    <meta name="viewport" content="width=device-width, initial-scale=1">
    <meta name="csrf-token" content="{{ csrf_token() }}">
    <meta name="user-auth" content="{{ Auth::check() ? 'true' : 'false' }}">
+   @auth
+      <meta name="wishlist-product-ids" content='@json(\App\Models\Wishlist::where('user_id', Auth::id())->pluck('product_id')->values()->all())'>
+   @else
+      <meta name="wishlist-product-ids" content='[]'>
+   @endauth
    
    <link rel="icon" type="image/png" href="{{ asset('frontend/assets/img/logo/logo.png') }}">
    <link rel="shortcut icon" type="image/png" href="{{ asset('frontend/assets/img/logo/logo.png') }}">

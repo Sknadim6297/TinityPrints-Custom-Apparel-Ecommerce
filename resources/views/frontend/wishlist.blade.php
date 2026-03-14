@@ -52,93 +52,64 @@
             </div>
         </div>
 
-        @forelse($wishlistItems as $item)
-            @if($loop->first)
-            <div class="row">
-            @endif
-            
-            @php
-                $product = $item->product;
-                $productImage = optional($product->images->first())->image_path;
-                $productColors = $product->colors ?? collect();
-            @endphp
+        @if($wishlistItems->count() > 0)
+        <div class="wishlist-grid">
+            @foreach($wishlistItems as $item)
+                @php
+                    $product = $item->product;
+                    $productImagePath = optional($product->images->first())->image_path;
+                    $productImage = $productImagePath
+                        ? (\Illuminate\Support\Str::startsWith($productImagePath, ['http://', 'https://']) ? $productImagePath : Storage::url($productImagePath))
+                        : asset('frontend/assets/img/product_category/product-cat-6.jpeg');
+                    $productColors = $product->colors ?? collect();
+                @endphp
 
-            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 mb-30">
-                <div class="single-product wishlist-product-item">
-                    <div class="product-image pos-rel">
-                        <a href="{{ route('product.details', $product->id) }}">
-                            <img src="{{ $productImage ? Storage::url($productImage) : asset('frontend/assets/img/product/product-img1.jpg') }}" 
-                                 alt="{{ $product->name }}">
-                        </a>
-                        
-                        <div class="product-action">
-                            <button class="quick-view-btn" data-product-id="{{ $product->id }}">
-                                <i class="far fa-eye"></i>
-                            </button>
-                        </div>
-
+                <div class="wishlist-card">
+                    <div class="wishlist-image-wrap">
                         @if($product->is_limited_edition)
-                        <div class="product-sticker-wrapper">
-                            <span class="product-sticker new">Limited</span>
-                        </div>
+                            <span class="wishlist-badge">LIMITED</span>
                         @elseif($product->created_at >= now()->subDays(30))
-                        <div class="product-sticker-wrapper">
-                            <span class="product-sticker new">New</span>
-                        </div>
+                            <span class="wishlist-badge">NEW</span>
                         @endif
 
-                        <!-- Wishlist Remove Button (Top Right) -->
-                        <div class="wishlist-remove-btn" style="position: absolute; top: 10px; right: 10px; z-index: 10;">
-                            <button class="btn-remove-wishlist" 
-                                    data-wishlist-id="{{ $item->id }}"
-                                    style="background: white; border: none; border-radius: 50%; width: 35px; height: 35px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); cursor: pointer;">
-                                <i class="fal fa-times" style="color: #ff4444;"></i>
-                            </button>
-                        </div>
+                        <button class="btn-remove-wishlist"
+                                data-wishlist-id="{{ $item->id }}"
+                                type="button"
+                                aria-label="Remove from wishlist">
+                            <i class="far fa-heart"></i>
+                        </button>
+
+                        <a href="{{ route('product.details', $product->id) }}" style="display:block;width:100%;height:100%;">
+                            <img src="{{ $productImage }}" alt="{{ $product->name }}">
+                        </a>
+
+                        <a href="{{ route('product.details', $product->id) }}" class="wishlist-view-btn">VIEW PRODUCT</a>
                     </div>
 
-                    <div class="product-desc">
-                        <div class="product-name">
+                    <div class="wishlist-info">
+                        <h4 class="wishlist-title">
                             <a href="{{ route('product.details', $product->id) }}">{{ $product->name }}</a>
-                        </div>
-                        
-                        <div class="product-price mb-2">
-                            <span class="price-now">₹{{ number_format($product->price, 2) }}</span>
-                        </div>
+                        </h4>
+
+                        <div class="wishlist-price">₹{{ number_format($product->price, 2) }}</div>
 
                         @if($productColors->count() > 0)
-                        <div class="product-colors mb-2">
-                            <small class="text-muted">Available in:</small>
-                            <div class="color-badges mt-1">
+                            <div class="color-badges">
                                 @foreach($productColors->take(5) as $color)
-                                <span class="badge" 
-                                      style="background-color: {{ $color->hex_code ?? '#cccccc' }}; 
-                                             width: 20px; 
-                                             height: 20px; 
-                                             display: inline-block; 
-                                             border-radius: 50%; 
-                                             margin-right: 3px;
-                                             border: 1px solid #ddd;"
-                                      title="{{ $color->color_name }}"></span>
+                                    <span class="color-dot"
+                                          style="background-color: {{ $color->hex_code ?? '#cccccc' }}"
+                                          title="{{ $color->color_name }}"></span>
                                 @endforeach
                                 @if($productColors->count() > 5)
-                                <small class="text-muted">+{{ $productColors->count() - 5 }}</small>
+                                    <span class="more-colors">+{{ $productColors->count() - 5 }}</span>
                                 @endif
                             </div>
-                        </div>
                         @endif
-
-                        <div class="product-actions mt-3">
-                            <button class="btn add-to-cart-btn w-100 mb-2" 
-                        </div>
                     </div>
                 </div>
-            </div>
-
-            @if($loop->last)
-            </div>
-            @endif
-        @empty
+            @endforeach
+        </div>
+        @else
         <!-- Empty Wishlist State -->
         <div class="row">
             <div class="col-12">
@@ -163,7 +134,7 @@
                 </div>
             </div>
         </div>
-        @endforelse
+        @endif
     </div>
 </div>
 <!-- wishlist area end  -->
@@ -222,21 +193,137 @@ document.addEventListener('DOMContentLoaded', function() {
 @endpush
 
 <style>
-.wishlist-product-item .product-actions button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+
+.wishlist-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 28px;
 }
 
-.wishlist-remove-btn button:hover {
-    box-shadow: 0 4px 12px rgba(255, 68, 68, 0.3);
-    transform: scale(1.1);
+.wishlist-card {
+    background: #fff;
+}
+
+.wishlist-image-wrap {
+    position: relative;
+    overflow: hidden;
+    height: 400px;
+}
+
+.wishlist-image-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .4s ease;
+}
+
+.wishlist-card:hover .wishlist-image-wrap img {
+    transform: scale(1.05);
+}
+
+.wishlist-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 2;
+    background: #111;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+}
+
+.btn-remove-wishlist {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 2;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: #fff;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .2);
+    color: #d62828;
+    transition: transform .2s ease;
+}
+
+.btn-remove-wishlist:hover {
+    transform: scale(1.08);
+}
+
+.wishlist-view-btn {
+    position: absolute;
+    bottom: -50px;
+    left: 0;
+    width: 100%;
+    background: #000;
+    color: #fff;
+    text-align: center;
+    padding: 13px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: bottom .3s ease;
+    text-decoration: none;
+}
+
+.wishlist-card:hover .wishlist-view-btn {
+    bottom: 0;
+    color: #fff;
+}
+
+.wishlist-info {
+    padding: 14px 0 10px;
+}
+
+.wishlist-title {
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.35;
+    margin-bottom: 6px;
+}
+
+.wishlist-title a {
+    color: #111;
+    text-decoration: none;
+}
+
+.wishlist-price {
+    font-size: 15px;
+    color: #e53935;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.wishlist-colors-label {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 6px;
 }
 
 .color-badges {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 3px;
+    gap: 5px;
+}
+
+.color-dot {
+    width: 18px;
+    height: 18px;
+    display: inline-block;
+    border-radius: 50%;
+    border: 1px solid #ddd;
+}
+
+.more-colors {
+    font-size: 12px;
+    color: #888;
 }
 
 .alert {
@@ -267,6 +354,29 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     50% {
         opacity: 0.5;
+    }
+}
+
+@media(max-width: 1200px) {
+    .wishlist-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media(max-width: 991px) {
+    .wishlist-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+    }
+
+    .wishlist-image-wrap {
+        height: 320px;
+    }
+}
+
+@media(max-width: 575px) {
+    .wishlist-grid {
+        grid-template-columns: 1fr;
     }
 }
 </style>

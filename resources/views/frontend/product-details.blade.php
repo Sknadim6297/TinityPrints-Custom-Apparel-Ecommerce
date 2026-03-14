@@ -396,7 +396,9 @@
                         </div>
                         <button type="button" class="fill-btn add-to-cart-btn" data-product-id="{{ $product->id }}">Add to Cart</button>
                      </div>
-                     <button type="button" class="border-btn add-to-wishlist-btn" data-product-id="{{ $product->id }}">Add to Wishlist</button>
+                     <button type="button" class="border-btn add-to-wishlist-btn" data-product-id="{{ $product->id }}" onclick="return window.tinnityToggleWishlist(event, this);" aria-label="Add to Wishlist" title="Add to Wishlist">
+                        <i class="far fa-heart"></i>
+                     </button>
                      <div class="product__details__tag tagcloud mt-25 mb-10">
                         <span>Category : </span>
                         <a href="{{ route('shop.category', $product->category) }}" rel="tag">{{ ucwords(str_replace('-', ' ', $product->category)) }}</a>
@@ -575,7 +577,9 @@
                         <span class="badge">NEW</span>
                      @endif
 
-                     <button type="button" class="wishlist add-to-wishlist-btn" data-product-id="{{ $relatedProduct->id }}" aria-label="Add to wishlist">♡</button>
+                     <button type="button" class="wishlist-btn add-to-wishlist-btn" data-product-id="{{ $relatedProduct->id }}" aria-label="Add to wishlist" onclick="return window.tinnityToggleWishlist(event, this);">
+                        <i class="far fa-heart"></i>
+                     </button>
 
                      <div class="product-img">
                         <a href="{{ route('product.details', $relatedProduct->id) }}">
@@ -756,17 +760,31 @@
          z-index: 3;
       }
 
-      .related_product .wishlist {
+      .related_product .wishlist-btn {
          position: absolute;
          right: 10px;
          top: 10px;
-         font-size: 20px;
+         width: 36px;
+         height: 36px;
+         border-radius: 50%;
+         border: none;
+         background: #fff;
+         display: inline-flex;
+         align-items: center;
+         justify-content: center;
+         font-size: 15px;
          cursor: pointer;
          z-index: 3;
-         border: none;
-         background: transparent;
-         line-height: 1;
-         padding: 0;
+         box-shadow: 0 2px 6px rgba(0, 0, 0, .2);
+         transition: background .2s ease;
+      }
+
+      .related_product .wishlist-btn:hover {
+         background: #ffe4e4;
+      }
+
+      .related_product .wishlist-btn.wl-active i {
+         color: #e60023 !important;
       }
 
       .related_product .cart-btn {
@@ -977,7 +995,7 @@
          display: inline-block;
          min-width: 46px;
          text-align: center;
-         padding: 10px 12px;
+         padding: 6px 12px;
          border: 2px solid #ddd;
          border-radius: 4px;
          font-weight: 600;
@@ -1008,7 +1026,7 @@
 
          .size-badge {
             min-width: 44px;
-            padding: 9px 10px;
+            padding: 6px 10px;
          }
       }
 

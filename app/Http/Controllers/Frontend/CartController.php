@@ -149,7 +149,6 @@ class CartController extends Controller
         $sidebarCartItems = Cart::where('user_id', auth()->id())
             ->with(['product.images', 'color'])
             ->latest()
-            ->take(3)
             ->get();
 
         $sidebarCartTotal = $sidebarCartItems->sum(function($item) {

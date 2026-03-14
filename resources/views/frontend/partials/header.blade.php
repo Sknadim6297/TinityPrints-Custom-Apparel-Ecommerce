@@ -69,7 +69,7 @@
                         @endauth
                      </div>
                      <div class="action-item action-item-cart">
-                        <a href="{{ route('cart.index') }}" class="view-cart-button">
+                        <a href="#" class="view-cart-button" aria-label="Open cart sidebar">
                            <svg xmlns="http://www.w3.org/2000/svg" width="16.665" height="20" viewBox="0 0 16.665 20">
                               <g id="Layer_2" data-name="Layer 2" transform="translate(-4.096 -1)">
                                  <path id="Path_35" data-name="Path 35"
@@ -95,7 +95,7 @@
                         <a href="#" class="action-btn-text">Cartlist</a>
                      </div>
                      <div class="action-item action-item-wishlist">
-                        <a href="{{ route('wishlist.index') }}" class="view-wishlist-button">
+                        <a href="#" class="view-wishlist-button" aria-label="Open wishlist sidebar">
                            <svg id="heart_2_" data-name="heart (2)" xmlns="http://www.w3.org/2000/svg" width="19.452"
                               height="18" viewBox="0 0 19.452 18">
                               <g id="Group_2" data-name="Group 2" transform="translate(0 0)">
@@ -825,13 +825,13 @@
                      </div>
                      <div class="action-list action-list-header1">
                         <div class="action-item action-item-cart">
-                           <a href="{{ route('cart.index') }}">
+                           <a href="#" class="view-cart-button" aria-label="Open cart sidebar">
                               <i class="fal fa-shopping-bag"></i>
                               <span class="action-item-number cart-count">{{ auth()->check() ? \App\Models\Cart::where('user_id', auth()->id())->count() : 0 }}</span>
                            </a>
                         </div>
                         <div class="action-item action-item-wishlist">
-                           <a href="{{ route('wishlist.index') }}">
+                           <a href="#" class="view-wishlist-button" aria-label="Open wishlist sidebar">
                               <i class="fal fa-heart"></i>
                               <span class="action-item-number wishlist-count">{{ auth()->check() ? \App\Models\Wishlist::where('user_id', auth()->id())->count() : 0 }}</span>
                            </a>
@@ -861,7 +861,6 @@
                      $sidebarCartItems = \App\Models\Cart::where('user_id', auth()->id())
                         ->with(['product.images', 'color'])
                         ->latest()
-                        ->take(3)
                         ->get();
                      $sidebarCartTotal = $sidebarCartItems->sum(function ($item) {
                         return $item->product->price * $item->quantity;
@@ -929,7 +928,6 @@
                      $sidebarWishlistItems = \App\Models\Wishlist::where('user_id', auth()->id())
                         ->with(['product.images'])
                         ->latest()
-                        ->take(3)
                         ->get();
                   ?>
 

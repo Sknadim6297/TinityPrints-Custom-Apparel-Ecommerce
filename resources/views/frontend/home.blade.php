@@ -18,7 +18,8 @@
         $featureBoxes = $homeSettings['feature_boxes'] ?? [];
 
         $resolveLink = function ($link, $fallback = '#') {
-            if (blank($link)) {
+            // Treat blank links and single-hash anchors as missing so we can fall back to an actual route.
+            if (blank($link) || trim($link) === '#') {
                 return $fallback;
             }
 
@@ -579,8 +580,27 @@
             position: absolute;
             right: 10px;
             top: 10px;
-            font-size: 20px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
             cursor: pointer;
+            z-index: 3;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, .2);
+            transition: background .2s ease;
+        }
+
+        .wishlist:hover {
+            background: #ffe4e4;
+        }
+
+        .wishlist.wl-active i {
+            color: #e60023;
         }
 
         .cart-btn {
@@ -1192,7 +1212,9 @@
                     @endphp
                     <div class="product-card">
                         <span class="badge">{{ $product->is_limited_edition ? ($limitedEditionConfig['badge_text'] ?? 'LIMITED') : 'TRENDING' }}</span>
-                        <span class="wishlist">♡</span>
+                        <button type="button" class="wishlist add-to-wishlist-btn" data-product-id="{{ $product->id }}" aria-label="Add to wishlist" onclick="return window.tinnityToggleWishlist(event, this);">
+                            <i class="far fa-heart"></i>
+                        </button>
                         <div class="product-img">
                             <a href="{{ route('product.details', $product->id) }}">
                                 <img src="{{ $productImage }}" alt="{{ $product->name }}">
@@ -1255,7 +1277,9 @@
                     @endphp
                     <div class="product-card">
                         <span class="badge">{{ $limitedEditionConfig['badge_text'] ?? 'LIMITED' }}</span>
-                        <span class="wishlist">♡</span>
+                        <button type="button" class="wishlist add-to-wishlist-btn" data-product-id="{{ $product->id }}" aria-label="Add to wishlist" onclick="return window.tinnityToggleWishlist(event, this);">
+                            <i class="far fa-heart"></i>
+                        </button>
                         <div class="product-img">
                             <a href="{{ route('product.details', $product->id) }}">
                                 <img src="{{ $limitedImage }}" alt="{{ $product->name }}">

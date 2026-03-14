@@ -36,7 +36,11 @@ class WishlistController extends Controller
             ->exists();
 
         if ($exists) {
-            return response()->json(['message' => 'Product already in wishlist.']);
+            return response()->json([
+                'success' => false,
+                'message' => 'Product already in wishlist.',
+                'wishlist_count' => Wishlist::where('user_id', auth()->id())->count(),
+            ]);
         }
 
         Wishlist::create([
@@ -64,7 +68,6 @@ class WishlistController extends Controller
         $sidebarWishlistItems = Wishlist::where('user_id', auth()->id())
             ->with(['product.images'])
             ->latest()
-            ->take(3)
             ->get();
 
         $html = view('frontend.partials.sidebar-wishlist-items', [
@@ -100,6 +103,39 @@ class WishlistController extends Controller
         Wishlist::where('id', $id)
             ->where('user_id', auth()->id())
             ->delete();
+
+        if (request()->expectsJson() || request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Item removed from wishlist.',
+                'wishlist_count' => Wishlist::where('user_id', auth()->id())->count(),
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Item removed from wishlist.');
+    }
+
+    public function destroyByProduct(Request $request, int $productId)
+    {
+        $deleted = Wishlist::where('user_id', auth()->id())
+            ->where('product_id', $productId)
+            ->delete();
+
+        if (($request->expectsJson() || $request->ajax()) && $deleted === 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Product is not in wishlist.',
+                'wishlist_count' => Wishlist::where('user_id', auth()->id())->count(),
+            ], 404);
+        }
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Removed from wishlist.',
+                'wishlist_count' => Wishlist::where('user_id', auth()->id())->count(),
+            ]);
+        }
 
         return redirect()->back()->with('success', 'Item removed from wishlist.');
     }

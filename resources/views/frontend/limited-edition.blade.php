@@ -172,7 +172,7 @@
          <div class="limited-card">
             <div class="limited-image-wrap">
                <span class="limited-badge">{{ $limitedEditionConfig['badge_text'] ?? 'LIMITED' }}</span>
-               <button type="button" class="limited-wishlist add-to-wishlist-btn" data-product-id="{{ $product->id }}" aria-label="Add to wishlist">
+               <button type="button" class="limited-wishlist add-to-wishlist-btn" data-product-id="{{ $product->id }}" aria-label="Add to wishlist" onclick="return window.tinnityToggleWishlist(event, this);">
                   <i class="far fa-heart"></i>
                </button>
                <a href="{{ route('product.details', $product->id) }}" style="display:block;width:100%;height:100%;">

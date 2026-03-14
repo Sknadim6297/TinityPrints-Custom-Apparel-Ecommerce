@@ -5572,14 +5572,16 @@ html .ui-button.ui-state-disabled:active {
 
 .sidebar-action {
   background: var(--clr-common-white);
-  height: 100%;
+  height: 100vh;
   position: fixed;
   z-index: 99999;
   top: 0;
   width: 390px;
-  padding: 30px 30px;
+  padding: 30px 30px 20px;
   transition: 0.6s;
-  overflow-y: scroll;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 @media (max-width: 575px) {
   .sidebar-action {
@@ -5642,6 +5644,7 @@ html .ui-button.ui-state-disabled:active {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+  flex-shrink: 0;
 }
 
 .sidebar-action-btn a {
@@ -5654,6 +5657,15 @@ html .ui-button.ui-state-disabled:active {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.sidebar-action-list::-webkit-scrollbar {
+  display: none;
 }
 
 .product-pricing span {
@@ -5693,10 +5705,11 @@ html .ui-button.ui-state-disabled:active {
 .product-price-total {
   padding-top: 20px;
   border-top: 1px solid var(--clr-common-border);
-  margin-top: 20px;
+  margin-top: 16px;
   display: flex;
   justify-content: space-between;
-  padding-bottom: 20px;
+  padding-bottom: 14px;
+  flex-shrink: 0;
 }
 
 .product-price-total span {
