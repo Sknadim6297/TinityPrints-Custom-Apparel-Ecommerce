@@ -105,6 +105,22 @@ class HomeSetting extends Model
                 'product_limit' => 4,
                 'badge_text' => 'LIMITED',
             ],
+            'limited_edition_page' => [
+                'page_title' => 'Limited Edition',
+                'hero_badge' => 'EXCLUSIVE COLLECTION',
+                'hero_title' => 'Limited Edition Drops',
+                'hero_image_url' => '',
+                'hero_description' => 'Discover our exclusive limited edition collections featuring unique designs, premium materials, and special collaborations. Each piece is carefully crafted in limited quantities, making them true collector\'s items.',
+                'feature_1' => 'Premium Quality',
+                'feature_2' => 'Limited Time Only',
+                'feature_3' => 'Exclusive Designs',
+                'products_title' => 'Current Limited Edition Drops',
+                'products_subtitle' => 'Get them before they\'re gone forever',
+                'empty_title' => 'No Limited Edition Items Available',
+                'empty_text' => 'Please check back soon for new exclusive drops.',
+                'browse_text' => 'Browse Regular Collection',
+                'browse_link' => '/shop',
+            ],
             'collection_reels' => [
                 'title' => 'Explore Our Collection',
                 'cards' => [
@@ -172,10 +188,10 @@ class HomeSetting extends Model
                 ],
             ],
             'blog' => [
-                'title' => 'Latest News',
+                'title' => 'Latest Newssss',
                 'subtitle' => 'Hot off the press: All the latest news in fashion',
                 'view_all_text' => 'View all posts',
-                'view_all_link' => '#',
+                'view_all_link' => '/blog',
                 'posts' => [
                     [
                         'date' => 'MARCH 07 2026',
@@ -183,7 +199,7 @@ class HomeSetting extends Model
                         'description' => "Explore Women's Day gift ideas that feel personal and meaningful. From stylish everyday wear to thoughtful surprises.",
                         'image_url' => 'https://images.unsplash.com/photo-1520975922284-9f8e3b0b8d2f',
                         'link_text' => 'Read more',
-                        'link' => '#',
+                        'link' => '/blog',
                     ],
                     [
                         'date' => 'FEBRUARY 28 2026',
@@ -191,7 +207,7 @@ class HomeSetting extends Model
                         'description' => 'From offline expansion to premium quality and collabs, here\'s what the pitch revealed next.',
                         'image_url' => 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c',
                         'link_text' => 'Read more',
-                        'link' => '#',
+                        'link' => '/blog',
                     ],
                     [
                         'date' => 'FEBRUARY 27 2026',
@@ -199,7 +215,7 @@ class HomeSetting extends Model
                         'description' => 'Bonkers Corner turns its Shark Tank moment into sustainable streetwear growth and global ambition.',
                         'image_url' => 'https://images.unsplash.com/photo-1520975922284-9f8e3b0b8d2f',
                         'link_text' => 'Read more',
-                        'link' => '#',
+                        'link' => '/blog',
                     ],
                 ],
             ],

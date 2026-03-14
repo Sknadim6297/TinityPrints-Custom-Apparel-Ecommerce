@@ -53,6 +53,7 @@
                      <ul>
                         <li><a href="{{ route('home') }}">Home</a></li>
                         <li><a href="{{ route('about') }}">About Company</a></li>
+                        <li><a href="{{ route('blog.index') }}">Blog</a></li>
                         <li><a href="{{ route('refund-policy') }}">Refund Policy</a></li>
                         <li><a href="{{ route('contact') }}">Contact Us</a></li>
                      </ul>

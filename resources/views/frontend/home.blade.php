@@ -970,6 +970,16 @@
             letter-spacing: 1px;
         }
 
+        .blog-tag {
+            display: inline-block;
+            margin-bottom: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #111;
+        }
+
         .blog-content h3 {
             font-size: 22px;
             margin: 10px 0;
@@ -1408,21 +1418,45 @@
 
     <section class="blog-section">
 
+        @php
+            $homepageBlogPosts = collect($homeBlogPosts ?? []);
+            $homepageConfigPosts = collect($blogConfig['posts'] ?? []);
+            $blogCards = $homepageBlogPosts->isNotEmpty()
+                ? $homepageBlogPosts->map(function ($post) {
+                    $imagePath = $post->featured_image;
+                    $imageUrl = $imagePath
+                        ? (\Illuminate\Support\Str::startsWith($imagePath, ['http://', 'https://']) ? $imagePath : Storage::url($imagePath))
+                        : asset('frontend/assets/img/blog/b-1.jpg');
+
+                    return [
+                        'tag' => 'Blog',
+                        'date' => optional($post->published_at ?? $post->created_at)->format('F d Y'),
+                        'title' => $post->title,
+                        'description' => $post->excerpt ?: Str::limit(strip_tags($post->content), 160),
+                        'image_url' => $imageUrl,
+                        'link_text' => 'Read more',
+                        'link' => route('blog.show', $post->slug),
+                    ];
+                })
+                : $homepageConfigPosts;
+        @endphp
+
         <div class="blog-header">
             <div>
-                <h2>{{ $blogConfig['title'] ?? 'Latest News' }}</h2>
-                <p>{{ $blogConfig['subtitle'] ?? '' }}</p>
+                <h2>{{ $blogConfig['title'] ?? 'Latest Newssss' }}</h2>
+                <p>{{ $blogConfig['subtitle'] ?? 'Hot off the press: All the latest news in fashion' }}</p>
             </div>
 
-            <a href="{{ $resolveLink($blogConfig['view_all_link'] ?? '#', '#') }}" class="view-all">{{ $blogConfig['view_all_text'] ?? 'View all posts' }}</a>
+            <a href="{{ $resolveLink($blogConfig['view_all_link'] ?? '/blog', route('blog.index')) }}" class="view-all">{{ $blogConfig['view_all_text'] ?? 'View all posts' }}</a>
         </div>
 
 
         <div class="blog-grid">
-            @foreach ($blogConfig['posts'] ?? [] as $post)
+            @foreach ($blogCards as $post)
                 <div class="blog-card">
                     <img src="{{ $post['image_url'] ?? '' }}" alt="Blog">
                     <div class="blog-content">
+                        <span class="blog-tag">{{ $post['tag'] ?? 'Blog' }}</span>
                         <span class="blog-date">{{ $post['date'] ?? '' }}</span>
                         <h3>{{ $post['title'] ?? '' }}</h3>
                         <p>{{ $post['description'] ?? '' }}</p>

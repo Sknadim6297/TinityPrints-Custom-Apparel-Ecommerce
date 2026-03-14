@@ -92,7 +92,7 @@
                         @endif">
                         Designs
                     </a>
-                    
+
                     <a href="{{ route('admin.customers.index') }}" class="px-3 py-2 rounded-md text-sm font-medium transition-all duration-150
                         @if(request()->routeIs('admin.customers.*'))
                             bg-gray-100 dark:bg-gray-700 text-red-600 dark:text-red-400 shadow-sm
@@ -251,7 +251,7 @@
             <a href="{{ route('admin.design-approvals.index') }}" class="text-gray-900 dark:text-gray-100 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                 Designs
             </a>
-            
+
             <a href="{{ route('admin.customers.index') }}" class="text-gray-900 dark:text-gray-100 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                 Customers
             </a>

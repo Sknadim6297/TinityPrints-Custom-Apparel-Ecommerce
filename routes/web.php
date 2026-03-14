@@ -10,6 +10,7 @@ use App\Http\Controllers\Frontend\OrderController;
 use App\Http\Controllers\Frontend\CustomDesignController;
 use App\Http\Controllers\Frontend\StockAlertController;
 use App\Http\Controllers\Frontend\DropdownController;
+use App\Http\Controllers\Frontend\BlogController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
@@ -33,6 +34,8 @@ Route::middleware('auth')->group(function () {
         ->name('custom-design.payment.process');
 });
 Route::get('/limited-edition', [HomeController::class, 'limitedEdition'])->name('limited-edition');
+Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
+Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 Route::get('/about', [HomeController::class, 'about'])->name('about');
 Route::get('/refund-policy', [HomeController::class, 'refundPolicy'])->name('refund-policy');
 Route::get('/contact', [HomeController::class, 'contact'])->name('contact');

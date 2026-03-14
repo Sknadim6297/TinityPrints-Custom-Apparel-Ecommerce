@@ -278,15 +278,6 @@
                                                 @foreach(collect($menuCategory['collections']) as $menuCollection)
                                                    <li>
                                                       <a href="{{ route('shop', ['category_id' => $menuCategory['id'], 'collection_type_id' => $menuCollection['id']]) }}">{{ $menuCollection['name'] }}</a>
-                                                      @if(collect($menuCollection['products'])->isNotEmpty())
-                                                         <ul>
-                                                            @foreach(collect($menuCollection['products']) as $menuProduct)
-                                                               <li>
-                                                                  <a href="{{ route('product.details', $menuProduct['id']) }}">{{ $menuProduct['name'] }}</a>
-                                                               </li>
-                                                            @endforeach
-                                                         </ul>
-                                                      @endif
                                                    </li>
                                                 @endforeach
                                              </ul>
@@ -596,6 +587,34 @@
 
          .main-menu3 .shop-mobile-tree {
             display: block;
+         }
+
+         .mean-container .shop-mega-menu,
+         .mean-container .shop-mega-shell,
+         .mean-container .shop-mega-column,
+         .mean-container .shop-mega-column-head,
+         .mean-container .shop-mega-list,
+         .mean-container .shop-mega-panel,
+         .mean-container .shop-mega-product-list,
+         .mean-container .shop-mega-empty-state,
+         .mean-container .shop-mega-trigger,
+         .mean-container .shop-mega-product-link {
+            display: none !important;
+         }
+
+         .mean-container .shop-mobile-tree {
+            display: block !important;
+         }
+
+         .mean-container .shop-menu-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+         }
+
+         .mean-container .shop-menu-link i {
+            font-size: 11px;
+            opacity: 0.65;
          }
       }
    </style>

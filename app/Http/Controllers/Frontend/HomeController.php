@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\CollectionType;
 use App\Models\DesignRequest;
 use App\Models\HomeSetting;
+use App\Models\BlogPost;
 use App\Models\Product;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -55,6 +56,12 @@ class HomeController extends Controller
             ->orderBy('sort_order')
             ->get();
 
+        $homeBlogPosts = BlogPost::published()
+            ->latest('published_at')
+            ->latest('created_at')
+            ->take(3)
+            ->get();
+
         $trendyProducts = Product::where('is_active', true)
             ->with('images')
             ->get();
@@ -67,7 +74,8 @@ class HomeController extends Controller
             'newArrivalProducts',
             'hotCollectionProducts',
             'trendyProducts',
-            'testimonials'
+            'testimonials',
+            'homeBlogPosts'
         ));
     }
 
@@ -440,12 +448,18 @@ class HomeController extends Controller
      */
     public function limitedEdition()
     {
+        $homeSettingRecord = HomeSetting::first();
+        $homeSettings = HomeSetting::mergedData($homeSettingRecord?->data);
+
         $limitedProducts = Product::where('is_limited_edition', true)
             ->where('is_active', true)
             ->with(['images', 'colors', 'sizes'])
             ->paginate(12);
 
-        return view('frontend.limited-edition', compact('limitedProducts'));
+        $limitedEditionPage = $homeSettings['limited_edition_page'] ?? [];
+        $limitedEditionConfig = $homeSettings['limited_edition'] ?? [];
+
+        return view('frontend.limited-edition', compact('limitedProducts', 'limitedEditionPage', 'limitedEditionConfig'));
     }
 
     /**

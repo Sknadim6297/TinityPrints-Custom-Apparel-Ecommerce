@@ -17,6 +17,8 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\SleeveTypeController;
 use App\Http\Controllers\Admin\CollectionTypeController;
 use App\Http\Controllers\Admin\HomeSettingController;
+use App\Http\Controllers\Admin\LimitedEditionSettingController;
+use App\Http\Controllers\Admin\BlogPostController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -65,8 +67,17 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
     Route::post('settings/home', [HomeSettingController::class, 'update'])
         ->name('home-settings.update');
 
+    // Limited Edition settings
+    Route::get('settings/limited-edition', [LimitedEditionSettingController::class, 'edit'])
+        ->name('limited-edition-settings.edit');
+    Route::post('settings/limited-edition', [LimitedEditionSettingController::class, 'update'])
+        ->name('limited-edition-settings.update');
+
     // Testimonials management
     Route::resource('testimonials', TestimonialController::class)
+        ->except(['show']);
+
+    Route::resource('blog-posts', BlogPostController::class)
         ->except(['show']);
     
     // Logout

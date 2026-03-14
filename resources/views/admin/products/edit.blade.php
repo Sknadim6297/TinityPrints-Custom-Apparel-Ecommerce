@@ -334,69 +334,9 @@
 
 <script>
 
-// Load dropdown options from API
 document.addEventListener('DOMContentLoaded', function() {
     loadDropdownOptions();
-});
 
-function loadDropdownOptions() {
-    fetch('{{ route("api.dropdowns.all") }}')
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                populateCategoryDropdown(data.data.categories);
-                populateSleeveTypeDropdown(data.data.sleeveTypes);
-                populateCollectionTypeDropdown(data.data.collectionTypes);
-            }
-        })
-        .catch(error => console.error('Error loading dropdowns:', error));
-}
-
-function populateCategoryDropdown(categories) {
-    const select = document.getElementById('category_id');
-    const currentValue = {{ $product->category_id ?? 'null' }};
-    
-    categories.forEach(category => {
-        const option = document.createElement('option');
-        option.value = category.id;
-        option.textContent = category.name;
-        if (currentValue == category.id) {
-            option.selected = true;
-        }
-        select.appendChild(option);
-    });
-}
-
-function populateSleeveTypeDropdown(sleeveTypes) {
-    const select = document.getElementById('sleeve_type_id');
-    const currentValue = {{ $product->sleeve_type_id ?? 'null' }};
-    
-    sleeveTypes.forEach(sleeveType => {
-        const option = document.createElement('option');
-        option.value = sleeveType.id;
-        option.textContent = sleeveType.name;
-        if (currentValue == sleeveType.id) {
-            option.selected = true;
-        }
-        select.appendChild(option);
-    });
-}
-
-function populateCollectionTypeDropdown(collectionTypes) {
-    const select = document.getElementById('collection_type_id');
-    const currentValue = {{ $product->collection_type_id ?? 'null' }};
-    
-    collectionTypes.forEach(collectionType => {
-        const option = document.createElement('option');
-        option.value = collectionType.id;
-        option.textContent = collectionType.name;
-        if (currentValue == collectionType.id) {
-            option.selected = true;
-        }
-        select.appendChild(option);
-    });
-}
-</script>
     const limitedEditionCheckbox = document.getElementById('is_limited_edition');
     const dropControlContainer = document.getElementById('drop_control_container');
     const addColorBtn = document.getElementById('add-color-btn');
@@ -404,7 +344,7 @@ function populateCollectionTypeDropdown(collectionTypes) {
     const newColorTemplate = document.getElementById('new-color-template');
     let newColorIndex = 0;
 
-    if (limitedEditionCheckbox) {
+    if (limitedEditionCheckbox && dropControlContainer) {
         limitedEditionCheckbox.addEventListener('change', function() {
             dropControlContainer.style.display = this.checked ? 'block' : 'none';
         });
@@ -420,9 +360,11 @@ function populateCollectionTypeDropdown(collectionTypes) {
             });
 
             const removeButton = colorBlock.querySelector('.remove-new-color');
-            removeButton.addEventListener('click', function() {
-                colorBlock.remove();
-            });
+            if (removeButton) {
+                removeButton.addEventListener('click', function() {
+                    colorBlock.remove();
+                });
+            }
 
             newColorsContainer.appendChild(colorBlock);
             newColorIndex++;
@@ -456,5 +398,63 @@ function populateCollectionTypeDropdown(collectionTypes) {
         });
     });
 });
+
+function loadDropdownOptions() {
+    fetch('{{ route("api.dropdowns.all") }}')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                populateCategoryDropdown(data.data.categories);
+                populateSleeveTypeDropdown(data.data.sleeveTypes);
+                populateCollectionTypeDropdown(data.data.collectionTypes);
+            }
+        })
+        .catch(error => console.error('Error loading dropdowns:', error));
+}
+
+function populateCategoryDropdown(categories) {
+    const select = document.getElementById('category_id');
+    const currentValue = {{ $product->category_id ?? 'null' }};
+
+    categories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category.id;
+        option.textContent = category.name;
+        if (currentValue == category.id) {
+            option.selected = true;
+        }
+        select.appendChild(option);
+    });
+}
+
+function populateSleeveTypeDropdown(sleeveTypes) {
+    const select = document.getElementById('sleeve_type_id');
+    const currentValue = {{ $product->sleeve_type_id ?? 'null' }};
+
+    sleeveTypes.forEach(sleeveType => {
+        const option = document.createElement('option');
+        option.value = sleeveType.id;
+        option.textContent = sleeveType.name;
+        if (currentValue == sleeveType.id) {
+            option.selected = true;
+        }
+        select.appendChild(option);
+    });
+}
+
+function populateCollectionTypeDropdown(collectionTypes) {
+    const select = document.getElementById('collection_type_id');
+    const currentValue = {{ $product->collection_type_id ?? 'null' }};
+
+    collectionTypes.forEach(collectionType => {
+        const option = document.createElement('option');
+        option.value = collectionType.id;
+        option.textContent = collectionType.name;
+        if (currentValue == collectionType.id) {
+            option.selected = true;
+        }
+        select.appendChild(option);
+    });
+}
 </script>
 @endsection

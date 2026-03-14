@@ -34,7 +34,6 @@ class HomeSettingController extends Controller
             'best_seller' => 'nullable|array',
             'brand_story' => 'nullable|array',
             'brand_story.image_file' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
-            'limited_edition' => 'nullable|array',
             'collection_reels' => 'nullable|array',
             'collection_reels.cards.*.image_file' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
             'custom_design' => 'nullable|array',
@@ -47,7 +46,8 @@ class HomeSettingController extends Controller
             'feature_boxes' => 'nullable|array',
         ]);
 
-        $payload = HomeSetting::defaults();
+        $settings = HomeSetting::first();
+        $payload = HomeSetting::mergedData($settings?->data ?? []);
 
         $payload['hero_slides'] = $this->buildSlidesWithUploads(
             $request,
@@ -83,12 +83,6 @@ class HomeSettingController extends Controller
             $request->input('brand_story.features', []),
             ['icon', 'text']
         );
-
-        $payload['limited_edition'] = array_replace($payload['limited_edition'], $this->sanitizeAssoc(
-            $request->input('limited_edition', []),
-            ['title', 'subtitle', 'view_all_text', 'view_all_link', 'badge_text']
-        ));
-        $payload['limited_edition']['product_limit'] = max(1, (int) $request->input('limited_edition.product_limit', $payload['limited_edition']['product_limit']));
 
         $payload['collection_reels'] = array_replace($payload['collection_reels'], $this->sanitizeAssoc(
             $request->input('collection_reels', []),
@@ -147,7 +141,7 @@ class HomeSettingController extends Controller
             ['title', 'description']
         );
 
-        $settings = HomeSetting::first() ?? new HomeSetting();
+        $settings = $settings ?? new HomeSetting();
         $settings->data = $payload;
         $settings->save();
 

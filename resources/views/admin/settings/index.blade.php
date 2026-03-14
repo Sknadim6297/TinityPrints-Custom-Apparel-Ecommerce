@@ -34,6 +34,22 @@
                 </div>
             </a>
 
+            <!-- Limited Edition Settings -->
+            <a href="{{ route('admin.limited-edition-settings.edit') }}" class="bg-gradient-to-br from-rose-400 to-orange-500 rounded-xl sm:rounded-2xl shadow-lg p-6 text-white transform transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-black text-sm font-medium mb-1">Limited Edition</p>
+                        <h3 class="text-xl font-bold">Page Settings</h3>
+                    </div>
+
+                    <div class="bg-rose-500 bg-opacity-30 rounded-full p-3">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0-5l1.5 3h3.5l-2.75 2.25.9 3.75L12 10.9 8.85 12l.9-3.75L7 6h3.5L12 3z"/>
+                        </svg>
+                    </div>
+                </div>
+            </a>
+
 
 
 
@@ -65,6 +81,22 @@
                     <div class="bg-indigo-500 bg-opacity-30 rounded-full p-3">
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-3-3v6" />
+                        </svg>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Blog Settings -->
+            <a href="{{ route('admin.blog-posts.index') }}" class="bg-gradient-to-br from-sky-400 to-cyan-600 rounded-xl sm:rounded-2xl shadow-lg p-6 text-white transform transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sky-100 text-sm font-medium mb-1">Blog</p>
+                        <h3 class="text-xl font-bold">Manage Blog Posts</h3>
+                    </div>
+
+                    <div class="bg-cyan-500 bg-opacity-30 rounded-full p-3">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v14a2 2 0 01-2 2zM7 7h10M7 11h10M7 15h6"/>
                         </svg>
                     </div>
                 </div>

@@ -438,7 +438,35 @@
 
                         @if($products->hasPages())
                             <div class="shop-pagination">
-                                {{ $products->links() }}
+                                <nav aria-label="Shop pagination">
+                                    <ul class="pagination">
+                                        <li class="{{ $products->onFirstPage() ? 'disabled' : '' }}">
+                                            @if($products->onFirstPage())
+                                                <span aria-disabled="true">Previous</span>
+                                            @else
+                                                <a href="{{ $products->previousPageUrl() }}" rel="prev">Previous</a>
+                                            @endif
+                                        </li>
+
+                                        @for($page = 1; $page <= $products->lastPage(); $page++)
+                                            <li class="{{ $products->currentPage() === $page ? 'active' : '' }}">
+                                                @if($products->currentPage() === $page)
+                                                    <span aria-current="page">{{ $page }}</span>
+                                                @else
+                                                    <a href="{{ $products->url($page) }}">{{ $page }}</a>
+                                                @endif
+                                            </li>
+                                        @endfor
+
+                                        <li class="{{ $products->hasMorePages() ? '' : 'disabled' }}">
+                                            @if($products->hasMorePages())
+                                                <a href="{{ $products->nextPageUrl() }}" rel="next">Next</a>
+                                            @else
+                                                <span aria-disabled="true">Next</span>
+                                            @endif
+                                        </li>
+                                    </ul>
+                                </nav>
                             </div>
                         @endif
 

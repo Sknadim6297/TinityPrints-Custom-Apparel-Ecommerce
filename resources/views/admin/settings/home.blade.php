@@ -320,36 +320,6 @@
                 </div>
 
                 <div class="section-card">
-                    <h4>Limited Edition Section</h4>
-                    <div class="field-grid">
-                        <div class="field-group">
-                            <label>Section Title</label>
-                            <input type="text" name="limited_edition[title]" value="{{ old('limited_edition.title', $data['limited_edition']['title'] ?? '') }}" class="form-control">
-                        </div>
-                        <div class="field-group">
-                            <label>Section Subtitle</label>
-                            <input type="text" name="limited_edition[subtitle]" value="{{ old('limited_edition.subtitle', $data['limited_edition']['subtitle'] ?? '') }}" class="form-control">
-                        </div>
-                        <div class="field-group">
-                            <label>View All Button Text</label>
-                            <input type="text" name="limited_edition[view_all_text]" value="{{ old('limited_edition.view_all_text', $data['limited_edition']['view_all_text'] ?? '') }}" class="form-control">
-                        </div>
-                        <div class="field-group">
-                            <label>View All Button Link</label>
-                            <input type="text" name="limited_edition[view_all_link]" value="{{ old('limited_edition.view_all_link', $data['limited_edition']['view_all_link'] ?? '') }}" class="form-control">
-                        </div>
-                        <div class="field-group">
-                            <label>Badge Text</label>
-                            <input type="text" name="limited_edition[badge_text]" value="{{ old('limited_edition.badge_text', $data['limited_edition']['badge_text'] ?? '') }}" class="form-control">
-                        </div>
-                        <div class="field-group">
-                            <label>How Many Products to Show</label>
-                            <input type="number" min="1" name="limited_edition[product_limit]" value="{{ old('limited_edition.product_limit', $data['limited_edition']['product_limit'] ?? 4) }}" class="form-control">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="section-card">
                     <h4>Collection Reels</h4>
                     <div class="field-grid">
                         <div class="field-group">
