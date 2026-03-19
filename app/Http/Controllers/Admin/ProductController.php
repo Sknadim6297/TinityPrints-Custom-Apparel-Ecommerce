@@ -125,10 +125,11 @@ class ProductController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
-            'fit_type' => 'required|in:regular,oversize,normal,slight_oversize',
-            'sleeve_type_id' => 'required|exists:sleeve_types,id',
+            'fit_type' => 'nullable|in:regular,oversize,normal,slight_oversize',
+            'sleeve_type_id' => 'nullable|exists:sleeve_types,id',
             'collection_type_id' => 'nullable|exists:collection_types,id',
-            'base_price' => 'required|numeric|min:0.01',
+            'mrp' => 'required|numeric|min:0.01',
+            'selling_price' => 'required|numeric|min:0.01|lte:mrp',
             'is_limited_edition' => 'boolean',
             'drop_month' => 'nullable|string',
             'drop_name' => 'nullable|string|max:255',
@@ -147,17 +148,36 @@ class ProductController extends Controller
             'colors.*.hex_code' => 'nullable|regex:/^#[0-9A-Fa-f]{6}$/',
             'colors.*.front_image' => 'nullable|image|max:5120',
             'colors.*.back_image' => 'nullable|image|max:5120',
+            'colors.*.extra_images' => 'nullable|array',
+            'colors.*.extra_images.*' => 'nullable|image|max:5120',
         ]);
+
+        $isAccessoryCategory = $this->isAccessoryCategory((int) $validated['category_id']);
+
+        if (! $isAccessoryCategory) {
+            $request->validate([
+                'fit_type' => 'required|in:regular,oversize,normal,slight_oversize',
+                'sleeve_type_id' => 'required|exists:sleeve_types,id',
+            ]);
+        }
+
+        $fitType = $isAccessoryCategory ? 'regular' : (string) $validated['fit_type'];
+        $sleeveTypeId = $isAccessoryCategory ? null : ($validated['sleeve_type_id'] ?? null);
+        $collectionTypeId = $isAccessoryCategory ? null : ($validated['collection_type_id'] ?? null);
+        $mrp = (float) $validated['mrp'];
+        $sellingPrice = (float) $validated['selling_price'];
 
         // Create product
         $product = Product::create([
             'name' => $validated['name'],
             'description' => $validated['description'],
             'category_id' => $validated['category_id'],
-            'fit_type' => $validated['fit_type'],
-            'sleeve_type_id' => $validated['sleeve_type_id'],
-            'collection_type_id' => $validated['collection_type_id'] ?? null,
-            'base_price' => $validated['base_price'],
+            'fit_type' => $fitType,
+            'sleeve_type_id' => $sleeveTypeId,
+            'collection_type_id' => $collectionTypeId,
+            'mrp' => $mrp,
+            'selling_price' => $sellingPrice,
+            'base_price' => $sellingPrice,
             'is_limited_edition' => $validated['is_limited_edition'] ?? false,
             'drop_month' => $validated['drop_month'],
             'drop_name' => $validated['drop_name'] ?? null,
@@ -185,10 +205,20 @@ class ProductController extends Controller
 
         // Create colors with images
         if ($request->has('colors')) {
+            $seenColorNames = [];
             foreach ($request->input('colors') as $index => $colorData) {
+                $colorName = trim((string) ($colorData['name'] ?? ''));
+                $normalizedColorName = strtolower($colorName);
+
+                if ($colorName === '' || in_array($normalizedColorName, $seenColorNames, true)) {
+                    continue;
+                }
+
+                $seenColorNames[] = $normalizedColorName;
+
                 $color = ProductColor::create([
                     'product_id' => $product->id,
-                    'color_name' => $colorData['name'],
+                    'color_name' => $colorName,
                     'hex_code' => $colorData['hex_code'] ?? null,
                     'is_active' => true,
                 ]);
@@ -216,6 +246,22 @@ class ProductController extends Controller
                         'image_path' => $backPath,
                     ]);
                 }
+
+                if ($request->hasFile("colors.$index.extra_images")) {
+                    foreach ($request->file("colors.$index.extra_images") as $extraImage) {
+                        if (! $extraImage) {
+                            continue;
+                        }
+
+                        $extraPath = $extraImage->store("products/{$product->id}/colors/{$color->id}", 'public');
+
+                        ProductImage::create([
+                            'product_color_id' => $color->id,
+                            'image_type' => 'extra',
+                            'image_path' => $extraPath,
+                        ]);
+                    }
+                }
             }
         }
 
@@ -241,10 +287,11 @@ class ProductController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
-            'fit_type' => 'required|in:regular,oversize,normal,slight_oversize',
-            'sleeve_type_id' => 'required|exists:sleeve_types,id',
+            'fit_type' => 'nullable|in:regular,oversize,normal,slight_oversize',
+            'sleeve_type_id' => 'nullable|exists:sleeve_types,id',
             'collection_type_id' => 'nullable|exists:collection_types,id',
-            'base_price' => 'required|numeric|min:0.01',
+            'mrp' => 'required|numeric|min:0.01',
+            'selling_price' => 'required|numeric|min:0.01|lte:mrp',
             'is_limited_edition' => 'boolean',
             'drop_month' => 'nullable|string',
             'drop_name' => 'nullable|string|max:255',
@@ -261,21 +308,42 @@ class ProductController extends Controller
             'existing_colors.*.hex_code' => 'nullable|regex:/^#[0-9A-Fa-f]{6}$/',
             'existing_colors.*.front_image' => 'nullable|image|max:5120',
             'existing_colors.*.back_image' => 'nullable|image|max:5120',
+            'existing_colors.*.extra_images' => 'nullable|array',
+            'existing_colors.*.extra_images.*' => 'nullable|image|max:5120',
             'new_colors' => 'nullable|array',
             'new_colors.*.name' => 'nullable|string|max:100',
             'new_colors.*.hex_code' => 'nullable|regex:/^#[0-9A-Fa-f]{6}$/',
             'new_colors.*.front_image' => 'nullable|image|max:5120',
             'new_colors.*.back_image' => 'nullable|image|max:5120',
+            'new_colors.*.extra_images' => 'nullable|array',
+            'new_colors.*.extra_images.*' => 'nullable|image|max:5120',
         ]);
+
+        $isAccessoryCategory = $this->isAccessoryCategory((int) $validated['category_id']);
+
+        if (! $isAccessoryCategory) {
+            $request->validate([
+                'fit_type' => 'required|in:regular,oversize,normal,slight_oversize',
+                'sleeve_type_id' => 'required|exists:sleeve_types,id',
+            ]);
+        }
+
+        $fitType = $isAccessoryCategory ? 'regular' : (string) $validated['fit_type'];
+        $sleeveTypeId = $isAccessoryCategory ? null : ($validated['sleeve_type_id'] ?? null);
+        $collectionTypeId = $isAccessoryCategory ? null : ($validated['collection_type_id'] ?? null);
+        $mrp = (float) $validated['mrp'];
+        $sellingPrice = (float) $validated['selling_price'];
 
         $product->update([
             'name' => $validated['name'],
             'description' => $validated['description'],
             'category_id' => $validated['category_id'],
-            'fit_type' => $validated['fit_type'],
-            'sleeve_type_id' => $validated['sleeve_type_id'],
-            'collection_type_id' => $validated['collection_type_id'] ?? null,
-            'base_price' => $validated['base_price'],
+            'fit_type' => $fitType,
+            'sleeve_type_id' => $sleeveTypeId,
+            'collection_type_id' => $collectionTypeId,
+            'mrp' => $mrp,
+            'selling_price' => $sellingPrice,
+            'base_price' => $sellingPrice,
             'is_limited_edition' => $validated['is_limited_edition'] ?? false,
             'drop_month' => $validated['drop_month'],
             'drop_name' => $validated['drop_name'] ?? null,
@@ -343,10 +411,34 @@ class ProductController extends Controller
                     $request->file("existing_colors.$colorId.back_image")
                 );
             }
+
+            if ($request->hasFile("existing_colors.$colorId.extra_images")) {
+                foreach ($request->file("existing_colors.$colorId.extra_images") as $extraImage) {
+                    if (! $extraImage) {
+                        continue;
+                    }
+
+                    $extraPath = $extraImage->store("products/{$product->id}/colors/{$color->id}", 'public');
+
+                    ProductImage::create([
+                        'product_color_id' => $color->id,
+                        'image_type' => 'extra',
+                        'image_path' => $extraPath,
+                    ]);
+                }
+            }
         }
+
+        $existingNormalizedColorNames = $product->colors()
+            ->pluck('color_name')
+            ->map(fn ($name) => strtolower(trim((string) $name)))
+            ->filter()
+            ->values()
+            ->all();
 
         foreach ($request->input('new_colors', []) as $index => $colorData) {
             $colorName = trim((string) ($colorData['name'] ?? ''));
+            $normalizedColorName = strtolower($colorName);
             $hasFrontImage = $request->hasFile("new_colors.$index.front_image");
             $hasBackImage = $request->hasFile("new_colors.$index.back_image");
             $hasHexCode = !empty($colorData['hex_code']);
@@ -358,6 +450,12 @@ class ProductController extends Controller
             if ($colorName === '') {
                 continue;
             }
+
+            if (in_array($normalizedColorName, $existingNormalizedColorNames, true)) {
+                continue;
+            }
+
+            $existingNormalizedColorNames[] = $normalizedColorName;
 
             $newColor = ProductColor::create([
                 'product_id' => $product->id,
@@ -382,6 +480,22 @@ class ProductController extends Controller
                     'back',
                     $request->file("new_colors.$index.back_image")
                 );
+            }
+
+            if ($request->hasFile("new_colors.$index.extra_images")) {
+                foreach ($request->file("new_colors.$index.extra_images") as $extraImage) {
+                    if (! $extraImage) {
+                        continue;
+                    }
+
+                    $extraPath = $extraImage->store("products/{$product->id}/colors/{$newColor->id}", 'public');
+
+                    ProductImage::create([
+                        'product_color_id' => $newColor->id,
+                        'image_type' => 'extra',
+                        'image_path' => $extraPath,
+                    ]);
+                }
             }
         }
 
@@ -409,6 +523,8 @@ class ProductController extends Controller
             'hex_code' => 'nullable|regex:/^#[0-9A-Fa-f]{6}$/',
             'front_image' => 'required|image|max:5120',
             'back_image' => 'required|image|max:5120',
+            'extra_images' => 'nullable|array',
+            'extra_images.*' => 'nullable|image|max:5120',
         ]);
 
         $color = ProductColor::create([
@@ -438,6 +554,22 @@ class ProductController extends Controller
                 'image_type' => 'back',
                 'image_path' => $backPath,
             ]);
+        }
+
+        if ($request->hasFile('extra_images')) {
+            foreach ($request->file('extra_images') as $extraImage) {
+                if (! $extraImage) {
+                    continue;
+                }
+
+                $extraPath = $extraImage->store("products/{$product->id}/colors/{$color->id}", 'public');
+
+                ProductImage::create([
+                    'product_color_id' => $color->id,
+                    'image_type' => 'extra',
+                    'image_path' => $extraPath,
+                ]);
+            }
         }
 
         return redirect()->route('admin.products.edit', $product)
@@ -471,5 +603,20 @@ class ProductController extends Controller
             'image_type' => $imageType,
             'image_path' => $path,
         ]);
+    }
+
+    protected function isAccessoryCategory(int $categoryId): bool
+    {
+        $category = Category::query()->find($categoryId);
+
+        if (! $category) {
+            return false;
+        }
+
+        $name = strtolower((string) $category->name);
+        $slug = strtolower((string) $category->slug);
+
+        return str_contains($name, 'accessories') || str_contains($name, 'accessory')
+            || str_contains($slug, 'accessories') || str_contains($slug, 'accessory');
     }
 }

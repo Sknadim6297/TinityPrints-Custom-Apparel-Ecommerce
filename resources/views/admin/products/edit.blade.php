@@ -54,12 +54,30 @@
                     </div>
 
                     <div>
-                        <label for="base_price" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Base Price (₹)</label>
-                        <input id="base_price" type="number" name="base_price" value="{{ $product->base_price }}" step="0.01" min="0.01" required
+                        <label for="mrp" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">MRP (₹)</label>
+                        <input id="mrp" type="number" name="mrp" value="{{ old('mrp', $product->mrp ?? $product->base_price) }}" step="0.01" min="0.01" required
                                class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400">
+                        @error('mrp')
+                            <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div>
+                        <label for="selling_price" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Selling Price (₹)</label>
+                        <input id="selling_price" type="number" name="selling_price" value="{{ old('selling_price', $product->selling_price ?? $product->base_price) }}" step="0.01" min="0.01" required
+                               class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400">
+                        @error('selling_price')
+                            <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label for="discount_percentage" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Discount (%)</label>
+                        <input id="discount_percentage" type="text" value="{{ $product->discount_percentage }}%" readonly
+                               class="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none">
+                    </div>
+
+                    <div id="sleeve-type-field">
                         <label for="sleeve_type_id" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Sleeve Type</label>
                         <select id="sleeve_type_id" name="sleeve_type_id" required
                                 class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400">
@@ -67,15 +85,15 @@
                         </select>
                     </div>
 
-                    <div>
-                        <label for="collection_type_id" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Collection Type</label>
+                    <div id="collection-type-field">
+                        <label for="collection_type_id" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Fabric</label>
                         <select id="collection_type_id" name="collection_type_id"
                                 class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400">
-                            <option value="">Select Collection Type (Optional)</option>
+                            <option value="">Select Fabric (Optional)</option>
                         </select>
                     </div>
 
-                    <div>
+                    <div id="fit-type-field">
                         <label for="fit_type" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Fit Type</label>
                         <select id="fit_type" name="fit_type" required
                                 class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400">
@@ -245,6 +263,25 @@
                                                accept="image/*"
                                                class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400">
                                     </div>
+
+                                    <div class="sm:col-span-2">
+                                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Extra Images</label>
+                                        @php
+                                            $extraImages = $color->images->where('image_type', 'extra');
+                                        @endphp
+                                        @if($extraImages->count() > 0)
+                                            <div class="flex flex-wrap gap-2 mb-2">
+                                                @foreach($extraImages as $extraImage)
+                                                    <img src="{{ asset('storage/' . $extraImage->image_path) }}" alt="Extra image" class="w-16 h-16 object-cover rounded-lg border border-gray-300 dark:border-gray-600">
+                                                @endforeach
+                                            </div>
+                                        @endif
+                                        <input type="file"
+                                               name="existing_colors[{{ $color->id }}][extra_images][]"
+                                               accept="image/*"
+                                               multiple
+                                               class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400">
+                                    </div>
                                 </div>
 
                                 <div class="mt-4 flex justify-end">
@@ -300,6 +337,12 @@
                                 <input type="file" data-field="back_image" accept="image/*"
                                        class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400">
                             </div>
+
+                            <div class="sm:col-span-2">
+                                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Extra Images</label>
+                                <input type="file" data-field="extra_images" accept="image/*" multiple
+                                       class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400">
+                            </div>
                         </div>
 
                         <button type="button"
@@ -343,6 +386,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const newColorsContainer = document.getElementById('new-colors-container');
     const newColorTemplate = document.getElementById('new-color-template');
     let newColorIndex = 0;
+    let isAddingColor = false;
 
     if (limitedEditionCheckbox && dropControlContainer) {
         limitedEditionCheckbox.addEventListener('change', function() {
@@ -350,12 +394,22 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    if (addColorBtn && newColorsContainer && newColorTemplate) {
+    if (addColorBtn && newColorsContainer && newColorTemplate && addColorBtn.dataset.bound !== '1') {
+        addColorBtn.dataset.bound = '1';
         addColorBtn.addEventListener('click', function() {
+            if (isAddingColor) {
+                return;
+            }
+            isAddingColor = true;
+
             const colorBlock = newColorTemplate.content.firstElementChild.cloneNode(true);
 
             colorBlock.querySelectorAll('[data-field]').forEach((field) => {
                 const fieldName = field.getAttribute('data-field');
+                if (fieldName === 'extra_images') {
+                    field.setAttribute('name', `new_colors[${newColorIndex}][extra_images][]`);
+                    return;
+                }
                 field.setAttribute('name', `new_colors[${newColorIndex}][${fieldName}]`);
             });
 
@@ -368,8 +422,61 @@ document.addEventListener('DOMContentLoaded', function() {
 
             newColorsContainer.appendChild(colorBlock);
             newColorIndex++;
+
+            setTimeout(() => {
+                isAddingColor = false;
+            }, 100);
         });
     }
+
+    function isAccessoriesCategory() {
+        const categorySelect = document.getElementById('category_id');
+        if (!categorySelect) {
+            return false;
+        }
+
+        const selectedOption = categorySelect.options[categorySelect.selectedIndex];
+        const text = (selectedOption?.textContent || '').toLowerCase();
+        const slug = (selectedOption?.dataset?.slug || '').toLowerCase();
+
+        return text.includes('accessor') || slug.includes('accessor');
+    }
+
+    function toggleCategoryDependentFields() {
+        const isAccessories = isAccessoriesCategory();
+        const sleeveField = document.getElementById('sleeve-type-field');
+        const fitField = document.getElementById('fit-type-field');
+        const collectionField = document.getElementById('collection-type-field');
+        const sleeveInput = document.getElementById('sleeve_type_id');
+        const fitInput = document.getElementById('fit_type');
+
+        [sleeveField, fitField, collectionField].forEach((el) => {
+            if (el) {
+                el.style.display = isAccessories ? 'none' : '';
+            }
+        });
+
+        if (sleeveInput) {
+            sleeveInput.required = !isAccessories;
+            if (isAccessories) {
+                sleeveInput.value = '';
+            }
+        }
+
+        if (fitInput) {
+            fitInput.required = !isAccessories;
+            if (isAccessories) {
+                fitInput.value = 'regular';
+            }
+        }
+    }
+
+    const categorySelect = document.getElementById('category_id');
+    if (categorySelect) {
+        categorySelect.addEventListener('change', toggleCategoryDependentFields);
+    }
+
+    window.tinnityToggleCategoryDependentFieldsEdit = toggleCategoryDependentFields;
 
     document.querySelectorAll('.delete-color-btn').forEach((button) => {
         button.addEventListener('click', function() {
@@ -397,6 +504,33 @@ document.addEventListener('DOMContentLoaded', function() {
             form.submit();
         });
     });
+
+    const mrpInput = document.getElementById('mrp');
+    const sellingPriceInput = document.getElementById('selling_price');
+    const discountInput = document.getElementById('discount_percentage');
+
+    function updateDiscountPreview() {
+        if (!mrpInput || !sellingPriceInput || !discountInput) {
+            return;
+        }
+
+        const mrp = parseFloat(mrpInput.value);
+        const selling = parseFloat(sellingPriceInput.value);
+
+        if (!Number.isFinite(mrp) || mrp <= 0 || !Number.isFinite(selling) || selling >= mrp) {
+            discountInput.value = '0%';
+            return;
+        }
+
+        const discount = Math.round(((mrp - selling) / mrp) * 100);
+        discountInput.value = `${Math.max(discount, 0)}%`;
+    }
+
+    if (mrpInput && sellingPriceInput) {
+        mrpInput.addEventListener('input', updateDiscountPreview);
+        sellingPriceInput.addEventListener('input', updateDiscountPreview);
+        updateDiscountPreview();
+    }
 });
 
 function loadDropdownOptions() {
@@ -420,11 +554,16 @@ function populateCategoryDropdown(categories) {
         const option = document.createElement('option');
         option.value = category.id;
         option.textContent = category.name;
+        option.dataset.slug = category.slug || '';
         if (currentValue == category.id) {
             option.selected = true;
         }
         select.appendChild(option);
     });
+
+    if (typeof window.tinnityToggleCategoryDependentFieldsEdit === 'function') {
+        window.tinnityToggleCategoryDependentFieldsEdit();
+    }
 }
 
 function populateSleeveTypeDropdown(sleeveTypes) {

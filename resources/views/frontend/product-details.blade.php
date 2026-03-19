@@ -149,164 +149,77 @@
                      @php
                         $activeColors = $product->colors->where('is_active', true);
                         $colorsForImages = $activeColors->count() > 0 ? $activeColors : $product->colors;
-                        $productImages = $colorsForImages
-                           ->flatMap(function ($color) {
-                              return $color->images->whereIn('image_type', ['front', 'back']);
-                           })
-                           ->values()
-                           ->take(10);
-                        $imageCount = $productImages->count();
+                        $colorImageMap = [];
+
+                        foreach ($colorsForImages as $color) {
+                           $images = $color->images
+                              ->whereIn('image_type', ['front', 'back', 'extra'])
+                              ->sortBy(function ($image) {
+                                 return match ($image->image_type) {
+                                    'front' => 0,
+                                    'back' => 1,
+                                    default => 2,
+                                 };
+                              })
+                              ->values();
+
+                           $preparedImages = $images->map(function ($image) {
+                              return [
+                                 'url' => Storage::url($image->image_path),
+                                 'type' => $image->image_type,
+                                 'id' => $image->id,
+                              ];
+                           })->values()->all();
+
+                           if (count($preparedImages) > 0) {
+                              $colorImageMap[(string) $color->id] = $preparedImages;
+                           }
+                        }
+
+                        $defaultImage = asset('frontend/assets/img/product_category/product-cat-1.jpg');
+                        $defaultColorId = array_key_first($colorImageMap);
+                        $defaultGalleryImages = $defaultColorId ? $colorImageMap[$defaultColorId] : [];
+                        $initialMainImage = count($defaultGalleryImages) > 0 ? $defaultGalleryImages[0]['url'] : $defaultImage;
 
                         $rawDescription = trim((string) ($product->description ?? ''));
                         $normalizedDescription = preg_replace('/<br\\s*\\/?>(\\s*)/i', "\n", $rawDescription);
                         $normalizedDescription = html_entity_decode(strip_tags((string) $normalizedDescription), ENT_QUOTES, 'UTF-8');
-                        $normalizedDescription = preg_replace('/\R+/', "\n", (string) $normalizedDescription);
-                        $descriptionLines = array_values(array_filter(array_map('trim', explode("\n", (string) $normalizedDescription)), function ($line) {
-                           return $line !== '';
-                        }));
+                        $normalizedDescription = preg_replace('/\r\n?|\n/u', "\n", (string) $normalizedDescription);
+                        $normalizedDescription = trim((string) $normalizedDescription);
 
-                        $sections = [
-                           'details' => ['title' => 'Product Details', 'items' => []],
-                           'wash' => ['title' => 'Wash Care', 'items' => []],
-                           'size' => ['title' => 'Size & Fit', 'items' => []],
-                           'additional' => ['title' => 'Additional Information', 'items' => []],
-                           'description' => ['title' => 'Product Description', 'items' => []],
-                        ];
-
-                        $currentSection = null;
-
-                        foreach ($descriptionLines as $line) {
-                           $normalizedLine = strtolower(trim(preg_replace('/\s+/', ' ', $line)));
-
-                           if (str_contains($normalizedLine, 'product details')) {
-                              $currentSection = 'details';
-                              continue;
-                           }
-
-                           if (str_contains($normalizedLine, 'wash care')) {
-                              $currentSection = 'wash';
-                              continue;
-                           }
-
-                           if (str_contains($normalizedLine, 'size and fit') || str_contains($normalizedLine, 'size & fit')) {
-                              $currentSection = 'size';
-                              continue;
-                           }
-
-                           if (str_contains($normalizedLine, 'additional information') || str_contains($normalizedLine, 'please note')) {
-                              $currentSection = 'additional';
-                              continue;
-                           }
-
-                           if (str_contains($normalizedLine, 'product description')) {
-                              $currentSection = 'description';
-                              continue;
-                           }
-
-                           if (! $currentSection) {
-                              $currentSection = 'description';
-                           }
-
-                           if (preg_match('/^([^:]{2,60}):\s*(.+)$/', $line, $matches)) {
-                              $sections[$currentSection]['items'][] = [
-                                 'type' => 'pair',
-                                 'label' => trim($matches[1]),
-                                 'value' => trim($matches[2]),
-                              ];
-                           } else {
-                              $sections[$currentSection]['items'][] = [
-                                 'type' => 'text',
-                                 'value' => $line,
-                              ];
-                           }
-                        }
-
-                        $nonDescriptionCount = count($sections['details']['items']) + count($sections['wash']['items']) + count($sections['size']['items']) + count($sections['additional']['items']);
-                        $hasStructuredSections = $nonDescriptionCount > 0;
-
-                        $structuredDescriptionHtml = '';
-
-                        if ($hasStructuredSections) {
-                           $structuredDescriptionHtml .= '<div class="product-structured-desc">';
-
-                           foreach (['details', 'wash', 'size', 'additional'] as $key) {
-                              if (empty($sections[$key]['items'])) {
-                                 continue;
-                              }
-
-                              $structuredDescriptionHtml .= '<h5>' . e($sections[$key]['title']) . '</h5>';
-                              $structuredDescriptionHtml .= '<ul>';
-
-                              foreach ($sections[$key]['items'] as $item) {
-                                 if ($item['type'] === 'pair') {
-                                    $structuredDescriptionHtml .= '<li><strong class="spec-label">' . e($item['label']) . ':</strong> ' . e($item['value']) . '</li>';
-                                 } else {
-                                    $structuredDescriptionHtml .= '<li>' . e($item['value']) . '</li>';
-                                 }
-                              }
-
-                              $structuredDescriptionHtml .= '</ul>';
-                           }
-
-                           if (! empty($sections['description']['items'])) {
-                              $descParts = [];
-                              foreach ($sections['description']['items'] as $item) {
-                                 if ($item['type'] === 'pair') {
-                                    $descParts[] = $item['label'] . ': ' . $item['value'];
-                                 } else {
-                                    $descParts[] = $item['value'];
-                                 }
-                              }
-
-                              $structuredDescriptionHtml .= '<h5>' . e($sections['description']['title']) . '</h5>';
-                              $structuredDescriptionHtml .= '<p>' . e(implode(' ', $descParts)) . '</p>';
-                           }
-
-                           $structuredDescriptionHtml .= '</div>';
-                        } else {
-                           $fallbackText = $normalizedDescription !== ''
-                              ? $normalizedDescription
-                              : 'No detailed description available for this product.';
-                           $structuredDescriptionHtml = '<p>' . nl2br(e($fallbackText)) . '</p>';
-                        }
+                        $productDescription = $normalizedDescription !== ''
+                           ? $normalizedDescription
+                           : 'No detailed description available for this product.';
 
                         $summarySource = $normalizedDescription !== ''
                            ? preg_replace('/\s+/', ' ', trim($normalizedDescription))
                            : 'No description available for this product.';
-                        $productSummary = \Illuminate\Support\Str::limit((string) $summarySource, 220);
+                        $productSummary = (string) $summarySource;
+
+                        $sellingPrice = (float) ($product->selling_price ?? $product->base_price);
+                        $mrp = (float) ($product->mrp ?? $sellingPrice);
+                        $discountPercentage = (int) $product->discount_percentage;
                      @endphp
-                     <div class="product-details-tab">
-                        <div class="tab-content" id="productDetailsTab">
-                           @if($imageCount > 0)
-                              @foreach($productImages as $index => $image)
-                                 <div class="tab-pane fade {{ $index === 0 ? 'active show' : '' }}" id="pro-{{ $index + 1 }}" role="tabpanel" aria-labelledby="pro-{{ $index + 1 }}-tab">
-                                    <img class="active" src="{{ Storage::url($image->image_path) }}" alt="{{ $product->name }}">
-                                 </div>
-                              @endforeach
-                           @else
-                              <div class="tab-pane fade active show" id="pro-1" role="tabpanel" aria-labelledby="pro-1-tab">
-                                 <img class="active" src="{{ asset('frontend/assets/img/product_category/product-cat-1.jpg') }}" alt="{{ $product->name }}">
-                              </div>
+                     <div class="product-gallery-wrapper mb-25">
+                        <div class="product-main-image-wrap" id="product-main-image-wrap" title="Click to zoom">
+                           @if($discountPercentage > 0)
+                              <span class="product-discount-badge">{{ $discountPercentage }}% OFF</span>
                            @endif
+                           <img id="main-product-image" src="{{ $initialMainImage }}" alt="{{ $product->name }}">
                         </div>
-                     </div>
-                     <div class="product-details-nav">
-                        <ul class="nav nav-tabs" id="myTab" role="tablist">
-                           @if($imageCount > 0)
-                              @foreach($productImages as $index => $image)
-                                 <li class="nav-item" role="presentation">
-                                    <button class="nav-link {{ $index === 0 ? 'active' : '' }}" id="pro-{{ $index + 1 }}-tab" data-bs-toggle="tab"
-                                       data-bs-target="#pro-{{ $index + 1 }}" type="button" role="tab" aria-controls="pro-{{ $index + 1 }}"
-                                       aria-selected="{{ $index === 0 ? 'true' : 'false' }}">
-                                       <img src="{{ Storage::url($image->image_path) }}" alt="{{ $product->name }}">
+                        <ul class="product-thumbnails" id="product-thumbnails">
+                           @if(count($defaultGalleryImages) > 0)
+                              @foreach($defaultGalleryImages as $index => $galleryImage)
+                                 <li>
+                                    <button type="button" class="thumbnail-btn {{ $index === 0 ? 'active' : '' }}" data-image-url="{{ $galleryImage['url'] }}">
+                                       <img src="{{ $galleryImage['url'] }}" alt="{{ $product->name }}">
                                     </button>
                                  </li>
                               @endforeach
                            @else
-                              <li class="nav-item" role="presentation">
-                                 <button class="nav-link active" id="pro-1-tab" data-bs-toggle="tab"
-                                    data-bs-target="#pro-1" type="button" role="tab" aria-controls="pro-1" aria-selected="true">
-                                    <img src="{{ asset('frontend/assets/img/product_category/product-cat-1.jpg') }}" alt="{{ $product->name }}">
+                              <li>
+                                 <button type="button" class="thumbnail-btn active" data-image-url="{{ $defaultImage }}">
+                                    <img src="{{ $defaultImage }}" alt="{{ $product->name }}">
                                  </button>
                               </li>
                            @endif
@@ -318,9 +231,17 @@
                <div class="col-lg-6">
                   <div class="product-side-info mb-30">
                      <h4 class="product-name mb-10">{{ $product->name }}</h4>
-                     <span class="product-price">INR {{ number_format($product->price, 2) }}</span>
+                     <div class="product-price-wrap">
+                        @if($discountPercentage > 0)
+                           <span class="product-price-old">INR {{ number_format($mrp, 2) }}</span>
+                        @endif
+                        <span class="product-price">INR {{ number_format($sellingPrice, 2) }}</span>
+                     </div>
 
-                     <p class="mb-30">{{ $productSummary }}</p>
+                     <div class="mb-30">
+                        <div id="product-summary" class="product-summary collapsed">{{ $productSummary }}</div>
+                        <button type="button" id="product-summary-toggle" class="btn-link product-summary-toggle">Read More</button>
+                     </div>
                      
                      @if($product->sizes->count() > 0)
                         <div class="available-sizes mb-20">
@@ -378,7 +299,7 @@
                            <div class="product-color-options" style="display: flex; gap: 10px; flex-wrap: wrap;">
                               @foreach($product->colors->where('is_active', true) as $color)
                                  <label class="color-option" style="cursor: pointer;" title="{{ $color->color_name }}">
-                                    <input type="radio" name="product_color" value="{{ $color->id }}" style="display: none;" required>
+                                    <input type="radio" name="product_color" value="{{ $color->id }}" style="display: none;" required {{ (string) $color->id === (string) $defaultColorId ? 'checked' : '' }}>
                                     <span class="color-badge" style="width: 40px; height: 40px; display: inline-block; border-radius: 50%; background-color: {{ $color->hex_code }}; border: 3px solid #ddd; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"></span>
                                  </label>
                               @endforeach
@@ -425,7 +346,7 @@
                      <div class="tab-pane fade active show" id="nav-general" role="tabpanel">
                         <div class="tabs-wrapper mt-35">
                            <div class="product__details-des">
-                              {!! $structuredDescriptionHtml !!}
+                              <div class="product-description-content">{{ $productDescription }}</div>
                               @if($product->is_limited_edition && $product->drop_story)
                                  <div class="mt-20">
                                     <h5>Drop Story</h5>
@@ -570,8 +491,13 @@
                @forelse($relatedProducts as $relatedProduct)
                   @php($productImage = optional($relatedProduct->images->first())->image_path)
                   @php($productColors = ($relatedProduct->colors ?? collect())->where('is_active', true))
+                  @php($relatedSellingPrice = (float) ($relatedProduct->selling_price ?? $relatedProduct->base_price))
+                  @php($relatedMrp = (float) ($relatedProduct->mrp ?? $relatedSellingPrice))
+                  @php($relatedDiscountPercentage = (int) $relatedProduct->discount_percentage)
                   <div class="product-card related-product-card">
-                     @if($relatedProduct->is_limited_edition)
+                     @if($relatedDiscountPercentage > 0)
+                        <span class="badge">{{ $relatedDiscountPercentage }}% OFF</span>
+                     @elseif($relatedProduct->is_limited_edition)
                         <span class="badge">LIMITED</span>
                      @elseif($relatedProduct->created_at >= now()->subDays(30))
                         <span class="badge">NEW</span>
@@ -591,7 +517,10 @@
                      <div class="product-info">
                         <h4>{{ strtoupper($relatedProduct->name) }}</h4>
                         <div class="price">
-                           <span class="new">INR {{ number_format($relatedProduct->price, 2) }}</span>
+                           @if($relatedDiscountPercentage > 0)
+                              <span class="old">INR {{ number_format($relatedMrp, 2) }}</span>
+                           @endif
+                           <span class="new">INR {{ number_format($relatedSellingPrice, 2) }}</span>
                         </div>
                         
                      </div>
@@ -674,8 +603,144 @@
       </div>
    </div>
 
+   <!-- Product Zoom Modal -->
+   <div class="modal fade" id="productImageZoomModal" tabindex="-1" aria-labelledby="productImageZoomModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-xl">
+         <div class="modal-content">
+            <div class="modal-header">
+               <h5 class="modal-title" id="productImageZoomModalLabel">{{ $product->name }}</h5>
+               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+               <img id="zoom-modal-image" src="{{ $initialMainImage }}" alt="{{ $product->name }}" style="max-width: 100%; max-height: 75vh; object-fit: contain;">
+            </div>
+         </div>
+      </div>
+   </div>
+
    <!-- Reviews rating CSS -->
    <style>
+      .product-gallery-wrapper {
+         display: flex;
+         flex-direction: column;
+         gap: 12px;
+      }
+
+      .product-main-image-wrap {
+         width: 100%;
+         border: 1px solid #efefef;
+         overflow: hidden;
+         position: relative;
+         aspect-ratio: 1 / 1;
+         background: #f8f8f8;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         cursor: zoom-in;
+      }
+
+      .product-discount-badge {
+         position: absolute;
+         top: 12px;
+         left: 12px;
+         background: #e53935;
+         color: #fff;
+         padding: 5px 10px;
+         font-size: 12px;
+         font-weight: 700;
+         border-radius: 4px;
+         z-index: 2;
+      }
+
+      .product-main-image-wrap img {
+         width: 100%;
+         height: 100%;
+         object-fit: contain !important;
+         object-position: center;
+         display: block;
+         transition: transform 0.3s ease;
+         transform-origin: center center;
+      }
+
+      @media (hover: hover) and (pointer: fine) {
+         .product-main-image-wrap:hover {
+            cursor: grab;
+         }
+
+         .product-main-image-wrap.is-panning {
+            cursor: grabbing;
+         }
+
+         .product-main-image-wrap:hover img {
+            transform: scale(1.45);
+         }
+      }
+
+      .product-thumbnails {
+         list-style: none;
+         margin: 0;
+         padding: 0;
+         display: flex;
+         flex-wrap: wrap;
+         gap: 8px;
+      }
+
+      .product-thumbnails .thumbnail-btn {
+         border: 2px solid #e1e1e1;
+         background: #fff;
+         padding: 0;
+         width: 70px;
+         height: 70px;
+         cursor: pointer;
+         transition: border-color .25s ease;
+      }
+
+      .product-thumbnails .thumbnail-btn.active,
+      .product-thumbnails .thumbnail-btn:hover {
+         border-color: #171717;
+      }
+
+      .product-thumbnails .thumbnail-btn img {
+         width: 100%;
+         height: 100%;
+         object-fit: cover;
+      }
+
+      .product-price-wrap {
+         display: flex;
+         align-items: center;
+         gap: 10px;
+         margin-bottom: 8px;
+      }
+
+      .product-price-old {
+         color: #999;
+         text-decoration: line-through;
+         font-size: 16px;
+      }
+
+      .product-summary {
+         white-space: pre-wrap;
+         line-height: 1.75;
+      }
+
+      .product-summary.collapsed {
+         display: -webkit-box;
+         -webkit-line-clamp: 3;
+         -webkit-box-orient: vertical;
+         overflow: hidden;
+      }
+
+      .product-summary-toggle {
+         margin-top: 8px;
+         color: #171717;
+         text-decoration: underline;
+         padding: 0;
+         border: none;
+         background: none;
+         font-weight: 600;
+      }
+
       /* Related products styled like home product cards */
       .related_product {
          padding: 60px 0 60px;
@@ -741,6 +806,15 @@
 
       .related_product .price {
          font-size: 14px;
+         display: flex;
+         gap: 8px;
+         align-items: center;
+         flex-wrap: wrap;
+      }
+
+      .related_product .price .old {
+         color: #999;
+         text-decoration: line-through;
       }
 
       .related_product .price .new {
@@ -830,38 +904,13 @@
          }
       }
 
-      .product-structured-desc h5 {
-         font-size: 18px;
-         font-weight: 700;
-         margin: 0 0 10px;
-      }
-
-      .product-structured-desc ul {
-         margin: 0 0 18px;
-         padding-left: 20px;
-      }
-
-      .product-structured-desc li {
-         margin-bottom: 8px;
-         line-height: 1.6;
-      }
-
-      .product-structured-desc p {
-         margin: 0 0 16px;
+      .product-description-content {
+         white-space: pre-line;
          line-height: 1.8;
       }
 
-      .product-structured-desc .spec-label {
-         font-weight: 700;
-      }
-
       @media (max-width: 576px) {
-         .product-structured-desc h5 {
-            font-size: 16px;
-         }
-
-         .product-structured-desc li,
-         .product-structured-desc p {
+         .product-description-content {
             font-size: 14px;
             line-height: 1.65;
          }
@@ -1060,6 +1109,133 @@
    <!-- Product Details JavaScript -->
    <script>
       document.addEventListener('DOMContentLoaded', function() {
+         const galleryDataElement = document.getElementById('product-gallery-data');
+         const galleryData = galleryDataElement ? JSON.parse(galleryDataElement.textContent || '{}') : {};
+         const fallbackImage = '{{ $defaultImage }}';
+         const mainImage = document.getElementById('main-product-image');
+         const thumbnailsContainer = document.getElementById('product-thumbnails');
+         const summaryElement = document.getElementById('product-summary');
+         const summaryToggle = document.getElementById('product-summary-toggle');
+         const zoomModalImage = document.getElementById('zoom-modal-image');
+         const mainImageWrap = document.getElementById('product-main-image-wrap');
+
+         function setMainImage(url) {
+            if (!mainImage) {
+               return;
+            }
+
+            const finalUrl = url || fallbackImage;
+            mainImage.src = finalUrl;
+            if (zoomModalImage) {
+               zoomModalImage.src = finalUrl;
+            }
+         }
+
+         function renderThumbnails(images) {
+            if (!thumbnailsContainer) {
+               return;
+            }
+
+            const safeImages = Array.isArray(images) && images.length > 0
+               ? images
+               : [{ url: fallbackImage, type: 'front', id: 'fallback' }];
+
+            thumbnailsContainer.innerHTML = '';
+
+            safeImages.forEach((image, index) => {
+               const li = document.createElement('li');
+               const button = document.createElement('button');
+               const thumbImage = document.createElement('img');
+
+               button.type = 'button';
+               button.className = `thumbnail-btn${index === 0 ? ' active' : ''}`;
+               button.dataset.imageUrl = image.url;
+
+               thumbImage.src = image.url;
+               thumbImage.alt = '{{ $product->name }}';
+
+               button.appendChild(thumbImage);
+               li.appendChild(button);
+               thumbnailsContainer.appendChild(li);
+
+               button.addEventListener('click', function() {
+                  setMainImage(image.url);
+                  thumbnailsContainer.querySelectorAll('.thumbnail-btn').forEach((btn) => btn.classList.remove('active'));
+                  button.classList.add('active');
+               });
+            });
+
+            setMainImage(safeImages[0].url);
+         }
+
+         function updateGalleryByColor(colorId) {
+            const images = galleryData[String(colorId)] || [];
+            renderThumbnails(images);
+         }
+
+         if (summaryElement && summaryToggle) {
+            const shouldHideToggle = summaryElement.scrollHeight <= summaryElement.clientHeight + 2;
+            if (shouldHideToggle) {
+               summaryToggle.style.display = 'none';
+            }
+
+            summaryToggle.addEventListener('click', function() {
+               const isCollapsed = summaryElement.classList.contains('collapsed');
+               summaryElement.classList.toggle('collapsed', !isCollapsed);
+               summaryToggle.textContent = isCollapsed ? 'Read Less' : 'Read More';
+            });
+         }
+
+         if (mainImageWrap) {
+            const updateZoomOrigin = function(event) {
+               if (!mainImage) {
+                  return;
+               }
+
+               const rect = mainImageWrap.getBoundingClientRect();
+               if (rect.width <= 0 || rect.height <= 0) {
+                  return;
+               }
+
+               const x = ((event.clientX - rect.left) / rect.width) * 100;
+               const y = ((event.clientY - rect.top) / rect.height) * 100;
+               const clampedX = Math.max(0, Math.min(100, x));
+               const clampedY = Math.max(0, Math.min(100, y));
+               mainImage.style.transformOrigin = `${clampedX}% ${clampedY}%`;
+            };
+
+            mainImageWrap.addEventListener('mousemove', updateZoomOrigin);
+            mainImageWrap.addEventListener('mouseleave', function() {
+               if (mainImage) {
+                  mainImage.style.transformOrigin = 'center center';
+               }
+               mainImageWrap.classList.remove('is-panning');
+            });
+
+            mainImageWrap.addEventListener('mousedown', function(event) {
+               if (event.button !== 0) {
+                  return;
+               }
+               mainImageWrap.classList.add('is-panning');
+            });
+
+            window.addEventListener('mouseup', function() {
+               mainImageWrap.classList.remove('is-panning');
+            });
+
+            mainImageWrap.addEventListener('click', function() {
+               if (!window.bootstrap) {
+                  return;
+               }
+               const modalElement = document.getElementById('productImageZoomModal');
+               if (!modalElement) {
+                  return;
+               }
+               const modal = new window.bootstrap.Modal(modalElement);
+               modal.show();
+            });
+         }
+
          // Quantity button functionality
          const quantityInput = document.getElementById('product-quantity');
          const plusButton = document.querySelector('.cart-plus');
@@ -1182,8 +1358,16 @@
                const radio = this.querySelector('input[type="radio"]');
                radio.checked = true;
                removeError('color');
+               updateGalleryByColor(radio.value);
             });
          });
+
+         const selectedColorInput = document.querySelector('input[name="product_color"]:checked');
+         if (selectedColorInput) {
+            updateGalleryByColor(selectedColorInput.value);
+         } else {
+            renderThumbnails([]);
+         }
          
          // Add validation function to window so cart-wishlist.js can use it
          window.validateProductSelection = function() {
@@ -1243,4 +1427,5 @@
          }
       });
    </script>
+   <script id="product-gallery-data" type="application/json">{!! json_encode($colorImageMap) !!}</script>
 @endsection

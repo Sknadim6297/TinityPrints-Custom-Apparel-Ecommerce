@@ -74,7 +74,9 @@
     .limited-card:hover .limited-image-wrap img { transform: scale(1.05); }
 
     .limited-badge { position: absolute; top: 12px; left: 12px; z-index: 2; background: #111; color: #fff; font-size: 11px; font-weight: 700; padding: 4px 10px; letter-spacing: .5px; text-transform: uppercase; }
-    .limited-wishlist { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; border-radius: 50%; border: none; background: #fff; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,.2); z-index: 2; }
+    .limited-badge.badge-promo { background: #e53935; }
+    .limited-badge.badge-edition { left: auto; right: 12px; }
+    .limited-wishlist { position: absolute; top: 52px; right: 12px; width: 36px; height: 36px; border-radius: 50%; border: none; background: #fff; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,.2); z-index: 2; }
     .limited-cta { position: absolute; bottom: -50px; left: 0; width: 100%; background: #000; color: #fff; text-align: center; border: none; padding: 13px; font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; transition: bottom .3s ease; }
     .limited-card:hover .limited-cta { bottom: 0; }
 
@@ -82,7 +84,9 @@
     .limited-name { font-size: 14px; font-weight: 700; margin-bottom: 6px; line-height: 1.35; }
     .limited-name a { color: #111; text-decoration: none; }
     .limited-name a:hover { color: #555; }
-    .limited-price { font-size: 14px; color: #e53935; font-weight: 700; margin-bottom: 6px; }
+    .limited-price { font-size: 14px; margin-bottom: 6px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .limited-price-old { color: #999; text-decoration: line-through; font-weight: 500; }
+    .limited-price-new { color: #e53935; font-weight: 700; }
     .limited-meta { font-size: 12px; color: #777; text-transform: none; letter-spacing: .2px; }
 
     .limited-empty { text-align: center; border: 1px dashed #ddd; padding: 40px 20px; color: #666; }
@@ -168,10 +172,16 @@
             $imageUrl = $productImage
                ? (\Illuminate\Support\Str::startsWith($productImage, ['http://', 'https://']) ? $productImage : Storage::url($productImage))
                : asset('frontend/assets/img/product_category/product-cat-6.jpeg');
+            $sellingPrice = (float) ($product->selling_price ?? $product->base_price);
+            $mrp = (float) ($product->mrp ?? $sellingPrice);
+            $discountPercentage = (int) $product->discount_percentage;
          @endphp
          <div class="limited-card">
             <div class="limited-image-wrap">
-               <span class="limited-badge">{{ $limitedEditionConfig['badge_text'] ?? 'LIMITED' }}</span>
+               @if($discountPercentage > 0)
+                  <span class="limited-badge badge-promo">{{ $discountPercentage }}% OFF</span>
+               @endif
+               <span class="limited-badge badge-edition">{{ $limitedEditionConfig['badge_text'] ?? 'LIMITED' }}</span>
                <button type="button" class="limited-wishlist add-to-wishlist-btn" data-product-id="{{ $product->id }}" aria-label="Add to wishlist" onclick="return window.tinnityToggleWishlist(event, this);">
                   <i class="far fa-heart"></i>
                </button>
@@ -182,7 +192,12 @@
             </div>
             <div class="limited-info">
                <div class="limited-name"><a href="{{ route('product.details', $product->id) }}">{{ $product->name }}</a></div>
-               <div class="limited-price">INR {{ number_format($product->price, 2) }}</div>
+               <div class="limited-price">
+                  @if($discountPercentage > 0)
+                     <span class="limited-price-old">INR {{ number_format($mrp, 2) }}</span>
+                  @endif
+                  <span class="limited-price-new">INR {{ number_format($sellingPrice, 2) }}</span>
+               </div>
                @if($product->drop_name || $product->drop_month)
                <div class="limited-meta">
                   @if($product->drop_name)

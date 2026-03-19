@@ -17,6 +17,8 @@ class Product extends Model
         'sleeve_type',
         'sleeve_type_id',
         'collection_type_id',
+        'mrp',
+        'selling_price',
         'base_price',
         'is_limited_edition',
         'drop_month',
@@ -35,6 +37,8 @@ class Product extends Model
     protected $casts = [
         'is_limited_edition' => 'boolean',
         'is_active' => 'boolean',
+        'mrp' => 'decimal:2',
+        'selling_price' => 'decimal:2',
         'base_price' => 'decimal:2',
         'rating' => 'decimal:1',
         'drop_start_at' => 'datetime',
@@ -42,6 +46,21 @@ class Product extends Model
         'countdown_enabled' => 'boolean',
         'auto_hide_out_of_stock' => 'boolean',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Automatically sync category string when category_id is set
+        static::saving(function ($product) {
+            if ($product->category_id) {
+                $category = Category::find($product->category_id);
+                if ($category) {
+                    $product->category = $category->slug;
+                }
+            }
+        });
+    }
 
     public function colors()
     {
@@ -101,7 +120,19 @@ class Product extends Model
     // Getter for price (using base_price)
     public function getPriceAttribute()
     {
-        return $this->base_price;
+        return $this->selling_price ?? $this->base_price;
+    }
+
+    public function getDiscountPercentageAttribute(): int
+    {
+        $mrp = (float) ($this->mrp ?? 0);
+        $sellingPrice = (float) ($this->selling_price ?? $this->base_price ?? 0);
+
+        if ($mrp <= 0 || $sellingPrice >= $mrp) {
+            return 0;
+        }
+
+        return (int) round((($mrp - $sellingPrice) / $mrp) * 100);
     }
 
     // Getter for stock_quantity (total stock)
@@ -113,7 +144,11 @@ class Product extends Model
     // Method to get sale price if applicable
     public function getSalePriceAttribute()
     {
-        // You can add sale price logic here
+        $sellingPrice = $this->selling_price ?? $this->base_price;
+        if ($this->discount_percentage > 0) {
+            return $sellingPrice;
+        }
+
         return null;
     }
 }

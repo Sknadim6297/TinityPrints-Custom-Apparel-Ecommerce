@@ -132,8 +132,12 @@ class HomeController extends Controller
 
             $query->where(function ($productQuery) use ($categoryFilter, $selectedCategory) {
                 if ($selectedCategory) {
+                    // Use category_id as primary filter if available, fall back to old category string
                     $productQuery->where('category_id', $selectedCategory->id)
-                        ->orWhere('category', $categoryFilter);
+                        ->orWhere(function ($q) use ($categoryFilter) {
+                            $q->whereNull('category_id')
+                              ->where('category', $categoryFilter);
+                        });
 
                     return;
                 }
@@ -193,12 +197,12 @@ class HomeController extends Controller
             });
         }
 
-        // Price range filter
+        // Price range filter (use selling price if available)
         if ($request->filled('min_price')) {
-            $query->where('base_price', '>=', (float) $request->min_price);
+            $query->whereRaw('COALESCE(selling_price, base_price) >= ?', [(float) $request->min_price]);
         }
         if ($request->filled('max_price')) {
-            $query->where('base_price', '<=', (float) $request->max_price);
+            $query->whereRaw('COALESCE(selling_price, base_price) <= ?', [(float) $request->max_price]);
         }
 
         // Sleeve Type filter
@@ -226,10 +230,10 @@ class HomeController extends Controller
         $sortBy = $request->get('sort', 'default');
         switch ($sortBy) {
             case 'price_low':
-                $query->orderBy('base_price', 'asc');
+                $query->orderByRaw('COALESCE(selling_price, base_price) asc');
                 break;
             case 'price_high':
-                $query->orderBy('base_price', 'desc');
+                $query->orderByRaw('COALESCE(selling_price, base_price) desc');
                 break;
             case 'newest':
                 $query->orderBy('created_at', 'desc');
@@ -327,7 +331,7 @@ class HomeController extends Controller
             ? 'Limited Edition'
             : ($selectedCollection?->name ?? $selectedCategory?->name ?? ($category ? ucwords(str_replace(['-', '_'], ' ', $category)) : 'Shop'));
 
-        $maxPrice = (int) ceil(Product::where('is_active', true)->max('base_price') ?? 5000);
+        $maxPrice = (int) ceil(Product::where('is_active', true)->max('selling_price') ?? Product::where('is_active', true)->max('base_price') ?? 5000);
         $maxPrice = max($maxPrice, 500);
 
         return view('frontend.shop', compact(
@@ -358,7 +362,7 @@ class HomeController extends Controller
      */
     public function productDetails($id)
     {
-        $product = Product::with(['colors.images', 'sizes'])->findOrFail($id);
+        $product = Product::with(['colors.images', 'sizes', 'category', 'sleeveType', 'collectionType'])->findOrFail($id);
         $relatedProducts = Product::with(['images', 'colors'])
             ->where('id', '!=', $id)
             ->where('is_active', true)

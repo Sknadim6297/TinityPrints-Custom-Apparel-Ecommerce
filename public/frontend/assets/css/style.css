@@ -54,6 +54,11 @@ body {
   line-height: 26px;
 }
 
+html,
+body {
+  overflow-x: hidden;
+}
+
 a {
   text-decoration: none;
 }
@@ -3749,7 +3754,10 @@ div.tagcloud a:hover {
   align-items: center;
   background-size: cover;
   background-repeat: no-repeat;
-  background-position: center;
+  background-position: center center;
+  background-attachment: scroll;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 .page-title {

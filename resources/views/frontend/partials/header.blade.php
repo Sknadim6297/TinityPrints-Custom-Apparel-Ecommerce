@@ -1,9 +1,16 @@
    <!-- header area start  -->
    <header class="header3">
-      <div class="header-note">
-         <p>Further reductions: enjoy an extra <span>20%</span> off our Sale and free home delivery</p>
-         <span class="note-close-btn"><i class="flaticon-cancel"></i></span>
-      </div>
+      <div class="top-note-bar">
+    <div class="scroll-text">
+        <p>
+            Further reductions: enjoy an extra <span>20%</span> off our Sale and free home delivery
+        </p>
+    </div>
+
+    <span class="note-close-btn">
+        <i class="flaticon-cancel"></i>
+    </span>
+</div>
       <div class="header3-top d-none d-lg-block">
          <div class="container header-container">
             <div class="row align-items-center">
@@ -315,6 +322,48 @@
    <main>
 
    <style>
+   
+   .top-note-bar{
+    position: relative;
+    overflow: hidden;
+    background: #95814f;
+    color: #fff;
+    padding: 10px 40px;
+}
+
+.scroll-text{
+    white-space: nowrap;
+    display: inline-block;
+    animation: scrollText 12s linear infinite;
+}
+
+.scroll-text p{
+    margin: 0;
+    font-size: 15px;
+        color: white;
+}
+
+.scroll-text span{
+    color: #ff4a4a;
+    font-weight: 600;
+}
+
+.note-close-btn{
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+@keyframes scrollText{
+    0%{
+        transform: translateX(100%);
+    }
+    100%{
+        transform: translateX(-100%);
+    }
+}
       .main-menu3 .shop-menu-item {
          position: relative;
       }

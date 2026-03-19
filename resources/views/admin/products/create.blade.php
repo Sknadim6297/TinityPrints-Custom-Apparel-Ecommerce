@@ -81,7 +81,7 @@
                     </div>
 
                     <!-- Sleeve Type -->
-                    <div>
+                    <div id="sleeve-type-field">
                         <label for="sleeve_type_id" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                             Sleeve Type *
                         </label>
@@ -96,15 +96,15 @@
                         @enderror
                     </div>
 
-                    <!-- Collection Type -->
-                    <div>
+                    <!-- Collection Type / Fabric -->
+                    <div id="collection-type-field">
                         <label for="collection_type_id" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                            Collection Type
+                            Fabric
                         </label>
                         <select id="collection_type_id" 
                                 name="collection_type_id"
                                 class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400 transition-all duration-200">
-                            <option value="">Select Collection Type (Optional)</option>
+                            <option value="">Select Fabric (Optional)</option>
                         </select>
                         @error('collection_type_id')
                             <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
@@ -112,7 +112,7 @@
                     </div>
 
                     <!-- Fit Type -->
-                    <div>
+                    <div id="fit-type-field">
                         <label for="fit_type" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                             Fit Type *
                         </label>
@@ -129,23 +129,53 @@
                         @enderror
                     </div>
 
-                    <!-- Base Price -->
+                    <!-- MRP -->
                     <div>
-                        <label for="base_price" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                            Base Price (₹) *
+                        <label for="mrp" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                            MRP (₹) *
                         </label>
-                        <input id="base_price" 
+                        <input id="mrp" 
                                type="number" 
-                               name="base_price" 
-                               value="{{ old('base_price') }}"
+                               name="mrp" 
+                               value="{{ old('mrp', old('base_price')) }}"
                                step="0.01"
                                min="0.01"
                                required
                                class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400 transition-all duration-200"
-                               placeholder="29.99">
-                        @error('base_price')
+                               placeholder="1299.00">
+                        @error('mrp')
                             <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                         @enderror
+                    </div>
+
+                    <!-- Selling Price -->
+                    <div>
+                        <label for="selling_price" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                            Selling Price (₹) *
+                        </label>
+                        <input id="selling_price" 
+                               type="number" 
+                               name="selling_price" 
+                               value="{{ old('selling_price', old('base_price')) }}"
+                               step="0.01"
+                               min="0.01"
+                               required
+                               class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400 transition-all duration-200"
+                               placeholder="999.00">
+                        @error('selling_price')
+                            <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label for="discount_percentage" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                            Discount (%)
+                        </label>
+                        <input id="discount_percentage"
+                               type="text"
+                               value="0%"
+                               readonly
+                               class="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none">
                     </div>
 
                     <!-- Drop Month -->
@@ -380,6 +410,18 @@
                                        class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400">
                                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Max 5MB. Recommended: 1000x1200px</p>
                             </div>
+
+                            <div class="sm:col-span-2">
+                                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                                    Extra Images
+                                </label>
+                                <input type="file"
+                                       name="colors[0][extra_images][]"
+                                       accept="image/*"
+                                       multiple
+                                       class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400">
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Upload multiple gallery images (optional).</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -441,37 +483,128 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Add color function
     let colorIndex = 1;
-    document.getElementById('add-color-btn').addEventListener('click', function() {
-        const container = document.getElementById('colors-container');
-        const template = container.firstElementChild.cloneNode(true);
+    let isAddingColor = false;
+    const addColorBtn = document.getElementById('add-color-btn');
+
+    if (addColorBtn && addColorBtn.dataset.bound !== '1') {
+        addColorBtn.dataset.bound = '1';
+        addColorBtn.addEventListener('click', function() {
+            if (isAddingColor) {
+                return;
+            }
+            isAddingColor = true;
+
+            const container = document.getElementById('colors-container');
+            const template = container.firstElementChild.cloneNode(true);
         
-        // Update all input names to use new index
-        template.querySelectorAll('input').forEach(input => {
-            const name = input.getAttribute('name');
-            if (name) {
-                const newName = name.replace(/\[\d+\]/, `[${colorIndex}]`);
-                input.setAttribute('name', newName);
-                // Keep default color for color picker, clear others
-                if (input.type !== 'color') {
-                    input.value = '';
+            // Update all input names to use new index
+            template.querySelectorAll('input').forEach(input => {
+                const name = input.getAttribute('name');
+                if (name) {
+                    const newName = name.replace(/\[\d+\]/, `[${colorIndex}]`);
+                    input.setAttribute('name', newName);
+                    // Keep default color for color picker, clear others
+                    if (input.type !== 'color') {
+                        input.value = '';
+                    }
                 }
+            });
+
+            // Add remove button
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'mt-4 inline-flex items-center px-3 py-2 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors duration-200 font-medium text-sm';
+            removeBtn.innerHTML = '<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg> Remove Color';
+            removeBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                template.remove();
+            });
+
+            template.appendChild(removeBtn);
+            container.appendChild(template);
+            colorIndex++;
+
+            setTimeout(() => {
+                isAddingColor = false;
+            }, 100);
+        });
+    }
+
+    function isAccessoriesCategory() {
+        const categorySelect = document.getElementById('category_id');
+        if (!categorySelect) {
+            return false;
+        }
+
+        const selectedOption = categorySelect.options[categorySelect.selectedIndex];
+        const text = (selectedOption?.textContent || '').toLowerCase();
+        const slug = (selectedOption?.dataset?.slug || '').toLowerCase();
+
+        return text.includes('accessor') || slug.includes('accessor');
+    }
+
+    function toggleCategoryDependentFields() {
+        const isAccessories = isAccessoriesCategory();
+        const sleeveField = document.getElementById('sleeve-type-field');
+        const fitField = document.getElementById('fit-type-field');
+        const collectionField = document.getElementById('collection-type-field');
+        const sleeveInput = document.getElementById('sleeve_type_id');
+        const fitInput = document.getElementById('fit_type');
+
+        [sleeveField, fitField, collectionField].forEach((el) => {
+            if (el) {
+                el.style.display = isAccessories ? 'none' : '';
             }
         });
 
-        // Add remove button
-        const removeBtn = document.createElement('button');
-        removeBtn.type = 'button';
-        removeBtn.className = 'mt-4 inline-flex items-center px-3 py-2 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors duration-200 font-medium text-sm';
-        removeBtn.innerHTML = '<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg> Remove Color';
-        removeBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            template.remove();
-        });
+        if (sleeveInput) {
+            sleeveInput.required = !isAccessories;
+            if (isAccessories) {
+                sleeveInput.value = '';
+            }
+        }
 
-        template.appendChild(removeBtn);
-        container.appendChild(template);
-        colorIndex++;
-    });
+        if (fitInput) {
+            fitInput.required = !isAccessories;
+            if (isAccessories) {
+                fitInput.value = 'regular';
+            }
+        }
+    }
+
+    const categorySelect = document.getElementById('category_id');
+    if (categorySelect) {
+        categorySelect.addEventListener('change', toggleCategoryDependentFields);
+    }
+
+    window.tinnityToggleCategoryDependentFields = toggleCategoryDependentFields;
+
+    const mrpInput = document.getElementById('mrp');
+    const sellingPriceInput = document.getElementById('selling_price');
+    const discountInput = document.getElementById('discount_percentage');
+
+    function updateDiscountPreview() {
+        if (!mrpInput || !sellingPriceInput || !discountInput) {
+            return;
+        }
+
+        const mrp = parseFloat(mrpInput.value);
+        const selling = parseFloat(sellingPriceInput.value);
+
+        if (!Number.isFinite(mrp) || mrp <= 0 || !Number.isFinite(selling) || selling >= mrp) {
+            discountInput.value = '0%';
+            return;
+        }
+
+        const discount = Math.round(((mrp - selling) / mrp) * 100);
+        discountInput.value = `${Math.max(discount, 0)}%`;
+    }
+
+    if (mrpInput && sellingPriceInput) {
+        mrpInput.addEventListener('input', updateDiscountPreview);
+        sellingPriceInput.addEventListener('input', updateDiscountPreview);
+        updateDiscountPreview();
+    }
 });
 
 // Load dropdown options from API
@@ -500,11 +633,16 @@ function populateCategoryDropdown(categories) {
         const option = document.createElement('option');
         option.value = category.id;
         option.textContent = category.name;
+        option.dataset.slug = category.slug || '';
         if (oldValue == category.id) {
             option.selected = true;
         }
         select.appendChild(option);
     });
+
+    if (typeof window.tinnityToggleCategoryDependentFields === 'function') {
+        window.tinnityToggleCategoryDependentFields();
+    }
 }
 
 function populateSleeveTypeDropdown(sleeveTypes) {

@@ -576,6 +576,12 @@
             z-index: 2;
         }
 
+        .badge.badge-limited {
+            left: auto;
+            right: 10px;
+            background: #1a1a1a;
+        }
+
         .wishlist {
             position: absolute;
             right: 10px;
@@ -1209,9 +1215,21 @@
                         $productImage = $productImagePath
                             ? Storage::url($productImagePath)
                             : 'https://via.placeholder.com/600x800?text=Product+Image';
+                        $sellingPrice = (float) ($product->selling_price ?? $product->base_price);
+                        $mrp = (float) ($product->mrp ?? $sellingPrice);
+                        $discountPercentage = (int) $product->discount_percentage;
                     @endphp
                     <div class="product-card">
+<<<<<<< HEAD
                         <span class="badge">{{ $product->is_limited_edition ? ($limitedEditionConfig['badge_text'] ?? 'LIMITED') : 'TRENDING' }}</span>
+=======
+                        @if($discountPercentage > 0)
+                            <span class="badge">{{ $discountPercentage }}% OFF</span>
+                        @endif
+                        @if($product->is_limited_edition)
+                            <span class="badge badge-limited">{{ $limitedEditionConfig['badge_text'] ?? 'LIMITED' }}</span>
+                        @endif
+>>>>>>> 72dff39 (changes)
                         <button type="button" class="wishlist add-to-wishlist-btn" data-product-id="{{ $product->id }}" aria-label="Add to wishlist" onclick="return window.tinnityToggleWishlist(event, this);">
                             <i class="far fa-heart"></i>
                         </button>
@@ -1224,7 +1242,10 @@
                         <div class="product-info">
                             <h4>{{ strtoupper($product->name) }}</h4>
                             <div class="price">
-                                <span class="new">Rs.{{ number_format((float) $product->price, 2) }}</span>
+                                @if($discountPercentage > 0)
+                                    <span class="old">Rs.{{ number_format($mrp, 2) }}</span>
+                                @endif
+                                <span class="new">Rs.{{ number_format($sellingPrice, 2) }}</span>
                             </div>
                         </div>
                     </div>
@@ -1274,9 +1295,15 @@
                         $limitedImage = $limitedImagePath
                             ? Storage::url($limitedImagePath)
                             : 'https://via.placeholder.com/600x800?text=Limited+Edition';
+                        $sellingPrice = (float) ($product->selling_price ?? $product->base_price);
+                        $mrp = (float) ($product->mrp ?? $sellingPrice);
+                        $discountPercentage = (int) $product->discount_percentage;
                     @endphp
                     <div class="product-card">
-                        <span class="badge">{{ $limitedEditionConfig['badge_text'] ?? 'LIMITED' }}</span>
+                        @if($discountPercentage > 0)
+                            <span class="badge">{{ $discountPercentage }}% OFF</span>
+                        @endif
+                        <span class="badge badge-limited">{{ $limitedEditionConfig['badge_text'] ?? 'LIMITED' }}</span>
                         <button type="button" class="wishlist add-to-wishlist-btn" data-product-id="{{ $product->id }}" aria-label="Add to wishlist" onclick="return window.tinnityToggleWishlist(event, this);">
                             <i class="far fa-heart"></i>
                         </button>
@@ -1289,7 +1316,10 @@
                         <div class="product-info">
                             <h4>{{ strtoupper($product->name) }}</h4>
                             <div class="price">
-                                <span class="new">Rs.{{ number_format((float) $product->price, 2) }}</span>
+                                @if($discountPercentage > 0)
+                                    <span class="old">Rs.{{ number_format($mrp, 2) }}</span>
+                                @endif
+                                <span class="new">Rs.{{ number_format($sellingPrice, 2) }}</span>
                             </div>
                         </div>
                     </div>

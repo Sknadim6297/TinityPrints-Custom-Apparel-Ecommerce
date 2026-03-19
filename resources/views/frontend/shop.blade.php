@@ -1,4 +1,4 @@
-﻿@extends('frontend.layout.app')
+@extends('frontend.layout.app')
 
 @section('title', ($pageTitle ?? 'Shop') === 'Shop' ? 'Shop' : ($pageTitle ?? 'Shop') . ' - Shop')
 
@@ -66,7 +66,7 @@
         .product-image img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s ease; }
         .product-card:hover .product-image img { transform: scale(1.05); }
         .product-badge { position: absolute; top: 12px; left: 12px; background: #ff3b30; color: #fff; font-size: 11px; font-weight: 600; padding: 4px 10px; letter-spacing: .5px; z-index: 2; }
-        .product-badge.badge-limited { background: #1a1a1a; }
+        .product-badge.badge-limited { background: #1a1a1a; left: auto; right: 12px; }
 
         .wishlist-btn { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; border-radius: 50%; border: none; background: #fff; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,.2); z-index: 2; transition: background .2s; display: flex; align-items: center; justify-content: center; font-size: 15px; }
         .wishlist-btn:hover { background: #ffe4e4; }
@@ -79,8 +79,9 @@
         .product-title { font-size: 13px; font-weight: 600; margin-bottom: 6px; line-height: 1.4; }
         .product-title a { text-decoration: none; color: #111; }
         .product-title a:hover { color: #555; }
-        .product-price { font-size: 13px; }
-        .base-price { color: #333; font-weight: 600; }
+        .product-price { font-size: 13px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .price-old { color: #999; text-decoration: line-through; }
+        .price-new { color: #e53935; font-weight: 700; }
         .product-category-tag { font-size: 11px; color: #aaa; margin-top: 4px; text-transform: uppercase; letter-spacing: .4px; }
 
         .no-products { text-align: center; padding: 80px 20px; color: #888; }
@@ -394,10 +395,17 @@
                                     $imgUrl   = $firstImg
                                         ? asset('storage/' . $firstImg->image_path)
                                         : asset('frontend/assets/img/product_category/product-cat-6.jpeg');
+                                    $sellingPrice = (float) ($product->selling_price ?? $product->base_price);
+                                    $mrp = (float) ($product->mrp ?? $sellingPrice);
+                                    $discountPercentage = (int) $product->discount_percentage;
                                 @endphp
 
                                 <div class="product-card">
                                     <div class="product-image">
+
+                                        @if($discountPercentage > 0)
+                                            <span class="product-badge">{{ $discountPercentage }}% OFF</span>
+                                        @endif
 
                                         @if($product->is_limited_edition)
                                             <span class="product-badge badge-limited">LIMITED</span>
@@ -416,7 +424,7 @@
 
                                         <button class="add-cart-btn" type="button"
                                             onclick="window.location='{{ route('product.details', $product->id) }}'">
-                                            SELECT OPTIONS
+                                            VIEW PRODUCT
                                         </button>
 
                                     </div>
@@ -426,7 +434,10 @@
                                             <a href="{{ route('product.details', $product->id) }}">{{ $product->name }}</a>
                                         </h4>
                                         <div class="product-price">
-                                            <span class="base-price">Rs.{{ number_format($product->base_price, 2) }}</span>
+                                            @if($discountPercentage > 0)
+                                                <span class="price-old">Rs.{{ number_format($mrp, 2) }}</span>
+                                            @endif
+                                            <span class="price-new">Rs.{{ number_format($sellingPrice, 2) }}</span>
                                         </div>
                                         @if($product->relationLoaded('category') && $product->getRelation('category'))
                                             <div class="product-category-tag">{{ $product->getRelation('category')->name }}</div>
