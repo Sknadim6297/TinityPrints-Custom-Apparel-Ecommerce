@@ -10,10 +10,26 @@ use App\Http\Controllers\Frontend\OrderController;
 use App\Http\Controllers\Frontend\CustomDesignController;
 use App\Http\Controllers\Frontend\StockAlertController;
 use App\Http\Controllers\Frontend\DropdownController;
+use App\Http\Controllers\Frontend\PaymentController;
 use App\Http\Controllers\Frontend\BlogController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
+
+// Simple health check and Razorpay test (for debugging)
+Route::get('/payment/test-razorpay', function () {
+    try {
+        $apiInstance = new \Razorpay\Api\Api('test_key', 'test_secret');
+        return response()->json(['success' => true, 'message' => 'Razorpay SDK is properly loaded']);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+            'class_exists' => class_exists('Razorpay\Api\Api'),
+            'file' => __FILE__,
+        ], 500);
+    }
+});
 
 // Frontend Routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -80,6 +96,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
     Route::get('/order-success/{order}', [CheckoutController::class, 'success'])->name('order.success');
+    
+    // Payment Routes (Razorpay Integration)
+    Route::post('/payment/create-razorpay-order/{order}', [PaymentController::class, 'createRazorpayOrder'])->name('payment.create-order');
+    Route::post('/payment/callback', [PaymentController::class, 'handleCallback'])->name('payment.callback');
+    Route::post('/payment/failure', [PaymentController::class, 'handleFailure'])->name('payment.failure');
+    Route::get('/payment/success/{order}', [PaymentController::class, 'success'])->name('payment.success');
+    Route::get('/payment/failed/{order}', [PaymentController::class, 'failure'])->name('payment.failure-page');
+    Route::get('/payment/status/{order}', [PaymentController::class, 'getPaymentStatus'])->name('payment.status');
+    Route::get('/payment/test-config', [PaymentController::class, 'testConfig'])->name('payment.test-config');
 });
 
 // Auth Routes - Redirect dashboard to home for regular users

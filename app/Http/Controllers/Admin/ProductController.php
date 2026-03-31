@@ -429,6 +429,21 @@ class ProductController extends Controller
             }
         }
 
+        // Handle deletion of extra images marked in the edit form
+        $deletedIds = array_filter((array) $request->input('delete_extra_images', []));
+        if (!empty($deletedIds)) {
+            $images = ProductImage::whereIn('id', $deletedIds)->get();
+            foreach ($images as $img) {
+                // Ensure the image belongs to this product
+                if ($img->color && $img->color->product_id == $product->id) {
+                    // Delete file from storage
+                    Storage::disk('public')->delete($img->image_path);
+                    // Delete DB record
+                    $img->delete();
+                }
+            }
+        }
+
         $existingNormalizedColorNames = $product->colors()
             ->pluck('color_name')
             ->map(fn ($name) => strtolower(trim((string) $name)))

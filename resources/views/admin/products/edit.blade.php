@@ -270,9 +270,13 @@
                                             $extraImages = $color->images->where('image_type', 'extra');
                                         @endphp
                                         @if($extraImages->count() > 0)
-                                            <div class="flex flex-wrap gap-2 mb-2">
+                                            <div class="flex flex-wrap gap-2 mb-2 extra-images-edit-container">
                                                 @foreach($extraImages as $extraImage)
-                                                    <img src="{{ asset('storage/' . $extraImage->image_path) }}" alt="Extra image" class="w-16 h-16 object-cover rounded-lg border border-gray-300 dark:border-gray-600">
+                                                    <div class="relative extra-image-wrapper" data-image-id="{{ $extraImage->id }}">
+                                                        <img src="{{ asset('storage/' . $extraImage->image_path) }}" alt="Extra image" class="w-16 h-16 object-cover rounded-lg border border-gray-300 dark:border-gray-600">
+                                                        <button type="button" class="absolute top-0 right-0 bg-white bg-opacity-80 rounded-full px-1 text-red-600 hover:bg-red-100 extra-image-delete-btn" title="Remove image" style="position:absolute;top:2px;right:2px;">❌</button>
+                                                        <input type="hidden" name="delete_extra_images[]" value="" class="delete-extra-image-input">
+                                                    </div>
                                                 @endforeach
                                             </div>
                                         @endif
@@ -595,5 +599,26 @@ function populateCollectionTypeDropdown(collectionTypes) {
         select.appendChild(option);
     });
 }
+// Extra Images Delete (Edit Form) — use event delegation for reliability
+document.addEventListener('click', function(e) {
+    const btn = e.target.closest && e.target.closest('.extra-image-delete-btn');
+    if (!btn) return;
+    e.preventDefault();
+    const wrapper = btn.closest('.extra-image-wrapper');
+    if (!wrapper) return;
+    const imageId = wrapper.getAttribute('data-image-id');
+    if (!imageId) return;
+    // Add a hidden input to the form so the deletion survives DOM removal
+    const form = btn.closest('form') || document.querySelector('form');
+    if (form) {
+        const hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.name = 'delete_extra_images[]';
+        hidden.value = imageId;
+        form.appendChild(hidden);
+    }
+    // Remove the image preview from UI
+    wrapper.remove();
+});
 </script>
 @endsection

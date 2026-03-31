@@ -1220,16 +1220,12 @@
                         $discountPercentage = (int) $product->discount_percentage;
                     @endphp
                     <div class="product-card">
-<<<<<<< HEAD
-                        <span class="badge">{{ $product->is_limited_edition ? ($limitedEditionConfig['badge_text'] ?? 'LIMITED') : 'TRENDING' }}</span>
-=======
                         @if($discountPercentage > 0)
                             <span class="badge">{{ $discountPercentage }}% OFF</span>
                         @endif
                         @if($product->is_limited_edition)
                             <span class="badge badge-limited">{{ $limitedEditionConfig['badge_text'] ?? 'LIMITED' }}</span>
                         @endif
->>>>>>> 72dff39 (changes)
                         <button type="button" class="wishlist add-to-wishlist-btn" data-product-id="{{ $product->id }}" aria-label="Add to wishlist" onclick="return window.tinnityToggleWishlist(event, this);">
                             <i class="far fa-heart"></i>
                         </button>

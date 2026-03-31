@@ -40,6 +40,9 @@
 
          <form action="{{ route('checkout.store') }}" method="POST" id="checkoutForm">
             @csrf
+            <input type="hidden" id="razorpay_payment_id" name="razorpay_payment_id">
+            <input type="hidden" id="razorpay_order_id" name="razorpay_order_id">
+            <input type="hidden" id="razorpay_signature" name="razorpay_signature">
             <div class="row">
                <div class="col-lg-7">
                   <!-- Saved Addresses Section -->
@@ -348,8 +351,8 @@
                         </div>
                      </div>
 
-                     <button type="submit" class="fill-btn w-100 mt-4">
-                        <i class="fal fa-lock me-2"></i> Place Order
+                     <button type="submit" id="checkout-btn" class="fill-btn w-100 mt-4">
+                        <i class="fal fa-lock me-2"></i> <span id="btn-text">Place Order</span>
                      </button>
 
                      <p class="text-center text-muted small mt-3 mb-0">
@@ -575,6 +578,222 @@
          const defaultAddress = document.querySelector('.saved-address-radio:checked');
          if (defaultAddress) {
             defaultAddress.dispatchEvent(new Event('change'));
+         }
+      });
+   </script>
+
+   <!-- Razorpay Script -->
+   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+   <script>
+      document.addEventListener('DOMContentLoaded', function() {
+         const checkoutForm = document.getElementById('checkoutForm');
+         const checkoutBtn = document.getElementById('checkout-btn');
+         const paymentMethodRadios = document.querySelectorAll('.payment-radio');
+
+         let orderId = null;
+         let isProcessingPayment = false;
+
+         // Update button text based on payment method
+         paymentMethodRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+               const btnText = document.getElementById('btn-text');
+               if (btnText) {
+                  if (this.value === 'online') {
+                     btnText.textContent = 'Proceed to Payment';
+                  } else {
+                     btnText.textContent = 'Place Order';
+                  }
+               }
+            });
+         });
+
+         // Form submission
+         checkoutForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            if (isProcessingPayment) {
+               return;
+            }
+
+            const selectedPaymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+
+            if (selectedPaymentMethod === 'online') {
+               // For online payment, first create the order, then initiate Razorpay
+               isProcessingPayment = true;
+               if (checkoutBtn) {
+                  checkoutBtn.disabled = true;
+                  checkoutBtn.innerHTML = '<i class="fal fa-spinner fa-spin me-2"></i> Processing...';
+               }
+
+               // Submit the checkout form via AJAX to create the order first
+               const formData = new FormData(checkoutForm);
+
+               fetch('{{ route("checkout.store") }}', {
+                  method: 'POST',
+                  body: formData,
+                  headers: {
+                     'X-Requested-With': 'XMLHttpRequest',
+                  }
+               })
+               .then(response => {
+                  if (!response.ok) {
+                     // Check if response is JSON
+                     return response.text().then(text => {
+                        try {
+                           return JSON.parse(text);
+                        } catch {
+                           throw new Error('Order creation failed');
+                        }
+                     });
+                  }
+                  return response.json();
+               })
+               .then(data => {
+                  if (data.success || data.redirect) {
+                     // Extract order ID from redirect URL or response
+                     let orderIdMatch = null;
+                     if (data.redirect) {
+                        orderIdMatch = data.redirect.match(/order-success\/(\d+)/);
+                     } else if (data.order_id) {
+                        orderIdMatch = [null, data.order_id];
+                     }
+
+                     if (orderIdMatch && orderIdMatch[1]) {
+                        orderId = orderIdMatch[1];
+                        initializeRazorpayPayment(orderId);
+                     } else {
+                        showError('Failed to create order');
+                        resetButton();
+                     }
+                  } else {
+                     showError(data.message || 'Order creation failed');
+                     resetButton();
+                  }
+               })
+               .catch(error => {
+                  console.error('Error:', error);
+                  showError('An error occurred. Please try again.');
+                  resetButton();
+               });
+            } else {
+               // For COD and Bank Transfer, just submit normally
+               checkoutForm.removeEventListener('submit', arguments.callee);
+               checkoutForm.submit();
+            }
+         });
+
+         function initializeRazorpayPayment(orderIdParam) {
+            // Create Razorpay order via API
+            fetch(`/payment/create-razorpay-order/${orderIdParam}`, {
+               method: 'POST',
+               headers: {
+                  'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}',
+                  'Content-Type': 'application/json',
+               }
+            })
+            .then(response => response.json())
+            .then(data => {
+               if (data.success) {
+                  openRazorpayCheckout(data, orderIdParam);
+               } else {
+                  showError(data.error || 'Failed to initialize payment');
+                  resetButton();
+               }
+            })
+            .catch(error => {
+               console.error('Error:', error);
+               showError('Failed to initialize payment');
+               resetButton();
+            });
+         }
+
+         function openRazorpayCheckout(razorpayData, orderIdParam) {
+            const options = {
+               key: razorpayData.key,
+               amount: razorpayData.amount,
+               currency: razorpayData.currency,
+               order_id: razorpayData.razorpay_order_id,
+               name: 'Tinnity',
+               description: 'Order Payment',
+               image: '{{ asset("frontend/assets/img/logo.png") }}',
+               prefill: {
+                  name: razorpayData.customer_name,
+                  email: razorpayData.customer_email,
+                  contact: razorpayData.customer_phone,
+               },
+               handler: function(response) {
+                  handleRazorpaySuccess(response, orderIdParam);
+               },
+               modal: {
+                  ondismiss: function() {
+                     resetButton();
+                     showError('Payment cancelled');
+                  }
+               },
+               theme: {
+                  color: '#ffc107'
+               }
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.open();
+         }
+
+         function handleRazorpaySuccess(response, orderIdParam) {
+            // Set hidden fields with Razorpay response
+            const paymentIdInput = document.getElementById('razorpay_payment_id');
+            const orderIdInput = document.getElementById('razorpay_order_id');
+            const signatureInput = document.getElementById('razorpay_signature');
+
+            if (paymentIdInput) paymentIdInput.value = response.razorpay_payment_id;
+            if (orderIdInput) orderIdInput.value = response.razorpay_order_id;
+            if (signatureInput) signatureInput.value = response.razorpay_signature;
+
+            // Verify payment on server
+            fetch('{{ route("payment.callback") }}', {
+               method: 'POST',
+               headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}',
+               },
+               body: JSON.stringify({
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_signature: response.razorpay_signature,
+               })
+            })
+            .then(res => res.json())
+            .then(data => {
+               if (data.success) {
+                  // Redirect to payment success page
+                  window.location.href = `/payment/success/${orderIdParam}`;
+               } else {
+                  // Redirect to payment failure page
+                  window.location.href = `/payment/failed/${orderIdParam}`;
+               }
+            })
+            .catch(error => {
+               console.error('Error:', error);
+               window.location.href = `/payment/failed/${orderIdParam}`;
+            });
+         }
+
+         function showError(message) {
+            alert(message);
+         }
+
+         function resetButton() {
+            isProcessingPayment = false;
+            if (checkoutBtn) {
+               checkoutBtn.disabled = false;
+               const btnText = document.getElementById('btn-text');
+               const selectedPaymentMethod = document.querySelector('input[name="payment_method"]:checked');
+               
+               if (btnText && selectedPaymentMethod) {
+                  btnText.textContent = selectedPaymentMethod.value === 'online' ? 'Proceed to Payment' : 'Place Order';
+               }
+            }
          }
       });
    </script>

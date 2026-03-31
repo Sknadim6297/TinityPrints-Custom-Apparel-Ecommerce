@@ -90,4 +90,9 @@ class Order extends Model
     {
         return $this->hasOne(RefundRequest::class);
     }
+
+    public function payment()
+    {
+        return $this->hasOne(Payment::class);
+    }
 }

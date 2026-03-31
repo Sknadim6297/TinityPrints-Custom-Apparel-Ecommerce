@@ -415,12 +415,13 @@
                                 <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                                     Extra Images
                                 </label>
-                                <input type="file"
-                                       name="colors[0][extra_images][]"
-                                       accept="image/*"
-                                       multiple
-                                       class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400">
-                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Upload multiple gallery images (optional).</p>
+                                    <input type="file"
+                                        name="colors[0][extra_images][]"
+                                        accept="image/*"
+                                        multiple
+                                        class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 extra-images-input">
+                                    <div class="extra-images-preview flex flex-wrap gap-2 mt-2"></div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Upload multiple gallery images (optional). You can remove any image before submitting.</p>
                             </div>
                         </div>
                     </div>
@@ -674,5 +675,57 @@ function populateCollectionTypeDropdown(collectionTypes) {
         select.appendChild(option);
     });
 }
+// Extra Images Preview & Remove Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    function handleExtraImagesInput(input) {
+        const previewContainer = input.closest('div').querySelector('.extra-images-preview');
+        input.addEventListener('change', function() {
+            // Clear previous previews
+            previewContainer.innerHTML = '';
+            const files = Array.from(input.files);
+            files.forEach((file, idx) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'relative inline-block';
+                    wrapper.style.maxWidth = '100px';
+                    wrapper.style.maxHeight = '100px';
+                    wrapper.style.marginRight = '8px';
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'rounded border border-gray-300 dark:border-gray-600';
+                    img.style.maxWidth = '100px';
+                    img.style.maxHeight = '100px';
+                    img.style.display = 'block';
+                    const removeBtn = document.createElement('button');
+                    removeBtn.type = 'button';
+                    removeBtn.innerHTML = '❌';
+                    removeBtn.title = 'Remove image';
+                    removeBtn.className = 'absolute top-0 right-0 bg-white bg-opacity-80 rounded-full px-1 text-red-600 hover:bg-red-100';
+                    removeBtn.style.position = 'absolute';
+                    removeBtn.style.top = '2px';
+                    removeBtn.style.right = '2px';
+                    removeBtn.addEventListener('click', function() {
+                        // Remove this image from preview and from input.files
+                        files.splice(idx, 1);
+                        // Create a new DataTransfer to update input.files
+                        const dt = new DataTransfer();
+                        files.forEach(f => dt.items.add(f));
+                        input.files = dt.files;
+                        // Re-render previews
+                        input.dispatchEvent(new Event('change'));
+                    });
+                    wrapper.appendChild(img);
+                    wrapper.appendChild(removeBtn);
+                    previewContainer.appendChild(wrapper);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+    }
+    document.querySelectorAll('.extra-images-input').forEach(input => {
+        handleExtraImagesInput(input);
+    });
+});
 </script>
 @endsection

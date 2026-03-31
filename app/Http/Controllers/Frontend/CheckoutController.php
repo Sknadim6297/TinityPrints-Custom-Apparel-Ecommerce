@@ -208,11 +208,29 @@ class CheckoutController extends Controller
 
             DB::commit();
 
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Order placed successfully! Order Number: ' . $orderNumber,
+                    'order_id' => $order->id,
+                    'order_number' => $orderNumber,
+                    'redirect' => route('order.success', ['order' => $order->id]),
+                ]);
+            }
+
             return redirect()->route('order.success', ['order' => $order->id])
                 ->with('success', 'Order placed successfully! Order Number: ' . $orderNumber);
 
         } catch (ValidationException $e) {
             DB::rollBack();
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $e->errors(),
+                ], 422);
+            }
 
             return redirect()->back()
                 ->withInput()
@@ -220,6 +238,15 @@ class CheckoutController extends Controller
                 ->with('error', 'Some items are out of stock for the selected size. Please update your cart and try again.');
         } catch (\Exception $e) {
             DB::rollBack();
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to place order. Please try again.',
+                    'error' => $e->getMessage(),
+                ], 500);
+            }
+
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Failed to place order. Please try again. Error: ' . $e->getMessage());
