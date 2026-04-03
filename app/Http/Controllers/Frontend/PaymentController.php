@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Payment;
+use App\Services\Shipping\ShiprocketService;
 use App\Support\AdminNotifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -286,6 +287,18 @@ class PaymentController extends Controller
                 'payment_id' => $paymentId,
                 'amount' => $order->total_amount,
             ]);
+
+            if (!$order->tracking_number) {
+                try {
+                    $shippingService = app(ShiprocketService::class);
+                    $shippingService->createShipment($order);
+                } catch (\Throwable $shippingError) {
+                    Log::warning('Shiprocket shipment creation failed after payment verification.', [
+                        'order_id' => $order->id,
+                        'message' => $shippingError->getMessage(),
+                    ]);
+                }
+            }
 
             // Notify admin about successful payment
             try {

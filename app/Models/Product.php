@@ -17,6 +17,7 @@ class Product extends Model
         'sleeve_type',
         'sleeve_type_id',
         'collection_type_id',
+        'product_weight_grams',
         'mrp',
         'selling_price',
         'base_price',
@@ -37,6 +38,7 @@ class Product extends Model
     protected $casts = [
         'is_limited_edition' => 'boolean',
         'is_active' => 'boolean',
+        'product_weight_grams' => 'integer',
         'mrp' => 'decimal:2',
         'selling_price' => 'decimal:2',
         'base_price' => 'decimal:2',

@@ -72,6 +72,40 @@
                      </div>
                   </div>
 
+                  <div class="order-details-card" style="background: #fff; border: 1px solid #eee; border-radius: 8px; padding: 30px; margin-bottom: 30px; text-align: left;">
+                     <h4 class="mb-4" style="color: #333; text-align: center;">Shipping Details</h4>
+
+                     <div class="detail-row mb-3" style="display: flex; justify-content: space-between; border-bottom: 1px solid #ddd; padding-bottom: 10px;">
+                        <span style="color: #666;">Shipping Partner:</span>
+                        <strong style="color: #333;">{{ $order->shipping_partner ?? 'Shiprocket' }}</strong>
+                     </div>
+
+                     <div class="detail-row mb-3" style="display: flex; justify-content: space-between; border-bottom: 1px solid #ddd; padding-bottom: 10px;">
+                        <span style="color: #666;">Shipping Method:</span>
+                        <strong style="color: #333;">{{ $order->shipping_method ?? 'Shiprocket Standard' }}</strong>
+                     </div>
+
+                     <div class="detail-row mb-3" style="display: flex; justify-content: space-between; border-bottom: 1px solid #ddd; padding-bottom: 10px;">
+                        <span style="color: #666;">Tracking Number:</span>
+                        <strong style="color: #333;">{{ $order->tracking_number ?? 'Pending' }}</strong>
+                     </div>
+
+                     <div class="detail-row mb-3" style="display: flex; justify-content: space-between; border-bottom: 1px solid #ddd; padding-bottom: 10px;">
+                        <span style="color: #666;">Shipping Weight (g):</span>
+                        <strong style="color: #333;">{{ $order->shipping_weight_grams !== null ? $order->shipping_weight_grams : 'Pending' }}</strong>
+                     </div>
+
+                     <div class="detail-row mb-3" style="display: flex; justify-content: space-between; border-bottom: 1px solid #ddd; padding-bottom: 10px;">
+                        <span style="color: #666;">Shipping Cost (₹):</span>
+                        <strong style="color: #333;">{{ $order->shipping_cost !== null ? number_format($order->shipping_cost, 2) : '0.00' }}</strong>
+                     </div>
+
+                     <div class="detail-row" style="display: flex; justify-content: space-between; padding-bottom: 10px;">
+                        <span style="color: #666;">Delivery Status:</span>
+                        <span class="badge bg-secondary">{{ ucwords(str_replace('_', ' ', $order->delivery_status ?? 'pending')) }}</span>
+                     </div>
+                  </div>
+
                   <!-- What's Next Section -->
                   <div class="whats-next-section mb-4">
                      <h5 style="color: #333; margin-bottom: 15px;">What's Next?</h5>
@@ -97,10 +131,10 @@
 
                   <!-- Action Buttons -->
                   <div class="action-buttons" style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                     <a href="{{ route('orders') }}" class="fill-btn" style="text-decoration: none; padding: 12px 30px; display: inline-block;">
+                     <a href="{{ route('orders') }}" class="fill-btn" style="text-decoration: none; display: inline-block;">
                         <i class="fal fa-receipt me-2"></i> View My Orders
                      </a>
-                     <a href="{{ route('shop') }}" class="border-btn" style="text-decoration: none; padding: 12px 30px; display: inline-block;">
+                     <a href="{{ route('shop') }}" class="border-btn" style="text-decoration: none; display: inline-block;">
                         <i class="fal fa-shopping-bag me-2"></i> Continue Shopping
                      </a>
                   </div>

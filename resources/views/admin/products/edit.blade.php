@@ -72,6 +72,15 @@
                     </div>
 
                     <div>
+                        <label for="product_weight_grams" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Product Weight (g)</label>
+                           <input id="product_weight_grams" type="number" name="product_weight_grams" value="{{ old('product_weight_grams', $product->product_weight_grams) }}" step="1" min="1" required
+                               class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400">
+                        @error('product_weight_grams')
+                            <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
                         <label for="discount_percentage" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Discount (%)</label>
                         <input id="discount_percentage" type="text" value="{{ $product->discount_percentage }}%" readonly
                                class="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none">

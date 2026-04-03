@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('shipping_partner')->nullable()->after('shipping_country');
             $table->unsignedInteger('shipping_weight_grams')->nullable()->after('shipping_partner');
             $table->decimal('shipping_cost', 10, 2)->nullable()->after('shipping_weight_grams');
-            $table->enum('delivery_status', ['pending', 'in_transit', 'delivered', 'failed'])->default('pending')->after('tracking_number');
+            $table->enum('delivery_status', ['pending', 'shipped', 'delivered', 'failed'])->default('pending')->after('tracking_number');
         });
     }
 

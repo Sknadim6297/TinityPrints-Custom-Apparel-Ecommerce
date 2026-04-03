@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -11,11 +12,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('products', function (Blueprint $table) {
-            // Change category from enum to string to support dynamic categories
-            // First, we need to drop the enum and recreate as string
-            $table->string('category')->nullable()->change();
-        });
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement('ALTER TABLE products MODIFY COLUMN category VARCHAR(255) NULL');
+        }
     }
 
     /**
@@ -23,8 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('products', function (Blueprint $table) {
-            $table->enum('category', ['t-shirt', 'accessories'])->change();
-        });
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement("ALTER TABLE products MODIFY COLUMN category ENUM('t-shirt', 'accessories') NULL");
+        }
     }
 };

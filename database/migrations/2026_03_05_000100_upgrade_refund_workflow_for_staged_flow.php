@@ -12,6 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (DB::getDriverName() !== 'mysql') {
+            return;
+        }
+
         Schema::table('refund_requests', function (Blueprint $table) {
             if (!Schema::hasColumn('refund_requests', 'ticket_id')) {
                 $table->string('ticket_id')->nullable()->unique()->after('id');
@@ -92,6 +96,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (DB::getDriverName() !== 'mysql') {
+            return;
+        }
+
         DB::statement("UPDATE refund_requests SET status = 'requested' WHERE status IN ('refund_requested','under_review','pending_customer_response','return_in_process','product_received')");
         DB::statement("UPDATE refund_requests SET status = 'approved' WHERE status = 'refund_approved'");
         DB::statement("UPDATE refund_requests SET status = 'rejected' WHERE status = 'refund_rejected'");

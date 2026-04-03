@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -11,10 +12,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('design_requests', function (Blueprint $table) {
-            // Make design_file_path nullable since we now use front_design_file and back_design_file
-            $table->string('design_file_path')->nullable()->change();
-        });
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement('ALTER TABLE design_requests MODIFY COLUMN design_file_path VARCHAR(255) NULL');
+        }
     }
 
     /**
@@ -22,9 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('design_requests', function (Blueprint $table) {
-            // Revert to NOT NULL (but this may fail if there are null values)
-            $table->string('design_file_path')->nullable(false)->change();
-        });
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement('ALTER TABLE design_requests MODIFY COLUMN design_file_path VARCHAR(255) NOT NULL');
+        }
     }
 };

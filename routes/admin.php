@@ -140,6 +140,10 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
             ->name('orders.show');
         Route::patch('orders/{order}', [OrderController::class, 'update'])
             ->name('orders.update');
+        Route::post('orders/{order}/shipment', [OrderController::class, 'createShipment'])
+            ->name('orders.shipment.create');
+        Route::post('orders/{order}/shipment/sync', [OrderController::class, 'syncShipment'])
+            ->name('orders.shipment.sync');
         Route::get('refunds', [RefundController::class, 'index'])
             ->name('refunds.index');
         Route::get('refunds/{refund}', [RefundController::class, 'show'])

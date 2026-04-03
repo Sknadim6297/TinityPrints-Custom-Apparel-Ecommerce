@@ -8,6 +8,7 @@ use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\UserAddress;
+use App\Services\Shipping\ShiprocketService;
 use App\Support\AdminNotifier;
 use App\Support\InventoryManager;
 use Illuminate\Http\Request;
@@ -90,6 +91,8 @@ class CheckoutController extends Controller
             return $item->product->price * $item->quantity;
         });
 
+        $shippingService = app(ShiprocketService::class);
+
         $discountAmount = session('coupon_discount', 0);
         $couponCode = session('coupon_code', null);
 
@@ -147,6 +150,8 @@ class CheckoutController extends Controller
                 'shipping_state' => $validated['shipping_state'] ?? null,
                 'shipping_postal_code' => $validated['shipping_postal_code'] ?? null,
                 'shipping_country' => $validated['shipping_country'],
+                'shipping_partner' => config('shipping.default_partner', 'Shiprocket'),
+                'shipping_method' => config('shipping.shiprocket.default_shipping_method', 'Shiprocket Standard'),
                 'subtotal' => $subtotal,
                 'discount_amount' => $discountAmount,
                 'total_amount' => $total,
@@ -178,6 +183,12 @@ class CheckoutController extends Controller
                 ]);
             }
 
+            $shippingWeightGrams = $shippingService->calculateOrderWeight($order);
+            $order->update([
+                'shipping_weight_grams' => $shippingWeightGrams,
+                'shipping_cost' => $shippingService->calculateShippingCost($shippingWeightGrams),
+            ]);
+
             // Clear cart
             Cart::where('user_id', auth()->id())->delete();
 
@@ -207,6 +218,17 @@ class CheckoutController extends Controller
             );
 
             DB::commit();
+
+            if ($validated['payment_method'] !== 'online') {
+                try {
+                    $shippingService->createShipment($order);
+                } catch (\Throwable $shippingError) {
+                    \Illuminate\Support\Facades\Log::warning('Shiprocket shipment creation failed after checkout.', [
+                        'order_id' => $order->id,
+                        'message' => $shippingError->getMessage(),
+                    ]);
+                }
+            }
 
             if ($request->expectsJson()) {
                 return response()->json([

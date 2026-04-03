@@ -546,6 +546,40 @@
                                         You will receive an email confirmation at <strong>{{ $order->email }}</strong> shortly. You can track your order status in your profile.
                                     </div>
 
+                                    <div class="order-block" style="margin-top:18px;">
+                                        <div class="order-block-head">
+                                            <h4 class="order-block-title">Shipping Details</h4>
+                                        </div>
+                                        <div class="order-block-body">
+                                            <div class="info-grid">
+                                                <div class="info-card">
+                                                    <div class="info-label">Shipping Partner</div>
+                                                    <div class="info-value">{{ $order->shipping_partner ?? 'Shiprocket' }}</div>
+                                                </div>
+                                                <div class="info-card">
+                                                    <div class="info-label">Shipping Method</div>
+                                                    <div class="info-value">{{ $order->shipping_method ?? 'Shiprocket Standard' }}</div>
+                                                </div>
+                                                <div class="info-card">
+                                                    <div class="info-label">Tracking Number</div>
+                                                    <div class="info-value">{{ $order->tracking_number ?? 'Assigned after shipment creation' }}</div>
+                                                </div>
+                                                <div class="info-card">
+                                                    <div class="info-label">Delivery Status</div>
+                                                    <div class="info-value">{{ ucwords(str_replace('_', ' ', $order->delivery_status ?? 'pending')) }}</div>
+                                                </div>
+                                                <div class="info-card">
+                                                    <div class="info-label">Shipping Weight</div>
+                                                    <div class="info-value">{{ $order->shipping_weight_grams !== null ? $order->shipping_weight_grams . ' g' : 'Will be set by admin' }}</div>
+                                                </div>
+                                                <div class="info-card">
+                                                    <div class="info-label">Shipping Cost</div>
+                                                    <div class="info-value">{{ $order->shipping_cost !== null ? 'INR ' . number_format($order->shipping_cost, 2) : 'Auto-calculated after weight is set' }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <div class="actions-row">
                                         <a href="{{ route('orders') }}" class="action-btn action-btn-primary">
                                             <i class="fal fa-list"></i>

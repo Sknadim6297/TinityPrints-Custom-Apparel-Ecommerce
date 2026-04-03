@@ -36,10 +36,10 @@ class OrderSeeder extends Seeder
             'shipping_state' => 'ICT',
             'shipping_postal_code' => '44000',
             'shipping_country' => 'Pakistan',
-            'shipping_partner' => 'Leopard',
+            'shipping_partner' => 'Shiprocket',
             'shipping_weight_grams' => 250,
             'shipping_cost' => 3000,
-            'shipping_method' => 'Leopard Courier',
+            'shipping_method' => 'Shiprocket Standard',
             'tracking_number' => null,
             'delivery_status' => 'pending',
         ]);
@@ -63,12 +63,12 @@ class OrderSeeder extends Seeder
             'shipping_state' => null,
             'shipping_postal_code' => 'NW1',
             'shipping_country' => 'United Kingdom',
-            'shipping_partner' => 'DHL',
+            'shipping_partner' => 'Shiprocket',
             'shipping_weight_grams' => 180,
             'shipping_cost' => 1600,
-            'shipping_method' => 'DHL',
-            'tracking_number' => 'DHL123456789',
-            'delivery_status' => 'in_transit',
+            'shipping_method' => 'Shiprocket Express',
+            'tracking_number' => 'SRMOCK123456789',
+            'delivery_status' => 'shipped',
         ]);
 
         Order::updateOrCreate([
@@ -90,10 +90,10 @@ class OrderSeeder extends Seeder
             'shipping_state' => 'Sindh',
             'shipping_postal_code' => '75290',
             'shipping_country' => 'Pakistan',
-            'shipping_partner' => 'TCS',
+            'shipping_partner' => 'Shiprocket',
             'shipping_weight_grams' => 120,
             'shipping_cost' => 400,
-            'shipping_method' => 'TCS',
+            'shipping_method' => 'Shiprocket Standard',
             'tracking_number' => null,
             'delivery_status' => 'pending',
         ]);
@@ -117,11 +117,11 @@ class OrderSeeder extends Seeder
             'shipping_state' => 'Punjab',
             'shipping_postal_code' => '54000',
             'shipping_country' => 'Pakistan',
-            'shipping_partner' => 'FedEx',
+            'shipping_partner' => 'Shiprocket',
             'shipping_weight_grams' => 300,
             'shipping_cost' => 4000,
-            'shipping_method' => 'FedEx',
-            'tracking_number' => 'FDX908877',
+            'shipping_method' => 'Shiprocket Standard',
+            'tracking_number' => 'SRMOCK908877',
             'delivery_status' => 'failed',
         ]);
     }

@@ -20,6 +20,27 @@
             </div>
         @endif
 
+        @if(session('error'))
+            <div class="mb-6 p-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300">
+                {{ session('error') }}
+            </div>
+        @endif
+
+        <div class="mb-6 flex flex-wrap gap-3">
+            <form method="POST" action="{{ route('admin.orders.shipment.create', $order) }}">
+                @csrf
+                <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-semibold transition-colors">
+                    <i class="fal fa-truck-loading mr-2"></i>Create Shipment
+                </button>
+            </form>
+            <form method="POST" action="{{ route('admin.orders.shipment.sync', $order) }}">
+                @csrf
+                <button type="submit" class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-lg text-sm font-semibold transition-colors">
+                    <i class="fal fa-sync mr-2"></i>Sync Shiprocket
+                </button>
+            </form>
+        </div>
+
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Left Column - Order Info -->
             <div class="lg:col-span-2 space-y-6">
@@ -53,6 +74,11 @@
                         <span class="px-4 py-2 rounded-lg text-sm font-semibold {{ $order->payment_status === 'paid' ? 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400' : 'bg-orange-50 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400' }}">
                             Payment: {{ ucwords($order->payment_status) }}
                         </span>
+                        @if($order->shipping_partner)
+                            <span class="px-4 py-2 rounded-lg text-sm font-semibold bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-200">
+                                Partner: {{ $order->shipping_partner }}
+                            </span>
+                        @endif
                         <span class="px-4 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-400">
                                 <i class="fal fa-calendar mr-1"></i>{{ $order->created_at->format('M d, Y') }}
                         </span>
@@ -266,7 +292,7 @@
                                     <p class="font-semibold text-gray-900 dark:text-gray-100">{{ $order->shipping_weight_grams }}g</p>
                                 </div>
                             @endif
-                            @if($order->delivery_status && $order->delivery_status !== 'pending')
+                            @if($order->delivery_status)
                                 <div>
                                     <span class="text-sm text-gray-500 dark:text-gray-400">Delivery Status:</span>
                                     <p class="font-semibold text-gray-900 dark:text-gray-100">{{ ucwords(str_replace('_', ' ', $order->delivery_status)) }}</p>
@@ -369,7 +395,7 @@
                                 <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Shipping Partner</label>
                                 <select name="shipping_partner" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                     <option value="">Select Partner</option>
-                                    @foreach(['Leopard', 'TCS', 'DHL', 'FedEx', 'BlueEx', 'Pakistan Post'] as $partner)
+                                    @foreach(['Shiprocket'] as $partner)
                                         <option value="{{ $partner }}" {{ $order->shipping_partner === $partner ? 'selected' : '' }}>{{ $partner }}</option>
                                     @endforeach
                                 </select>
@@ -393,7 +419,7 @@
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Delivery Status</label>
                                 <select name="delivery_status" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                    @foreach(['pending','in_transit','delivered','failed'] as $status)
+                                    @foreach(['pending','shipped','delivered','failed'] as $status)
                                         <option value="{{ $status }}" {{ $order->delivery_status === $status ? 'selected' : '' }}>
                                             {{ ucwords(str_replace('_', ' ', $status)) }}
                                         </option>
@@ -402,8 +428,12 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Shipping Method</label>
-                                <input type="text" name="shipping_method" value="{{ $order->shipping_method }}"
-                                       class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                                <select name="shipping_method" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                                    <option value="">Select Method</option>
+                                    @foreach(['Shiprocket Standard', 'Shiprocket Express', 'Manual'] as $method)
+                                        <option value="{{ $method }}" {{ $order->shipping_method === $method ? 'selected' : '' }}>{{ $method }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
                         <div class="mt-6 flex justify-end gap-3">

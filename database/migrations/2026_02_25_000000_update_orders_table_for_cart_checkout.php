@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -25,11 +26,12 @@ return new class extends Migration
             
             // Add coupon code if applied
             $table->string('coupon_code')->nullable()->after('payment_method');
-            
-            // Make some fields nullable for cart-based orders
-            $table->unsignedBigInteger('product_id')->nullable()->change();
-            $table->string('product_size')->nullable()->change();
         });
+
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement('ALTER TABLE orders MODIFY COLUMN product_id BIGINT UNSIGNED NULL');
+            DB::statement('ALTER TABLE orders MODIFY COLUMN product_size VARCHAR(255) NULL');
+        }
     }
 
     /**
@@ -37,6 +39,11 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement('ALTER TABLE orders MODIFY COLUMN product_id BIGINT UNSIGNED NOT NULL');
+            DB::statement('ALTER TABLE orders MODIFY COLUMN product_size VARCHAR(255) NOT NULL');
+        }
+
         Schema::table('orders', function (Blueprint $table) {
             $table->dropForeign(['user_id']);
             $table->dropColumn([

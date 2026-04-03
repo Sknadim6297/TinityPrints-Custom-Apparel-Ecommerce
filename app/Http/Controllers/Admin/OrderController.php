@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Services\Shipping\ShiprocketService;
 use App\Support\AdminNotifier;
 use App\Support\InventoryManager;
 use Illuminate\Http\Request;
@@ -44,20 +45,21 @@ class OrderController extends Controller
 
     public function update(Request $request, Order $order)
     {
+        $shippingService = app(ShiprocketService::class);
         $previousStatus = $order->order_status;
         $previousPaymentStatus = $order->payment_status;
 
         $validated = $request->validate([
             'order_status' => 'required|in:design_pending,design_approved,payment_pending,paid,printing,packed,shipped,delivered,refund_requested,under_review,refund_approved,refund_rejected,return_in_process,product_received,refund_completed,refunded,cancelled',
             'payment_status' => 'required|in:pending,paid,refunded',
-            'delivery_status' => 'required|in:pending,in_transit,delivered,failed',
+            'delivery_status' => 'required|in:pending,shipped,delivered,in_transit,failed',
             'tracking_number' => 'nullable|string|max:255',
             'shipping_method' => 'nullable|string|max:255',
             'shipping_partner' => 'nullable|string|max:255',
             'shipping_weight_grams' => 'nullable|integer|min:0',
         ]);
 
-        $shippingCost = $this->calculateShippingCost($validated['shipping_weight_grams'] ?? null);
+        $shippingCost = $shippingService->calculateShippingCost($validated['shipping_weight_grams'] ?? null);
 
         DB::transaction(function () use ($order, $validated, $shippingCost, $previousStatus) {
             $updateData = [
@@ -106,7 +108,7 @@ class OrderController extends Controller
         });
 
         if ($order->order_status === 'shipped' && $order->delivery_status === 'pending') {
-            $order->update(['delivery_status' => 'in_transit']);
+            $order->update(['delivery_status' => 'shipped']);
         }
 
         if ($order->order_status === 'delivered') {
@@ -147,14 +149,32 @@ class OrderController extends Controller
             ->with('success', 'Order updated successfully.');
     }
 
-    private function calculateShippingCost(?int $weightGrams): ?float
+    public function createShipment(Order $order)
     {
-        if ($weightGrams === null) {
-            return null;
+        $shippingService = app(ShiprocketService::class);
+
+        try {
+            $result = $shippingService->createShipment($order);
+        } catch (\Throwable $exception) {
+            return redirect('/admin/orders/' . $order->id)
+                ->with('error', 'Something went wrong while creating the shipment. Please try again.');
         }
 
-        $extraGrams = max(0, $weightGrams - 100);
+        if (($result['status'] ?? null) === 'awb_pending') {
+            return redirect('/admin/orders/' . $order->id)
+                ->with('error', $result['message'] ?? 'Shipment created but AWB pending. Please recharge wallet.');
+        }
 
-        return (float) ($extraGrams * 20);
+        return redirect('/admin/orders/' . $order->id)
+            ->with('success', 'Shipment created in ' . strtoupper($result['mode']) . ' mode for order ' . $order->order_number . '.');
+    }
+
+    public function syncShipment(Order $order)
+    {
+        $shippingService = app(ShiprocketService::class);
+        $result = $shippingService->syncShipment($order);
+
+        return redirect('/admin/orders/' . $order->id)
+            ->with('success', 'Shipment synced in ' . strtoupper($result['mode']) . ' mode for order ' . $order->order_number . '.');
     }
 }

@@ -45,6 +45,10 @@
                             <p class="font-semibold text-gray-900 dark:text-gray-100 text-lg mt-1">₹{{ number_format($product->base_price, 2) }}</p>
                         </div>
                         <div>
+                            <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Weight</p>
+                            <p class="font-semibold text-gray-900 dark:text-gray-100 mt-1">{{ $product->product_weight_grams ?? 250 }} g</p>
+                        </div>
+                        <div>
                             <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Sleeve Type</p>
                             <p class="font-semibold text-gray-900 dark:text-gray-100 mt-1">{{ $product->sleeveType?->name ?? 'N/A' }}</p>
                         </div>

@@ -5,27 +5,21 @@ use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         if (DB::getDriverName() !== 'mysql') {
             return;
         }
 
-        DB::statement("ALTER TABLE product_images MODIFY COLUMN image_type ENUM('front', 'back', 'extra') NOT NULL");
+        DB::statement("ALTER TABLE orders MODIFY COLUMN delivery_status ENUM('pending', 'shipped', 'delivered', 'failed') NOT NULL DEFAULT 'pending'");
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         if (DB::getDriverName() !== 'mysql') {
             return;
         }
 
-        DB::statement("ALTER TABLE product_images MODIFY COLUMN image_type ENUM('front', 'back') NOT NULL");
+        DB::statement("ALTER TABLE orders MODIFY COLUMN delivery_status ENUM('pending', 'in_transit', 'delivered', 'failed') NOT NULL DEFAULT 'pending'");
     }
 };
