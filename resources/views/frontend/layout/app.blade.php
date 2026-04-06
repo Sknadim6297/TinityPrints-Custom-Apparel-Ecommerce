@@ -69,11 +69,93 @@
          background: #f8f9fa;
          border-radius: 8px;
       }
+
+      /* Offer popup */
+      .offer-popup-overlay {
+         position: fixed;
+         inset: 0;
+         background: rgba(0, 0, 0, 0.72);
+         backdrop-filter: blur(3px);
+         z-index: 9999;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         padding: 16px;
+         opacity: 0;
+         visibility: hidden;
+         transition: opacity 0.35s ease, visibility 0.35s ease;
+      }
+
+      .offer-popup-overlay.is-visible {
+         opacity: 1;
+         visibility: visible;
+      }
+
+      .offer-popup-modal {
+         position: relative;
+         width: min(88vw, 520px);
+         transform: translateY(12px) scale(0.98);
+         transition: transform 0.35s ease;
+      }
+
+      .offer-popup-overlay.is-visible .offer-popup-modal {
+         transform: translateY(0) scale(1);
+      }
+
+      .offer-popup-image {
+         display: block;
+         width: 100%;
+         height: auto;
+         max-height: 78vh;
+         object-fit: contain;
+         border-radius: 14px;
+         box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+      }
+
+      .offer-popup-close {
+         position: absolute;
+         top: -12px;
+         right: -12px;
+         width: 34px;
+         height: 34px;
+         border: 0;
+         border-radius: 50%;
+         background: #ffffff;
+         color: #111111;
+         font-size: 20px;
+         line-height: 1;
+         font-weight: 700;
+         cursor: pointer;
+         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+      }
+
+      @media (max-width: 767px) {
+         .offer-popup-modal {
+            width: min(90vw, 360px);
+         }
+
+         .offer-popup-close {
+            top: -10px;
+            right: -6px;
+         }
+      }
    </style>
    @yield('styles')
 </head>
 <body>
  @include('frontend.partials.header')
+
+    <div class="offer-popup-overlay" id="offerPopupOverlay" aria-hidden="true">
+        <div class="offer-popup-modal" role="dialog" aria-modal="true" aria-label="Special Offer">
+            <button type="button" class="offer-popup-close" id="offerPopupClose" aria-label="Close popup">&times;</button>
+            <img
+                src="{{ asset('assets/magnetposternew.png') }}"
+                alt="Tinnity collectible magnet offer"
+                class="offer-popup-image"
+                id="offerPopupImage"
+            >
+        </div>
+    </div>
 
     <main>
         @yield('content')
@@ -110,6 +192,69 @@
    <script src="{{ asset('frontend/assets/js/main.js') }}"></script>
    <script src="{{ asset('frontend/assets/js/cart-wishlist.js') }}"></script>
    <script src="{{ asset('frontend/assets/js/auth-protection.js') }}"></script>
+   <script>
+      (function () {
+         var popupSeenKey = 'tinnity_offer_popup_seen';
+         var overlay = document.getElementById('offerPopupOverlay');
+         var closeButton = document.getElementById('offerPopupClose');
+         var popupImage = document.getElementById('offerPopupImage');
+         var autoCloseTimer = null;
+
+         if (!overlay || !closeButton) {
+            return;
+         }
+
+         function closePopup() {
+            if (!overlay.classList.contains('is-visible')) {
+               return;
+            }
+
+            overlay.classList.remove('is-visible');
+            overlay.setAttribute('aria-hidden', 'true');
+            sessionStorage.setItem(popupSeenKey, '1');
+
+            if (autoCloseTimer) {
+               window.clearTimeout(autoCloseTimer);
+               autoCloseTimer = null;
+            }
+         }
+
+         function openPopup() {
+            overlay.classList.add('is-visible');
+            overlay.setAttribute('aria-hidden', 'false');
+
+            autoCloseTimer = window.setTimeout(function () {
+               closePopup();
+               }, 15000);
+         }
+
+         if (sessionStorage.getItem(popupSeenKey) === '1') {
+            return;
+         }
+
+         closeButton.addEventListener('click', closePopup);
+
+         overlay.addEventListener('click', function (event) {
+            if (event.target === overlay) {
+               closePopup();
+            }
+         });
+
+         document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+               closePopup();
+            }
+         });
+
+         if (popupImage) {
+            popupImage.addEventListener('error', function () {
+               closePopup();
+            });
+         }
+
+         openPopup();
+      })();
+   </script>
    @stack('scripts')
 </body>
 </html>
