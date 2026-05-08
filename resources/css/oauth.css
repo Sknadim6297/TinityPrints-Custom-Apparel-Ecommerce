@@ -1,0 +1,247 @@
+/* OAuth Buttons Styling */
+
+.sign-social {
+    margin: 30px 0 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.sign-social span {
+    color: #666;
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: uppercase;
+    background: #f9f9f9;
+    padding: 0 15px;
+    position: relative;
+    z-index: 1;
+}
+
+.sign-social::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1px;
+    background: #ddd;
+    z-index: 0;
+}
+
+.sign-social-icon {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+.oauth-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px 24px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: #ffffff;
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    min-width: 160px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.oauth-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(139, 90, 33, 0.1);
+    transform: translate(-50%, -50%);
+    transition: width 0.5s, height 0.5s;
+    z-index: 0;
+}
+
+.oauth-btn:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.oauth-btn:hover {
+    border-color: #8b5a21;
+    color: #8b5a21;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(139, 90, 33, 0.15);
+}
+
+.oauth-btn svg {
+    width: 20px;
+    height: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+.oauth-btn span {
+    position: relative;
+    z-index: 1;
+    font-weight: 600;
+}
+
+/* Google Button Specific */
+.sign-gmail.oauth-btn {
+    border-color: #4285f4;
+}
+
+.sign-gmail.oauth-btn:hover {
+    border-color: #2d5ac6;
+    background: #f8f9fa;
+    color: #2d5ac6;
+}
+
+/* Facebook Button Specific */
+.sign-facebook.oauth-btn {
+    border-color: #2467ec;
+}
+
+.sign-facebook.oauth-btn:hover {
+    border-color: #1a4ba3;
+    background: #f5f7fb;
+    color: #1a4ba3;
+}
+
+/* Responsive Design */
+@media (max-width: 576px) {
+    .sign-social-icon {
+        gap: 10px;
+    }
+
+    .oauth-btn {
+        padding: 10px 16px;
+        min-width: 140px;
+        font-size: 13px;
+    }
+
+    .oauth-btn svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .sign-social span {
+        padding: 0 10px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 360px) {
+    .sign-social-icon {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .oauth-btn {
+        width: 100%;
+        min-width: unset;
+    }
+
+    .sign-social {
+        margin: 20px 0 15px;
+    }
+}
+
+/* Loading State */
+.oauth-btn:disabled,
+.oauth-btn.loading {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.oauth-btn.loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #8b5a21;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Error State */
+.oauth-btn.error {
+    border-color: #dc3545;
+    color: #dc3545;
+    background: #fff5f5;
+}
+
+.oauth-btn.error:hover {
+    background: #ffe0e0;
+    border-color: #c82333;
+}
+
+/* Success State */
+.oauth-btn.success {
+    border-color: #28a745;
+    color: #28a745;
+    background: #f1f9f1;
+}
+
+.oauth-btn.success:hover {
+    background: #e8f5e9;
+    border-color: #20c997;
+}
+
+/* Accessibility */
+.oauth-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(139, 90, 33, 0.1), 0 0 0 5px rgba(139, 90, 33, 0.2);
+}
+
+.oauth-btn:focus:not(:focus-visible) {
+    box-shadow: none;
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    .sign-social span {
+        background: #1a1a1a;
+        color: #ccc;
+    }
+
+    .sign-social::before {
+        background: #333;
+    }
+
+    .oauth-btn {
+        background: #2a2a2a;
+        color: #e0e0e0;
+        border-color: #444;
+    }
+
+    .oauth-btn:hover {
+        background: #3a3a3a;
+    }
+}
