@@ -7,7 +7,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Configuration
     const CONFIG = {
-        loginRoute: '/login',
+        loginRoute: '/auth/login',
         cartRoute: '/cart',
         wishlistRoute: '/wishlist',
         cartStoreRoute: '/cart'
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
      */
     function redirectToLoginWithIntent(intendedUrl) {
         const loginUrl = new URL(CONFIG.loginRoute, window.location.origin);
-        loginUrl.searchParams.set('redirect', intendedUrl || window.location.pathname);
+        loginUrl.searchParams.set('redirect_to', intendedUrl || window.location.href);
         window.location.href = loginUrl.toString();
     }
 

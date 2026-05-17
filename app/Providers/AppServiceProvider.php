@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Category;
+use App\Models\HomeSetting;
 use App\Models\Product;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Route;
@@ -79,6 +80,8 @@ class AppServiceProvider extends ServiceProvider
             })->values();
 
             $view->with('shopMenu', $shopMenu);
+            $view->with('promoBar', HomeSetting::promoBarData());
+            $view->with('promoBarHtml', HomeSetting::promoBarHtml());
         });
     }
 }

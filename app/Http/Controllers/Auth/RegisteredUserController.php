@@ -68,7 +68,7 @@ class RegisteredUserController extends Controller
         }
 
         $path = parse_url($candidate, PHP_URL_PATH) ?? '';
-        $blockedPaths = ['/login', '/register', '/forgot-password', '/logout'];
+        $blockedPaths = ['/login', '/auth/login', '/register', '/auth/register', '/forgot-password', '/auth/forgot-password', '/logout', '/auth/logout'];
 
         foreach ($blockedPaths as $blockedPath) {
             if (Str::startsWith($path, $blockedPath)) {

@@ -67,6 +67,7 @@
                                 <th class="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300">Name</th>
                                 <th class="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300">Email</th>
                                 <th class="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300">Phone</th>
+                                <th class="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300">Login Provider</th>
                                 <th class="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300">Joined</th>
                                 <th class="px-4 sm:px-6 py-3 text-center text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300">Actions</th>
                             </tr>
@@ -87,6 +88,15 @@
                                     </td>
                                     <td class="px-4 sm:px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
                                         {{ $customer->phone ?? 'N/A' }}
+                                    </td>
+                                    <td class="px-4 sm:px-6 py-4 text-sm">
+                                        @php $provider = $customer->loginProviderLabel(); @endphp
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold
+                                            @if($provider === 'Facebook') bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300
+                                            @elseif($provider === 'Google') bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300
+                                            @else bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 @endif">
+                                            {{ $provider }}
+                                        </span>
                                     </td>
                                     <td class="px-4 sm:px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
                                         {{ $customer->created_at->format('M d, Y') }}
@@ -136,7 +146,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="px-4 sm:px-6 py-8 text-center text-gray-600 dark:text-gray-400">
+                                    <td colspan="7" class="px-4 sm:px-6 py-8 text-center text-gray-600 dark:text-gray-400">
                                         No customers found
                                     </td>
                                 </tr>

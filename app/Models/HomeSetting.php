@@ -20,6 +20,11 @@ class HomeSetting extends Model
     public static function defaults(): array
     {
         return [
+            'promo_bar' => [
+                'enabled' => true,
+                'text' => 'Further reductions: enjoy an extra {discount} off our Sale and free home delivery',
+                'discount' => '20',
+            ],
             'hero_slides' => [
                 [
                     'image_url' => 'https://assets.designhill.com/resize_img.php?atyp=st_page_file&pth=ad_bt_tbitlbbi_org||BT852244||three_bnr_info_two_link_btn_banner_image1_img&flp=1689746974-93380456064b77e1e722b10-73415040.png',
@@ -256,5 +261,34 @@ class HomeSetting extends Model
     {
         $data = $data ?? [];
         return array_replace_recursive(self::defaults(), $data);
+    }
+
+    public static function promoBarData(): array
+    {
+        $settings = self::first();
+        $merged = self::mergedData($settings?->data);
+
+        return $merged['promo_bar'] ?? self::defaults()['promo_bar'];
+    }
+
+    public static function promoBarHtml(?array $promoBar = null): string
+    {
+        $promoBar = $promoBar ?? self::promoBarData();
+        $text = (string) ($promoBar['text'] ?? '');
+        $discount = trim((string) ($promoBar['discount'] ?? '20'));
+
+        if ($discount === '') {
+            $discount = '20';
+        }
+
+        $discountHtml = '<span>' . e($discount) . '%</span>';
+
+        if (str_contains($text, '{discount}')) {
+            $parts = explode('{discount}', $text, 2);
+
+            return e($parts[0]) . $discountHtml . e($parts[1] ?? '');
+        }
+
+        return e($text) . ' ' . $discountHtml;
     }
 }

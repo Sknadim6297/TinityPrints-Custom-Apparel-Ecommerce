@@ -128,7 +128,7 @@
 
         if (!isAuthenticated) {
             // Store the intended URL and redirect through auth
-            window.location.href = '/login?redirect_to=' + encodeURIComponent(window.location.href);
+            window.location.href = '/auth/login?redirect_to=' + encodeURIComponent(window.location.href);
             return false;
         }
 
@@ -164,7 +164,7 @@
             },
             error: function(xhr) {
                 if (xhr.status === 401) {
-                    window.location.href = '/login';
+                    window.location.href = '/auth/login';
                 } else {
                     const response = xhr.responseJSON;
                     showMessage(response.message || 'Error adding product to wishlist.', 'error');
@@ -238,7 +238,7 @@
         
         if (!isAuthenticated) {
             // Store the intended URL and redirect through auth
-            window.location.href = '/login?redirect_to=' + encodeURIComponent(window.location.href);
+            window.location.href = '/auth/login?redirect_to=' + encodeURIComponent(window.location.href);
             return false;
         }
 
@@ -279,7 +279,7 @@
                 $btn.prop('disabled', false);
                 
                 if (xhr.status === 401) {
-                    window.location.href = '/login';
+                    window.location.href = '/auth/login';
                 } else {
                     const errorMessage = xhr.responseJSON && xhr.responseJSON.message 
                         ? xhr.responseJSON.message 

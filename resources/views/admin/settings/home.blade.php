@@ -163,6 +163,34 @@
                 @endif
 
                 <div class="section-card">
+                    <h4>Top Promo Bar</h4>
+                    <div class="section-help">
+                        Edit the scrolling announcement above the header. Use <code>{discount}</code> where the discount percentage should appear (wrapped in a highlighted span).
+                    </div>
+                    <div class="field-grid single">
+                        <div class="field-group">
+                            <label>
+                                <input type="hidden" name="promo_bar[enabled]" value="0">
+                                <input type="checkbox" name="promo_bar[enabled]" value="1"
+                                    {{ old('promo_bar.enabled', $data['promo_bar']['enabled'] ?? true) ? 'checked' : '' }}>
+                                Show promo bar on website
+                            </label>
+                        </div>
+                        <div class="field-group">
+                            <label>Announcement text</label>
+                            <textarea name="promo_bar[text]" class="form-control" rows="3">{{ old('promo_bar.text', $data['promo_bar']['text'] ?? '') }}</textarea>
+                        </div>
+                        <div class="field-group">
+                            <label>Discount percentage</label>
+                            <input type="text" name="promo_bar[discount]" class="form-control"
+                                value="{{ old('promo_bar.discount', $data['promo_bar']['discount'] ?? '20') }}"
+                                placeholder="e.g. 20">
+                            <small style="color:#6b7280;">Displayed as <strong>20%</strong> when discount is 20.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-card">
                     <h4>Hero Slides</h4>
                     <div class="section-help">Update slide image, text, button text and button link for each hero slide.</div>
                     @foreach (($data['hero_slides'] ?? []) as $index => $slide)

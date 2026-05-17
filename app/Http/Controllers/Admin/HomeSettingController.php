@@ -27,6 +27,10 @@ class HomeSettingController extends Controller
     public function update(Request $request)
     {
         $request->validate([
+            'promo_bar' => 'nullable|array',
+            'promo_bar.text' => 'nullable|string|max:500',
+            'promo_bar.discount' => 'nullable|string|max:20',
+            'promo_bar.enabled' => 'nullable|boolean',
             'hero_slides' => 'nullable|array',
             'hero_slides.*.image_file' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
             'side_banners' => 'nullable|array',
@@ -48,6 +52,12 @@ class HomeSettingController extends Controller
 
         $settings = HomeSetting::first();
         $payload = HomeSetting::mergedData($settings?->data ?? []);
+
+        $payload['promo_bar'] = [
+            'enabled' => $request->boolean('promo_bar.enabled'),
+            'text' => $this->sanitizeValue($request->input('promo_bar.text', $payload['promo_bar']['text'] ?? '')),
+            'discount' => $this->sanitizeValue($request->input('promo_bar.discount', $payload['promo_bar']['discount'] ?? '20')),
+        ];
 
         $payload['hero_slides'] = $this->buildSlidesWithUploads(
             $request,

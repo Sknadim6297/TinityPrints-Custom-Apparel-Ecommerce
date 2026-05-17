@@ -6,6 +6,7 @@ use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class FacebookOAuthService
 {
@@ -16,14 +17,24 @@ class FacebookOAuthService
     {
         $params = [
             'client_id' => config('oauth.facebook.client_id'),
-            'redirect_uri' => config('oauth.facebook.redirect_uri'),
+            'redirect_uri' => $this->redirectUri(),
             'response_type' => 'code',
             'scope' => 'email,public_profile',
             'state' => $state,
-            'auth_type' => 'rerequest',
         ];
 
-        return 'https://www.facebook.com/v18.0/dialog/oauth?' . http_build_query($params);
+        return 'https://www.facebook.com/v21.0/dialog/oauth?' . http_build_query($params);
+    }
+
+    public function redirectUri(): string
+    {
+        $configured = trim((string) config('oauth.facebook.redirect_uri'));
+
+        if ($configured !== '') {
+            return $configured;
+        }
+
+        return route('oauth.facebook.callback', absolute: true);
     }
 
     /**
@@ -32,15 +43,19 @@ class FacebookOAuthService
     public function getAccessToken(string $code): ?array
     {
         try {
-            $response = Http::get('https://graph.facebook.com/v18.0/oauth/access_token', [
+            $response = Http::get('https://graph.facebook.com/v21.0/oauth/access_token', [
                 'client_id' => config('oauth.facebook.client_id'),
                 'client_secret' => config('oauth.facebook.client_secret'),
                 'code' => $code,
-                'redirect_uri' => config('oauth.facebook.redirect_uri'),
+                'redirect_uri' => $this->redirectUri(),
             ]);
 
             if ($response->successful()) {
-                return $response->json();
+                $data = $response->json();
+
+                if (isset($data['access_token'])) {
+                    return $data;
+                }
             }
 
             Log::error('Facebook token exchange failed', ['response' => $response->json()]);
@@ -57,8 +72,8 @@ class FacebookOAuthService
     public function getUserInfo(string $accessToken): ?array
     {
         try {
-            $response = Http::get('https://graph.facebook.com/v18.0/me', [
-                'fields' => 'id,name,email,picture.width(500).height(500)',
+            $response = Http::get('https://graph.facebook.com/v21.0/me', [
+                'fields' => 'id,name,email,picture.type(large)',
                 'access_token' => $accessToken,
             ]);
 
@@ -108,10 +123,10 @@ class FacebookOAuthService
                 'email' => $userEmail ?? 'facebook_' . $facebookUser['id'] . '@local.app',
                 'provider_name' => 'facebook',
                 'provider_id' => $facebookUser['id'],
-                'avatar' => $facebookUser['picture']['data']['url'] ?? null,
+                'avatar' => $this->resolveAvatarUrl($facebookUser),
                 'social_email' => $userEmail,
                 'email_verified_at' => $userEmail ? now() : null,
-                'password' => bcrypt(''), // Empty password for OAuth users
+                'password' => Str::password(32),
                 'role' => 'customer',
             ]);
 
@@ -134,8 +149,8 @@ class FacebookOAuthService
             ];
 
             // Update avatar if available
-            if (isset($facebookUser['picture']['data']['url'])) {
-                $updateData['avatar'] = $facebookUser['picture']['data']['url'];
+            if ($avatar = $this->resolveAvatarUrl($facebookUser)) {
+                $updateData['avatar'] = $avatar;
             }
 
             $user->update($updateData);
@@ -156,9 +171,8 @@ class FacebookOAuthService
                 'social_email' => $providerUser['email'] ?? $user->social_email,
             ];
 
-            // Update avatar if available
-            if (isset($providerUser['picture']['data']['url'])) {
-                $updateData['avatar'] = $providerUser['picture']['data']['url'];
+            if ($avatar = $this->resolveAvatarUrl($providerUser)) {
+                $updateData['avatar'] = $avatar;
             }
 
             $user->update($updateData);
@@ -176,8 +190,22 @@ class FacebookOAuthService
      */
     public static function isConfigured(): bool
     {
-        return !empty(config('oauth.facebook.client_id')) 
-            && !empty(config('oauth.facebook.client_secret'))
-            && !empty(config('oauth.facebook.redirect_uri'));
+        return !empty(config('oauth.facebook.client_id'))
+            && !empty(config('oauth.facebook.client_secret'));
+    }
+
+    private function resolveAvatarUrl(array $facebookUser): ?string
+    {
+        $picture = $facebookUser['picture'] ?? null;
+
+        if (is_string($picture)) {
+            return $picture;
+        }
+
+        if (is_array($picture)) {
+            return $picture['data']['url'] ?? $picture['url'] ?? null;
+        }
+
+        return null;
     }
 }

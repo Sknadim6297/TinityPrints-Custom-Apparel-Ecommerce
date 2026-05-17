@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Services\FacebookOAuthService;
 use App\Services\GoogleOAuthService;
+use App\Traits\RecordsLoginHistory;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +16,7 @@ use Illuminate\Support\Str;
 
 class OAuthController extends Controller
 {
+    use RecordsLoginHistory;
     /**
      * Google OAuth Service
      */
@@ -46,6 +49,7 @@ class OAuthController extends Controller
 
             $state = Str::random(40);
             Session::put('oauth.google.state', $state);
+            $this->rememberOAuthRedirect();
 
             $authUrl = $this->googleOAuth->getAuthorizationUrl($state);
             return redirect($authUrl);
@@ -102,14 +106,7 @@ class OAuthController extends Controller
                     ->with('error', 'Unable to create or find your account.');
             }
 
-            // Authenticate user
-            Auth::login($user, remember: true);
-            Session::forget('oauth.google.state');
-
-            Log::info('User logged in via Google', ['user_id' => $user->id, 'email' => $user->email]);
-
-            return redirect()->intended(route('home'))
-                ->with('success', 'Successfully logged in with Google!');
+            return $this->completeOAuthLogin($user, 'oauth.google.state', 'Google');
         } catch (Exception $e) {
             Log::error('Google callback error: ' . $e->getMessage());
             return redirect()->route('login')
@@ -130,6 +127,7 @@ class OAuthController extends Controller
 
             $state = Str::random(40);
             Session::put('oauth.facebook.state', $state);
+            $this->rememberOAuthRedirect();
 
             $authUrl = $this->facebookOAuth->getAuthorizationUrl($state);
             return redirect($authUrl);
@@ -186,18 +184,55 @@ class OAuthController extends Controller
                     ->with('error', 'Unable to create or find your account.');
             }
 
-            // Authenticate user
-            Auth::login($user, remember: true);
-            Session::forget('oauth.facebook.state');
-
-            Log::info('User logged in via Facebook', ['user_id' => $user->id, 'email' => $user->email]);
-
-            return redirect()->intended(route('home'))
-                ->with('success', 'Successfully logged in with Facebook!');
+            return $this->completeOAuthLogin($user, 'oauth.facebook.state', 'Facebook');
         } catch (Exception $e) {
             Log::error('Facebook callback error: ' . $e->getMessage());
             return redirect()->route('login')
                 ->with('error', 'An unexpected error occurred. Please try again.');
         }
+    }
+
+    private function completeOAuthLogin(User $user, string $stateSessionKey, string $providerLabel): RedirectResponse
+    {
+        Auth::login($user, remember: true);
+        request()->session()->regenerate();
+        $this->recordLoginHistory(request());
+        Session::forget($stateSessionKey);
+
+        Log::info("User logged in via {$providerLabel}", ['user_id' => $user->id, 'email' => $user->email]);
+
+        $redirectTo = request()->query('redirect_to') ?: request()->session()->get('url.intended');
+
+        if ($redirectTo && $this->isValidInternalUrl($redirectTo)) {
+            return redirect()->to($redirectTo)
+                ->with('success', "Successfully logged in with {$providerLabel}!");
+        }
+
+        return redirect()->intended(route('home'))
+            ->with('success', "Successfully logged in with {$providerLabel}!");
+    }
+
+    private function rememberOAuthRedirect(): void
+    {
+        $redirectTo = request()->query('redirect_to');
+
+        if ($redirectTo && $this->isValidInternalUrl($redirectTo)) {
+            Session::put('url.intended', $redirectTo);
+        }
+    }
+
+    private function isValidInternalUrl(?string $url): bool
+    {
+        if (!$url) {
+            return false;
+        }
+
+        $parsed = parse_url($url);
+
+        if (isset($parsed['host'])) {
+            return $parsed['host'] === request()->getHost();
+        }
+
+        return str_starts_with($url, '/');
     }
 }

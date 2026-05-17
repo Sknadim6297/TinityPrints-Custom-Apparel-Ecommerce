@@ -12,9 +12,7 @@
                      <div class="social__links social-border">
                         <ul>
                            <li><a href="#" target="_blank"><i class="fab fa-facebook-f"></i></a></li>
-                           <li><a href="#" target="_blank"><i class="fab fa-twitter"></i></a></li>
                            <li><a href="#" target="_blank"><i class="fab fa-instagram"></i></a></li>
-                           <li><a href="#" target="_blank"><i class="fab fa-pinterest"></i></a></li>
                         </ul>
                      </div>
                   </div>

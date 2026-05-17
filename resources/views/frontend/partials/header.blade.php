@@ -1,16 +1,16 @@
    <!-- header area start  -->
    <header class="header3">
+      @if(($promoBar['enabled'] ?? true) && !empty($promoBarHtml))
       <div class="top-note-bar">
     <div class="scroll-text">
-        <p>
-            Further reductions: enjoy an extra <span>20%</span> off our Sale and free home delivery
-        </p>
+        <p>{!! $promoBarHtml !!}</p>
     </div>
 
     <span class="note-close-btn">
         <i class="flaticon-cancel"></i>
     </span>
 </div>
+      @endif
       <div class="header3-top d-none d-lg-block">
          <div class="container header-container">
             <div class="row align-items-center">

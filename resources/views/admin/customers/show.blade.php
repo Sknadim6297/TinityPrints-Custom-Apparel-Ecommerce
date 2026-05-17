@@ -45,11 +45,43 @@
                 <h3 class="font-semibold text-lg text-gray-800 dark:text-gray-200 mb-4">Basic Information</h3>
                 <div class="space-y-3">
                     <div>
-                        <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Email</p>
+                        <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Login Provider</p>
+                        @php $provider = $customer->loginProviderLabel(); @endphp
+                        <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold
+                            @if($provider === 'Facebook') bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300
+                            @elseif($provider === 'Google') bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300
+                            @else bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 @endif">
+                            {{ $provider }}
+                        </span>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Account Email</p>
                         <p class="text-sm font-medium text-blue-600 dark:text-blue-400">
-                            <a href="mailto:{{ $customer->email }}" class="hover:underline">{{ $customer->email }}</a>
+                            @if($customer->displayEmail() !== '—')
+                                <a href="mailto:{{ $customer->displayEmail() }}" class="hover:underline">{{ $customer->displayEmail() }}</a>
+                            @else
+                                <span class="text-gray-500 dark:text-gray-400">Not provided by provider</span>
+                            @endif
                         </p>
                     </div>
+                    @if($customer->email !== $customer->displayEmail() && $customer->displayEmail() !== '—')
+                    <div>
+                        <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">System Email</p>
+                        <p class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $customer->email }}</p>
+                    </div>
+                    @endif
+                    @if($customer->provider_id)
+                    <div>
+                        <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Provider ID</p>
+                        <p class="text-sm font-medium text-gray-900 dark:text-gray-100 break-all">{{ $customer->provider_id }}</p>
+                    </div>
+                    @endif
+                    @if($customer->avatar)
+                    <div>
+                        <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Profile Photo</p>
+                        <img src="{{ $customer->avatar }}" alt="{{ $customer->name }}" class="w-16 h-16 rounded-full object-cover border border-gray-200 dark:border-gray-600">
+                    </div>
+                    @endif
                     <div>
                         <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Phone</p>
                         <p class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ $customer->phone ?? 'Not provided' }}</p>

@@ -6,6 +6,7 @@ use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class GoogleOAuthService
 {
@@ -16,7 +17,7 @@ class GoogleOAuthService
     {
         $params = [
             'client_id' => config('oauth.google.client_id'),
-            'redirect_uri' => config('oauth.google.redirect_uri'),
+            'redirect_uri' => $this->redirectUri(),
             'response_type' => 'code',
             'scope' => 'openid email profile',
             'state' => $state,
@@ -38,7 +39,7 @@ class GoogleOAuthService
                 'client_secret' => config('oauth.google.client_secret'),
                 'code' => $code,
                 'grant_type' => 'authorization_code',
-                'redirect_uri' => config('oauth.google.redirect_uri'),
+                'redirect_uri' => $this->redirectUri(),
             ]);
 
             if ($response->successful()) {
@@ -108,7 +109,7 @@ class GoogleOAuthService
                 'avatar' => $googleUser['picture'] ?? null,
                 'social_email' => $googleUser['email'],
                 'email_verified_at' => now(),
-                'password' => bcrypt(''), // Empty password for OAuth users
+                'password' => Str::password(32),
                 'role' => 'customer',
             ]);
 
@@ -159,10 +160,20 @@ class GoogleOAuthService
     /**
      * Validate OAuth configuration
      */
+    public function redirectUri(): string
+    {
+        $configured = trim((string) config('oauth.google.redirect_uri'));
+
+        if ($configured !== '') {
+            return $configured;
+        }
+
+        return route('oauth.google.callback', absolute: true);
+    }
+
     public static function isConfigured(): bool
     {
-        return !empty(config('oauth.google.client_id')) 
-            && !empty(config('oauth.google.client_secret'))
-            && !empty(config('oauth.google.redirect_uri'));
+        return !empty(config('oauth.google.client_id'))
+            && !empty(config('oauth.google.client_secret'));
     }
 }

@@ -92,4 +92,31 @@ class User extends Authenticatable
         return $this->belongsToMany(Coupon::class, 'coupon_user_usage', 'user_id', 'coupon_id')
             ->withTimestamps();
     }
+
+    public function loginProviderLabel(): string
+    {
+        return match ($this->provider_name) {
+            'facebook' => 'Facebook',
+            'google' => 'Google',
+            default => 'Email/Password',
+        };
+    }
+
+    public function isOAuthUser(): bool
+    {
+        return in_array($this->provider_name, ['facebook', 'google'], true);
+    }
+
+    public function displayEmail(): string
+    {
+        if ($this->social_email) {
+            return $this->social_email;
+        }
+
+        if ($this->isOAuthUser() && str_ends_with($this->email, '@local.app')) {
+            return '—';
+        }
+
+        return $this->email;
+    }
 }

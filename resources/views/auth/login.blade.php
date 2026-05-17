@@ -80,7 +80,7 @@
             <div class="row justify-content-center">
                <div class="col-lg-8">
                   <div class="signup-form-wrapper">
-                     <form method="POST" action="/login">
+                     <form method="POST" action="{{ url('/auth/login') }}">
                         @csrf
                         @if ($errors->any())
                            <div class="alert alert-danger">

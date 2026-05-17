@@ -66,7 +66,7 @@ class AuthenticatedSessionController extends Controller
         $path = parse_url($candidate, PHP_URL_PATH) ?? '';
 
         // Avoid loops back to auth endpoints.
-        $blockedPaths = ['/login', '/register', '/forgot-password', '/logout'];
+        $blockedPaths = ['/login', '/auth/login', '/register', '/auth/register', '/forgot-password', '/auth/forgot-password', '/logout', '/auth/logout'];
         foreach ($blockedPaths as $blockedPath) {
             if (Str::startsWith($path, $blockedPath)) {
                 return;
@@ -116,7 +116,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect('/login');
+        return redirect()->route('login');
     }
 
     private function redirectPath($user): string
