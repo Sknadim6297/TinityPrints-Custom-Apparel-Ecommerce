@@ -165,7 +165,9 @@
 
                            $preparedImages = $images->map(function ($image) {
                               return [
-                                 'url' => Storage::url($image->image_path),
+                                 'url' => $image->url(\App\Support\ImageOptimizer::VARIANT_LARGE),
+                                 'thumb' => $image->url(\App\Support\ImageOptimizer::VARIANT_THUMB),
+                                 'full' => $image->url(\App\Support\ImageOptimizer::VARIANT_FULL),
                                  'type' => $image->image_type,
                                  'id' => $image->id,
                               ];
@@ -205,14 +207,14 @@
                            @if($discountPercentage > 0)
                               <span class="product-discount-badge">{{ $discountPercentage }}% OFF</span>
                            @endif
-                           <img id="main-product-image" src="{{ $initialMainImage }}" alt="{{ $product->name }}">
+                           <img id="main-product-image" src="{{ $initialMainImage }}" alt="{{ $product->name }}" decoding="async" fetchpriority="high">
                         </div>
                         <ul class="product-thumbnails" id="product-thumbnails">
                            @if(count($defaultGalleryImages) > 0)
                               @foreach($defaultGalleryImages as $index => $galleryImage)
                                  <li>
-                                    <button type="button" class="thumbnail-btn {{ $index === 0 ? 'active' : '' }}" data-image-url="{{ $galleryImage['url'] }}">
-                                       <img src="{{ $galleryImage['url'] }}" alt="{{ $product->name }}">
+                                    <button type="button" class="thumbnail-btn {{ $index === 0 ? 'active' : '' }}" data-image-url="{{ $galleryImage['url'] }}" data-full-url="{{ $galleryImage['full'] ?? $galleryImage['url'] }}">
+                                       <img src="{{ $galleryImage['thumb'] ?? $galleryImage['url'] }}" alt="{{ $product->name }}" loading="lazy" decoding="async">
                                     </button>
                                  </li>
                               @endforeach
@@ -489,7 +491,12 @@
             </div>
             <div class="product-grid related-grid">
                @forelse($relatedProducts as $relatedProduct)
-                  @php($productImage = optional($relatedProduct->images->first())->image_path)
+                  @php
+                     $relatedImageModel = $relatedProduct->images->first();
+                     $productImage = $relatedImageModel
+                        ? $relatedImageModel->url(\App\Support\ImageOptimizer::VARIANT_CARD)
+                        : null;
+                  @endphp
                   @php($productColors = ($relatedProduct->colors ?? collect())->where('is_active', true))
                   @php($relatedSellingPrice = (float) ($relatedProduct->selling_price ?? $relatedProduct->base_price))
                   @php($relatedMrp = (float) ($relatedProduct->mrp ?? $relatedSellingPrice))
@@ -509,7 +516,7 @@
 
                      <div class="product-img">
                         <a href="{{ route('product.details', $relatedProduct->id) }}">
-                           <img src="{{ $productImage ? Storage::url($productImage) : asset('frontend/assets/img/product/product-img1.jpg') }}" alt="{{ $relatedProduct->name }}">
+                           <img src="{{ $productImage ?: asset('frontend/assets/img/product/product-img1.jpg') }}" alt="{{ $relatedProduct->name }}" loading="lazy" decoding="async">
                         </a>
                         <a href="{{ route('product.details', $relatedProduct->id) }}" class="cart-btn text-center">VIEW PRODUCT</a>
                      </div>
@@ -612,7 +619,7 @@
                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body text-center">
-               <img id="zoom-modal-image" src="{{ $initialMainImage }}" alt="{{ $product->name }}" style="max-width: 100%; max-height: 75vh; object-fit: contain;">
+               <img id="zoom-modal-image" src="" alt="{{ $product->name }}" style="max-width: 100%; max-height: 75vh; object-fit: contain;" decoding="async">
             </div>
          </div>
       </div>
@@ -1119,16 +1126,20 @@
          const zoomModalImage = document.getElementById('zoom-modal-image');
          const mainImageWrap = document.getElementById('product-main-image-wrap');
 
-         function setMainImage(url) {
+         function setMainImage(imageOrUrl, fullUrl) {
             if (!mainImage) {
                return;
             }
 
-            const finalUrl = url || fallbackImage;
-            mainImage.src = finalUrl;
-            if (zoomModalImage) {
-               zoomModalImage.src = finalUrl;
-            }
+            const displayUrl = typeof imageOrUrl === 'object'
+               ? (imageOrUrl.url || fallbackImage)
+               : (imageOrUrl || fallbackImage);
+            const zoomUrl = fullUrl
+               || (typeof imageOrUrl === 'object' ? (imageOrUrl.full || imageOrUrl.url) : displayUrl)
+               || fallbackImage;
+
+            mainImage.src = displayUrl;
+            mainImage.dataset.fullUrl = zoomUrl;
          }
 
          function renderThumbnails(images) {
@@ -1150,22 +1161,25 @@
                button.type = 'button';
                button.className = `thumbnail-btn${index === 0 ? ' active' : ''}`;
                button.dataset.imageUrl = image.url;
+               button.dataset.fullUrl = image.full || image.url;
 
-               thumbImage.src = image.url;
+               thumbImage.src = image.thumb || image.url;
                thumbImage.alt = '{{ $product->name }}';
+               thumbImage.loading = 'lazy';
+               thumbImage.decoding = 'async';
 
                button.appendChild(thumbImage);
                li.appendChild(button);
                thumbnailsContainer.appendChild(li);
 
                button.addEventListener('click', function() {
-                  setMainImage(image.url);
+                  setMainImage(image);
                   thumbnailsContainer.querySelectorAll('.thumbnail-btn').forEach((btn) => btn.classList.remove('active'));
                   button.classList.add('active');
                });
             });
 
-            setMainImage(safeImages[0].url);
+            setMainImage(safeImages[0]);
          }
 
          function updateGalleryByColor(colorId) {
@@ -1230,6 +1244,9 @@
                const modalElement = document.getElementById('productImageZoomModal');
                if (!modalElement) {
                   return;
+               }
+               if (zoomModalImage) {
+                  zoomModalImage.src = mainImage.dataset.fullUrl || mainImage.src || fallbackImage;
                }
                const modal = new window.bootstrap.Modal(modalElement);
                modal.show();

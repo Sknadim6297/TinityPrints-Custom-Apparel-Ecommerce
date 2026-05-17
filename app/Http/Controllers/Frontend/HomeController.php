@@ -25,11 +25,6 @@ class HomeController extends Controller
         $bestSellerLimit = max(1, (int) ($homeSettings['best_seller']['product_limit'] ?? 8));
         $limitedEditionLimit = max(1, (int) ($homeSettings['limited_edition']['product_limit'] ?? 4));
 
-        // Get featured products for the home page
-        $featuredProducts = Product::where('is_active', true)
-            ->with('images')
-            ->get();
-
         $bestSellerProducts = Product::where('is_active', true)
             ->with('images')
             ->orderBy('created_at', 'desc')
@@ -43,15 +38,6 @@ class HomeController extends Controller
             ->take($limitedEditionLimit)
             ->get();
 
-        $newArrivalProducts = Product::where('is_active', true)
-            ->with('images')
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        $hotCollectionProducts = Product::where('is_active', true)
-            ->with('images')
-            ->get();
-
         $testimonials = \App\Models\Testimonial::where('is_active', true)
             ->orderBy('sort_order')
             ->get();
@@ -62,18 +48,10 @@ class HomeController extends Controller
             ->take(3)
             ->get();
 
-        $trendyProducts = Product::where('is_active', true)
-            ->with('images')
-            ->get();
-
         return view('frontend.home', compact(
             'homeSettings',
-            'featuredProducts', 
-            'bestSellerProducts', 
+            'bestSellerProducts',
             'limitedEditionProducts',
-            'newArrivalProducts',
-            'hotCollectionProducts',
-            'trendyProducts',
             'testimonials',
             'homeBlogPosts'
         ));

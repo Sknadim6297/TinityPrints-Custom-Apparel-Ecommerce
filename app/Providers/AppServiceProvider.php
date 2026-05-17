@@ -25,6 +25,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $offerPopup = HomeSetting::offerPopupData();
+        $offerPopupImageUrl = trim((string) ($offerPopup['image_url'] ?? ''));
+
+        View::share([
+            'offerPopup' => $offerPopup,
+            'showOfferPopup' => ! empty($offerPopup['enabled']) && $offerPopupImageUrl !== '',
+            'offerPopupImageUrl' => $offerPopupImageUrl,
+        ]);
+
         View::composer('frontend.partials.header', function ($view) {
             $categories = Category::query()
                 ->where('is_active', true)

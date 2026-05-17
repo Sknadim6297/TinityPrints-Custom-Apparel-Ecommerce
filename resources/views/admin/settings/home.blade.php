@@ -191,6 +191,35 @@
                 </div>
 
                 <div class="section-card">
+                    <h4>Offer Popup</h4>
+                    <div class="section-help">Image shown once per browser session when visitors land on the site. Upload a compressed JPG/WebP (recommended under 500 KB) for fast loading.</div>
+                    <div class="field-grid single">
+                        <div class="field-group">
+                            <label>
+                                <input type="hidden" name="offer_popup[enabled]" value="0">
+                                <input type="checkbox" name="offer_popup[enabled]" value="1"
+                                    {{ old('offer_popup.enabled', $data['offer_popup']['enabled'] ?? true) ? 'checked' : '' }}>
+                                Show offer popup on website
+                            </label>
+                        </div>
+                        @php $offerPopupImage = old('offer_popup.existing_image_url', $data['offer_popup']['image_url'] ?? ''); @endphp
+                        <div class="field-group">
+                            <label>Current popup image</label>
+                            <input type="hidden" name="offer_popup[existing_image_url]" value="{{ $offerPopupImage }}">
+                            @if($offerPopupImage)
+                                <img src="{{ $offerPopupImage }}" alt="Offer popup preview" style="max-width:280px;border-radius:8px;border:1px solid #e5e7eb;">
+                            @else
+                                <p style="color:#6b7280;font-size:13px;">No popup image uploaded yet.</p>
+                            @endif
+                        </div>
+                        <div class="field-group">
+                            <label>Upload popup image</label>
+                            <input type="file" name="offer_popup[image_file]" class="form-control" accept="image/png,image/jpeg,image/jpg,image/webp">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-card">
                     <h4>Hero Slides</h4>
                     <div class="section-help">Update slide image, text, button text and button link for each hero slide.</div>
                     @foreach (($data['hero_slides'] ?? []) as $index => $slide)

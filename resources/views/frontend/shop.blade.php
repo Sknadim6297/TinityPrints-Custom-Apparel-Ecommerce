@@ -393,7 +393,7 @@
                                 @php
                                     $firstImg = $product->images->first();
                                     $imgUrl   = $firstImg
-                                        ? asset('storage/' . $firstImg->image_path)
+                                        ? product_image_url($firstImg->image_path, 'card')
                                         : asset('frontend/assets/img/product_category/product-cat-6.jpeg');
                                     $sellingPrice = (float) ($product->selling_price ?? $product->base_price);
                                     $mrp = (float) ($product->mrp ?? $sellingPrice);
@@ -419,7 +419,7 @@
                                         </button>
 
                                         <a href="{{ route('product.details', $product->id) }}" style="display:block;width:100%;height:100%;">
-                                            <img src="{{ $imgUrl }}" alt="{{ $product->name }}" loading="lazy">
+                                            <img src="{{ $imgUrl }}" alt="{{ $product->name }}" loading="lazy" decoding="async" width="520" height="650">
                                         </a>
 
                                         <button class="add-cart-btn" type="button"

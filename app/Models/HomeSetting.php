@@ -25,6 +25,10 @@ class HomeSetting extends Model
                 'text' => 'Further reductions: enjoy an extra {discount} off our Sale and free home delivery',
                 'discount' => '20',
             ],
+            'offer_popup' => [
+                'enabled' => false,
+                'image_url' => '',
+            ],
             'hero_slides' => [
                 [
                     'image_url' => 'https://assets.designhill.com/resize_img.php?atyp=st_page_file&pth=ad_bt_tbitlbbi_org||BT852244||three_bnr_info_two_link_btn_banner_image1_img&flp=1689746974-93380456064b77e1e722b10-73415040.png',
@@ -269,6 +273,14 @@ class HomeSetting extends Model
         $merged = self::mergedData($settings?->data);
 
         return $merged['promo_bar'] ?? self::defaults()['promo_bar'];
+    }
+
+    public static function offerPopupData(): array
+    {
+        $settings = self::first();
+        $merged = self::mergedData($settings?->data);
+
+        return $merged['offer_popup'] ?? self::defaults()['offer_popup'];
     }
 
     public static function promoBarHtml(?array $promoBar = null): string

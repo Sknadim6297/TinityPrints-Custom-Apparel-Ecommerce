@@ -1213,8 +1213,8 @@
                     @php
                         $productImagePath = optional($product->images->first())->image_path;
                         $productImage = $productImagePath
-                            ? Storage::url($productImagePath)
-                            : 'https://via.placeholder.com/600x800?text=Product+Image';
+                            ? product_image_url($productImagePath, 'card')
+                            : asset('frontend/assets/img/product_category/product-cat-1.jpg');
                         $sellingPrice = (float) ($product->selling_price ?? $product->base_price);
                         $mrp = (float) ($product->mrp ?? $sellingPrice);
                         $discountPercentage = (int) $product->discount_percentage;
@@ -1231,7 +1231,7 @@
                         </button>
                         <div class="product-img">
                             <a href="{{ route('product.details', $product->id) }}">
-                                <img src="{{ $productImage }}" alt="{{ $product->name }}">
+                                <img src="{{ $productImage }}" alt="{{ $product->name }}" loading="lazy" decoding="async" width="520" height="650">
                             </a>
                             <a href="{{ route('product.details', $product->id) }}" class="cart-btn text-center">VIEW PRODUCT</a>
                         </div>
@@ -1289,8 +1289,8 @@
                     @php
                         $limitedImagePath = optional($product->images->first())->image_path;
                         $limitedImage = $limitedImagePath
-                            ? Storage::url($limitedImagePath)
-                            : 'https://via.placeholder.com/600x800?text=Limited+Edition';
+                            ? product_image_url($limitedImagePath, 'card')
+                            : asset('frontend/assets/img/product_category/product-cat-1.jpg');
                         $sellingPrice = (float) ($product->selling_price ?? $product->base_price);
                         $mrp = (float) ($product->mrp ?? $sellingPrice);
                         $discountPercentage = (int) $product->discount_percentage;
@@ -1305,7 +1305,7 @@
                         </button>
                         <div class="product-img">
                             <a href="{{ route('product.details', $product->id) }}">
-                                <img src="{{ $limitedImage }}" alt="{{ $product->name }}">
+                                <img src="{{ $limitedImage }}" alt="{{ $product->name }}" loading="lazy" decoding="async" width="520" height="650">
                             </a>
                             <a href="{{ route('product.details', $product->id) }}" class="cart-btn text-center">VIEW PRODUCT</a>
                         </div>

@@ -8,6 +8,7 @@ use App\Models\CollectionType;
 use App\Models\Product;
 use App\Models\ProductColor;
 use App\Models\ProductImage;
+use App\Support\ImageOptimizer;
 use App\Models\ProductSize;
 use App\Models\SleeveType;
 use Illuminate\Http\Request;
@@ -614,6 +615,8 @@ class ProductController extends Controller
         if ($existingImage) {
             Storage::disk('public')->delete($existingImage->image_path);
             $existingImage->update(['image_path' => $path]);
+            ImageOptimizer::warmVariants($path);
+
             return;
         }
 
@@ -622,6 +625,8 @@ class ProductController extends Controller
             'image_type' => $imageType,
             'image_path' => $path,
         ]);
+
+        ImageOptimizer::warmVariants($path);
     }
 
     protected function isAccessoryCategory(int $categoryId): bool

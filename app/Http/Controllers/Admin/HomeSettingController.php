@@ -31,6 +31,9 @@ class HomeSettingController extends Controller
             'promo_bar.text' => 'nullable|string|max:500',
             'promo_bar.discount' => 'nullable|string|max:20',
             'promo_bar.enabled' => 'nullable|boolean',
+            'offer_popup' => 'nullable|array',
+            'offer_popup.enabled' => 'nullable|boolean',
+            'offer_popup.image_file' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
             'hero_slides' => 'nullable|array',
             'hero_slides.*.image_file' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
             'side_banners' => 'nullable|array',
@@ -57,6 +60,16 @@ class HomeSettingController extends Controller
             'enabled' => $request->boolean('promo_bar.enabled'),
             'text' => $this->sanitizeValue($request->input('promo_bar.text', $payload['promo_bar']['text'] ?? '')),
             'discount' => $this->sanitizeValue($request->input('promo_bar.discount', $payload['promo_bar']['discount'] ?? '20')),
+        ];
+
+        $offerPopupImageUrl = $this->sanitizeValue($request->input('offer_popup.existing_image_url', $payload['offer_popup']['image_url'] ?? ''));
+        if ($request->hasFile('offer_popup.image_file')) {
+            $storedPath = $request->file('offer_popup.image_file')->store('home-settings/offer-popup', 'public');
+            $offerPopupImageUrl = Storage::url($storedPath);
+        }
+        $payload['offer_popup'] = [
+            'enabled' => $request->boolean('offer_popup.enabled'),
+            'image_url' => $offerPopupImageUrl,
         ];
 
         $payload['hero_slides'] = $this->buildSlidesWithUploads(

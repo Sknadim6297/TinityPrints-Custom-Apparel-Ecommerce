@@ -145,17 +145,21 @@
 <body>
  @include('frontend.partials.header')
 
+    @if(!empty($showOfferPopup))
     <div class="offer-popup-overlay" id="offerPopupOverlay" aria-hidden="true">
         <div class="offer-popup-modal" role="dialog" aria-modal="true" aria-label="Special Offer">
             <button type="button" class="offer-popup-close" id="offerPopupClose" aria-label="Close popup">&times;</button>
             <img
-                src="{{ asset('assets/magnetposternew.png') }}"
-                alt="Tinnity collectible magnet offer"
+                src=""
+                data-src="{{ $offerPopupImageUrl }}"
+                alt="Special offer"
                 class="offer-popup-image"
                 id="offerPopupImage"
+                decoding="async"
             >
         </div>
     </div>
+    @endif
 
     <main>
         @yield('content')
@@ -225,7 +229,33 @@
 
             autoCloseTimer = window.setTimeout(function () {
                closePopup();
-               }, 15000);
+            }, 15000);
+         }
+
+         function loadPopupImage(onReady) {
+            if (!popupImage) {
+               onReady(false);
+               return;
+            }
+
+            var targetSrc = popupImage.getAttribute('data-src');
+            if (!targetSrc) {
+               onReady(false);
+               return;
+            }
+
+            if (popupImage.getAttribute('src') === targetSrc && popupImage.complete) {
+               onReady(true);
+               return;
+            }
+
+            popupImage.onload = function () {
+               onReady(true);
+            };
+            popupImage.onerror = function () {
+               onReady(false);
+            };
+            popupImage.src = targetSrc;
          }
 
          if (sessionStorage.getItem(popupSeenKey) === '1') {
@@ -252,7 +282,13 @@
             });
          }
 
-         openPopup();
+         window.addEventListener('load', function () {
+            loadPopupImage(function (loaded) {
+               if (loaded) {
+                  openPopup();
+               }
+            });
+         });
       })();
    </script>
    @stack('scripts')
